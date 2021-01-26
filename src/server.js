@@ -1,6 +1,6 @@
 const restify = require('restify')
 
-const start = ({ appInfo, log, onMessage, onNotify }) => {
+const createServer = ({ appInfo, log, onMessage, onNotify }) => {
   const server = restify.createServer({ log })
   server.use(restify.plugins.queryParser())
   server.use(restify.plugins.bodyParser())
@@ -26,14 +26,16 @@ const start = ({ appInfo, log, onMessage, onNotify }) => {
   })
 
   server.post('/api/messages', async (req, res, next) => {
-    await onMessage()
+    await onMessage(req, res)
     next()
   })
 
   server.post('/api/notify', async (req, res, next) => {
-    await onNotify(req, res)
+    const input = {} // TODO extract input from req
+    const notification = await onNotify(input)
+    res.send(notification)
     next()
   })
 }
 
-module.exports = { start }
+module.exports = { createServer }

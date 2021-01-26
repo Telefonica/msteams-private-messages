@@ -28,7 +28,9 @@
     "eslint-plugin-promise": "^4.2.1"
   },
   "dependencies": {
+    "botbuilder": "^4.11.1",
     "bunyan": "^1.8.15",
+    "dotenv": "^8.2.0",
     "restify": "^8.5.1"
   }
 }
