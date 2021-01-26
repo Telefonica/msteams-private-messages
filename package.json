@@ -4,6 +4,8 @@
   "description": "send private messages to users in MSTeams",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
+    "lint": "eslint . -f table .",
     "test": "jest"
   },
   "keywords": [
@@ -15,5 +17,13 @@
     "email": "Lifecycle@telefonica.com",
     "name": "Software Lifecycle Team"
   },
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.14.1",
+    "eslint": "^7.18.0",
+    "eslint-config-standard": "^16.0.2",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1"
+  }
 }
