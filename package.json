@@ -4,7 +4,7 @@
   "description": "send private messages to users in MSTeams",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node index.js | ./node_modules/.bin/bunyan",
     "lint": "eslint . -f table .",
     "test": "jest"
   },
@@ -19,11 +19,16 @@
   },
   "license": "ISC",
   "devDependencies": {
+    "@types/restify": "^8.4.2",
     "@typescript-eslint/eslint-plugin": "^4.14.1",
     "eslint": "^7.18.0",
     "eslint-config-standard": "^16.0.2",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1"
+  },
+  "dependencies": {
+    "bunyan": "^1.8.15",
+    "restify": "^8.5.1"
   }
 }
