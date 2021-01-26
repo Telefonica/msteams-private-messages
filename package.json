@@ -1,0 +1,19 @@
+{
+  "name": "msteams-private-messages",
+  "version": "0.0.1",
+  "description": "send private messages to users in MSTeams",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [
+    "Microsoft Teams",
+    "bot",
+    "messaging"
+  ],
+  "author": {
+    "email": "Lifecycle@telefonica.com",
+    "name": "Software Lifecycle Team"
+  },
+  "license": "ISC"
+}
