@@ -1,5 +1,9 @@
 const dotenv = require('dotenv')
 const path = require('path')
+
+/* load .env file before instanciating dependent objects (do NOT move) */
+dotenv.config({ path: path.join(__dirname, '.env') })
+
 const { log } = require('./src/log')
 const { createBotAdapter } = require('./src/bot-adapter')
 const { createBot } = require('./src/bot')
@@ -7,9 +11,6 @@ const { createServer } = require('./src/server')
 const { createStorage } = require('./src/storage')
 
 log.info('[STARTUP]', log.fields.name)
-
-/* load .env file before instanciating dependent objects (do NOT move) */
-dotenv.config({ path: path.join(__dirname, '.env') })
 log.info('[STARTUP]', '.env file read')
 
 /* *** */

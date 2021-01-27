@@ -33,19 +33,27 @@ const createStorage = () => {
         const username = activity.from.name
         log.debug('[db] updating <user-topic> pair: <%s, %s>', username, topic)
         if (!db.subscriptions[username]) {
-          db.subscriptions[username] = []
+          db.subscriptions[username] = new Set()
         }
-        db.subscriptions[username].push(topic)
+        db.subscriptions[username].add(topic)
       }
     },
-    readUser: username => {
-      log.debug('[db] reading info for user "%s"', username)
+    getConversation: username => {
+      log.debug('[db] reading conversation for user "%s"', username)
       const conversationId = db.users[username]
-      return {
-        conversationId,
-        conversation: db.conversations[conversationId],
-        subscribedTo: db.subscriptions[username]
+      if (!conversationId) {
+        return null
       }
+      return db.conversations[conversationId]
+    },
+    getSubscriptions: username => {
+      log.debug('[db] reading subscriptions for user "%s"', username)
+      const subscriptions = db.subscriptions[username] || {}
+      return Array.from(subscriptions)
+    },
+    resetSubscriptions: username => {
+      log.debug('[db] reading subscriptions for user "%s"', username)
+      db.subscriptions[username] = new Set()
     }
   }
 }

@@ -44,21 +44,27 @@ const createBot = storage => {
 
     const { check, reset, subscriptions } = cards.registeredKeywords()
     if (text === check) {
-      const info = storage.readUser(username)
-      await context.sendActivity(JSON.stringify(info))
+      const info = storage.getSubscriptions(username)
+      // TODO: cool card instead
+      await context.sendActivity(
+        `subscribed to ${info.length} topics (${info.toString()})`
+      )
     } else if (text === reset) {
-      // TODO
-      const info = storage.readUser(username)
-      await context.sendActivity(JSON.stringify(info))
+      storage.resetSubscriptions(username)
+      const info = storage.getSubscriptions(username)
+      // TODO: cool card instead
+      await context.sendActivity(
+        `subscribed to ${info.length} topics (${info.toString()})`
+      )
     } else if (subscriptions.indexOf(text) > -1) {
       storage.subscribe(context.activity, text)
-      const info = storage.readUser(username)
-      await context.sendActivity(JSON.stringify(info))
+      const info = storage.getSubscriptions(username)
+      // TODO: cool card instead
+      await context.sendActivity(
+        `subscribed to ${info.length} topics (${info.toString()})`
+      )
     } else {
-      await context.sendActivities([
-        cards.unknownCard(),
-        cards.menuCard()
-      ])
+      await context.sendActivities([cards.unknownCard(), cards.menuCard()])
     }
     await next()
   })
