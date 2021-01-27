@@ -1,14 +1,26 @@
 cards:
-  menu:
-    - title: Label 1
-      text: key1
-    - title: Label a
-      text: key2
-    - title: Label b
-      text: key3
-    - title: Label c
-      text: key4
-    - title: Label d
-      text: key5
-    - title: Label e
-      text: key6
+  welcomeCard:
+    title: Private Notifications Center
+    text: Lorem Ipsum
+
+  unknownCard:
+    title: ""
+    text: Unknown command...
+
+  menuCard:
+    title: Available Options
+    checkButton:
+      title: CHECK my subscribed topics 🧾
+      value: CHECK
+    resetButton:
+      title: RESET all my subscribed topics ❌
+      value: RESET
+    subscriptionButtons:
+      - title: Subscribe to LATAM notifications 🇦🇷
+        value: LATAM
+      - title: Subscribe to UK notifications 🇬🇧
+        value: UK
+      - title: Subscribe to SPAIN notifications 🇪🇸
+        value: SPAIN
+      - title: Subscribe to GERMANY notifications 🇩🇪
+        value: GERMANY

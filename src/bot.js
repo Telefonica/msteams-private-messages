@@ -4,29 +4,19 @@ const { readYaml } = require('./yaml')
 const { log } = require('./log')
 
 /**
- * @param {string} rawText
+ * @param {Types.Storage} storage
  */
-// eslint-disable-next-line no-unused-vars
-const getKeyword = rawText => {
-  const text = rawText.trim().toLocaleLowerCase()
-  /* if chain */
-  if (text.includes('a')) {
-    return 'a'
-  }
-  return undefined
-}
-
-const createBot = conversationReferences => {
+const createBot = storage => {
   const bot = new ActivityHandler()
   const config = readYaml('bot')
   const cards = prepareCards({ config })
+  log.info('[STARTUP]', 'bot.yaml config read')
 
   /**
    * A party (including the bot) joins or leaves a conversation
    */
   bot.onConversationUpdate(async (context, next) => {
-    await context.sendTraceActivity('onConversationUpdate', context.activity)
-    conversationReferences.add(context.activity)
+    storage.add(context.activity)
     await next()
   })
 
@@ -38,9 +28,7 @@ const createBot = conversationReferences => {
     const membersAdded = context.activity.membersAdded
     for (let cnt = 0; cnt < membersAdded.length; cnt++) {
       if (membersAdded[cnt].id !== context.activity.recipient.id) {
-        const welcomeMessage =
-          'Welcome to the Proactive Bot sample.  Navigate to http://localhost:3978/api/notify to proactively message everyone who has previously messaged this bot.'
-        await context.sendActivity(welcomeMessage)
+        await context.sendActivities([cards.welcomeCard(), cards.menuCard()])
       }
     }
     await next()
@@ -50,15 +38,33 @@ const createBot = conversationReferences => {
    * Main handler: Message activity received
    */
   bot.onMessage(async (context, next) => {
-    conversationReferences.add(context.activity)
+    storage.add(context.activity)
+    const username = context.activity.from.name
+    const text = context.activity.text
 
-    // const keyword = getKeyword(context.activity.text)
-
-    await context.sendActivity(cards.menuCard())
+    const { check, reset, subscriptions } = cards.registeredKeywords()
+    if (text === check) {
+      const info = storage.readUser(username)
+      await context.sendActivity(JSON.stringify(info))
+    } else if (text === reset) {
+      // TODO
+      const info = storage.readUser(username)
+      await context.sendActivity(JSON.stringify(info))
+    } else if (subscriptions.indexOf(text) > -1) {
+      storage.subscribe(context.activity, text)
+      const info = storage.readUser(username)
+      await context.sendActivity(JSON.stringify(info))
+    } else {
+      await context.sendActivities([
+        cards.unknownCard(),
+        cards.menuCard()
+      ])
+    }
     await next()
   })
 
-  log.info('[STARTUP] bot created and configured')
+  log.info('[STARTUP] bot ready')
+
   return bot
 }
 
