@@ -1,6 +1,8 @@
 const restify = require('restify')
+const { log } = require('./log')
 
-const createServer = ({ appInfo, log, onMessage, onNotify }) => {
+const createServer = ({ onMessage, onNotify }) => {
+  // TODO use log.child()
   const server = restify.createServer({ log })
   server.use(restify.plugins.queryParser())
   server.use(restify.plugins.bodyParser())
@@ -21,7 +23,7 @@ const createServer = ({ appInfo, log, onMessage, onNotify }) => {
   })
 
   server.get('/', (_, res, next) => {
-    res.send(appInfo)
+    res.send(log.fields.name)
     next()
   })
 

@@ -1,8 +1,9 @@
 const { TurnContext } = require('botbuilder')
+const { log } = require('./log')
 
 const db = {}
 
-const createStorage = log => {
+const createStorage = () => {
   return {
     add: activity => {
       const ref = TurnContext.getConversationReference(activity)

@@ -1,0 +1,14 @@
+cards:
+  menu:
+    - title: Label 1
+      text: key1
+    - title: Label a
+      text: key2
+    - title: Label b
+      text: key3
+    - title: Label c
+      text: key4
+    - title: Label d
+      text: key5
+    - title: Label e
+      text: key6

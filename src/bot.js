@@ -1,7 +1,25 @@
 const { ActivityHandler } = require('botbuilder')
+const { prepareCards } = require('./cards')
+const { readYaml } = require('./yaml')
+const { log } = require('./log')
 
-const createBot = (conversationReferences, log) => {
+/**
+ * @param {string} rawText
+ */
+// eslint-disable-next-line no-unused-vars
+const getKeyword = rawText => {
+  const text = rawText.trim().toLocaleLowerCase()
+  /* if chain */
+  if (text.includes('a')) {
+    return 'a'
+  }
+  return undefined
+}
+
+const createBot = conversationReferences => {
   const bot = new ActivityHandler()
+  const config = readYaml('bot')
+  const cards = prepareCards({ config })
 
   /**
    * A party (including the bot) joins or leaves a conversation
@@ -34,8 +52,9 @@ const createBot = (conversationReferences, log) => {
   bot.onMessage(async (context, next) => {
     conversationReferences.add(context.activity)
 
-    // Echo back what the user said
-    await context.sendActivity(`You sent '${context.activity.text}'`)
+    // const keyword = getKeyword(context.activity.text)
+
+    await context.sendActivity(cards.menuCard())
     await next()
   })
 

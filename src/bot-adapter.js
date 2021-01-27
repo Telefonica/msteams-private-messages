@@ -1,6 +1,7 @@
 const { BotFrameworkAdapter } = require('botbuilder')
+const { log } = require('./log')
 
-const createBotAdapter = log => {
+const createBotAdapter = () => {
   const runningLocally = process.env.LOCAL || false
 
   const adapter = new BotFrameworkAdapter({
