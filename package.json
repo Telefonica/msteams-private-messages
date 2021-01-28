@@ -1,6 +1,6 @@
 {
   "name": "msteams-private-messages",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "send private messages to users in MSTeams",
   "main": "index.js",
   "scripts": {
@@ -12,12 +12,25 @@
   "keywords": [
     "Microsoft Teams",
     "bot",
-    "messaging"
+    "messaging",
+    "notifications"
   ],
+  "repository": {
+    "url": "https://github.com/Telefonica/msteams-private-messages"
+  },
+  "bugs": {
+    "url": "https://github.com/Telefonica/msteams-private-messages/issues"
+  },
   "author": {
     "email": "Lifecycle@telefonica.com",
     "name": "Software Lifecycle Team"
   },
+  "maintainers": [
+    {
+      "name": "Manu Artero Anguita",
+      "email": "manutero.developer@gmail.com"
+    }
+  ],
   "license": "ISC",
   "devDependencies": {
     "@types/jest": "^26.0.20",
