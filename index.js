@@ -17,6 +17,7 @@ const adapter = createBotAdapter()
 const storage = createStorage()
 const bot = createBot(storage)
 
+/** @type {Types.Handlers} */
 const handlers = {
   processMessage: async (req, res) => {
     adapter.processActivity(req, res, async turnContext => {
@@ -57,8 +58,9 @@ const handlers = {
   },
 
   broadcast: async (topic, message) => {
-    storage.getSubscriptions()
+    // TODO
     return {
+      status: 200,
       response: null
     }
   }

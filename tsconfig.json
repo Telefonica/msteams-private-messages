@@ -1,0 +1,18 @@
+{
+    "compileOnSave": false,
+    "compilerOptions": {
+        "noEmit": true, // no output file (just checker)
+        "allowJs": true,
+        "checkJs": true,
+        "target": "es6",
+        "resolveJsonModule": true, // require(*.json)
+        "moduleResolution": "node",
+        "alwaysStrict": true, // 'use strict'
+        "noImplicitAny": true // hard mode: ON
+    },
+    "include": [
+        "types.d.ts",
+        "index.js",
+        "./src"
+    ]
+}

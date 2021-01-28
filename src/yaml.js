@@ -5,15 +5,16 @@ const { log } = require('./log')
 
 /**
  * @param {string} filename "bot"
+ * @return {any}
  */
-const readYaml = fileName => {
+const readYaml = filename => {
   try {
-    const filePath = path.join(process.cwd(), 'config', fileName)
+    const filePath = path.join(process.cwd(), 'config', filename)
     const file = fs.readFileSync(filePath + '.yaml', 'utf8')
     const doc = yaml.load(file)
     return doc
   } catch (err) {
-    log.error(err, `${fileName}.yaml`)
+    log.error(err, `${filename}.yaml`)
     return {}
   }
 }

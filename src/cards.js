@@ -3,8 +3,14 @@
  */
 const { CardFactory, MessageFactory, ActionTypes } = require('botbuilder')
 
+/**
+ * @param {import('botbuilder').Attachment} card
+ */
 const asMessage = card => MessageFactory.attachment(card)
 
+/**
+ * @param {{title: string, text: string}} param0
+ */
 const simpleCard = ({ title, text }) => {
   const card = CardFactory.heroCard(title, text)
   return asMessage(card)
@@ -12,6 +18,7 @@ const simpleCard = ({ title, text }) => {
 
 /**
  * @param {import('botbuilder').CardAction[]} cardActions
+ * @param {{title: string, value: string}} param1
  */
 const addDefaultButton = (cardActions, { title, value }) => {
   cardActions.push({
@@ -21,23 +28,26 @@ const addDefaultButton = (cardActions, { title, value }) => {
   })
 }
 
-const prepareCards = ({ config }) => {
+/**
+ * @param {Types.Config} config
+ */
+const prepareCards = ({ cards }) => {
   const menuCard = () => {
-    const subscriptionButtons = config.cards.menuCard.subscriptionButtons
+    const subscriptionButtons = cards.menuCard.subscriptionButtons
     const cardActions = subscriptionButtons.map(({ title, value }) => ({
       title,
       value,
       type: ActionTypes.ImBack
     }))
-    addDefaultButton(cardActions, config.cards.menuCard.checkButton)
-    addDefaultButton(cardActions, config.cards.menuCard.resetButton)
-    const title = config.cards.menuCard.title
+    addDefaultButton(cardActions, cards.menuCard.checkButton)
+    addDefaultButton(cardActions, cards.menuCard.resetButton)
+    const title = cards.menuCard.title
     const menuCard = CardFactory.heroCard(title, null, cardActions)
     return asMessage(menuCard)
   }
 
   const registeredKeywords = () => {
-    const menu = config.cards.menuCard
+    const menu = cards.menuCard
     return {
       check: menu.checkButton.value,
       reset: menu.resetButton.value,
@@ -48,8 +58,8 @@ const prepareCards = ({ config }) => {
   return {
     menuCard,
     registeredKeywords,
-    welcomeCard: () => simpleCard(config.cards.welcomeCard),
-    unknownCard: () => simpleCard(config.cards.unknownCard)
+    welcomeCard: () => simpleCard(cards.welcomeCard),
+    unknownCard: () => simpleCard(cards.unknownCard)
   }
 }
 

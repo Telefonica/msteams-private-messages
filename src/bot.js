@@ -8,8 +8,9 @@ const { log } = require('./log')
  */
 const createBot = storage => {
   const bot = new ActivityHandler()
+  /** @type {Types.Config} */
   const config = readYaml('bot')
-  const cards = prepareCards({ config })
+  const cards = prepareCards(config)
   log.info('[STARTUP]', 'bot.yaml config read')
 
   /**

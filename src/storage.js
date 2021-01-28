@@ -3,8 +3,13 @@ const { log } = require('./log')
 
 /* memory object: playground */
 const db = {
+  /** @type {{[index:string]: Partial<Types.ConversationReference>}} */
   conversations: {},
+
+  /** @type {{[index:string]: string}} */
   users: {},
+
+  /** @type {{[index:string]: Set<String>}} */
   subscriptions: {}
 }
 
@@ -51,7 +56,7 @@ const createStorage = () => {
     },
     getSubscriptions: username => {
       log.debug('[db] reading subscriptions for user "%s"', username)
-      const subscriptions = db.subscriptions[username] || {}
+      const subscriptions = db.subscriptions[username] || new Set()
       return Array.from(subscriptions)
     },
     resetSubscriptions: username => {
