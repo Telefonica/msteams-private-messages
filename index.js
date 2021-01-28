@@ -13,21 +13,55 @@ const { createStorage } = require('./src/storage')
 log.info('[STARTUP]', log.fields.name)
 log.info('[STARTUP]', '.env file read')
 
-/* *** */
-
 const adapter = createBotAdapter()
 const storage = createStorage()
 const bot = createBot(storage)
 
-createServer({
-  onMessage: async (req, res) => {
+const handlers = {
+  processMessage: async (req, res) => {
     adapter.processActivity(req, res, async turnContext => {
-      // route to main dialog.
+      /* route to main dialog */
       await bot.run(turnContext)
     })
   },
-  onNotify: async input => {
-    log.info('TODO onNotify')
-    return {}
+
+  notify: async (username, message) => {
+    const conversationRef = storage.getConversation(username)
+    if (!conversationRef) {
+      return {
+        status: 404,
+        response: {
+          code: 'NotFound',
+          input: { username, message }
+        }
+      }
+    }
+
+    /**
+     * @doc https://docs.microsoft.com/en-us/azure/bot-service/bot-builder-howto-proactive-message?view=azure-bot-service-4.0&tabs=javascript
+     */
+    await adapter.continueConversation(conversationRef, async context => {
+      const conversationId = conversationRef.conversation.id
+      log.debug('conversation #%s restored', conversationId)
+      try {
+        await context.sendActivity(message)
+      } catch (err) {
+        log.error(err, 'sending activity to conversation #%s', conversationId)
+      }
+    })
+
+    return {
+      status: 202,
+      response: { conversationRef }
+    }
+  },
+
+  broadcast: async (topic, message) => {
+    storage.getSubscriptions()
+    return {
+      response: null
+    }
   }
-})
+}
+
+createServer(handlers)

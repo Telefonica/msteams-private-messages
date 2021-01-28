@@ -8,6 +8,9 @@ const db = {
   subscriptions: {}
 }
 
+/**
+ * @return {Types.Storage}
+ */
 const createStorage = () => {
   return {
     /**

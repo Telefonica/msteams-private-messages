@@ -10,4 +10,19 @@ declare namespace Types {
     getSubscriptions: (username: string) => string[];
     resetSubscriptions: (username: string) => void;
   }
+
+  interface Handlers {
+    processMessage: (
+      req: import("restify").Request,
+      res: import("restify").Response
+    ) => Promise<void>;
+    notify: (
+      username: string,
+      message: string
+    ) => Promise<{ status: number; response: any }>;
+    broadcast: (
+      topic: string,
+      message: string
+    ) => Promise<{ status: number; response: any }>;
+  }
 }

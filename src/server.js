@@ -1,7 +1,14 @@
 const restify = require('restify')
 const { log } = require('./log')
 
-const createServer = ({ onMessage, onNotify }) => {
+/**
+ * restify server in charge of:
+ *  - routing + parsing
+ *  - logging requests and responses
+ *  - extracting input from request
+ * @param {Types.Handlers} param0
+ */
+const createServer = ({ processMessage, notify, broadcast }) => {
   // TODO use log.child()
   const server = restify.createServer({ log })
   server.use(restify.plugins.queryParser())
@@ -27,15 +34,58 @@ const createServer = ({ onMessage, onNotify }) => {
     next()
   })
 
-  server.post('/api/messages', async (req, res, next) => {
-    await onMessage(req, res)
+  server.post('/api/v1/messages', async (req, res, next) => {
+    await processMessage(req, res)
     next()
   })
 
-  server.post('/api/notify', async (req, res, next) => {
-    const input = {} // TODO extract input from req
-    const notification = await onNotify(input)
-    res.send(notification)
+  server.post('/api/v1/notify', async (req, res, next) => {
+    if (!req.body) {
+      res.send(400, {
+        code: 'BadRequest',
+        required: ['username', 'message'],
+        got: req.body
+      })
+      return next()
+    }
+
+    const username = req.body.username
+    const message = req.body.message
+    if (!username || !message) {
+      res.send(400, {
+        code: 'BadRequest',
+        required: ['username', 'message'],
+        got: { username, message }
+      })
+    } else {
+      const { status, response } = await notify(username, message)
+      res.send(status, response)
+    }
+    next()
+  })
+
+  server.post('/api/v1/broadcast', async (req, res, next) => {
+    if (!req.body) {
+      res.send(400, {
+        code: 'BadRequest',
+        required: ['topic', 'message'],
+        got: req.body
+      })
+      return next()
+    }
+
+    const topic = req.body.topic
+    const message = req.body.message
+    if (!topic || !message) {
+      res.send(400, {
+        code: 'BadRequest',
+        required: ['topic', 'message'],
+        got: { topic, message }
+      })
+    } else {
+      const { status, response } = await broadcast(topic, message)
+      res.send(status, response)
+    }
     next()
   })
 }
