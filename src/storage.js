@@ -3,14 +3,14 @@ const { log } = require('./log')
 
 /* memory object: playground */
 const db = {
-  /** @type {{[index:string]: Partial<Types.ConversationReference>}} */
+  /** @type {{[conversationId:string]: Partial<Types.ConversationReference>}} */
   conversations: {},
 
-  /** @type {{[index:string]: string}} */
+  /** @type {{[username:string]: string}} */
   users: {},
 
-  /** @type {{[index:string]: Set<String>}} */
-  subscriptions: {}
+  /** @type {{[topic:string]: string[]}} */
+  topics: {}
 }
 
 /**
@@ -18,10 +18,7 @@ const db = {
  */
 const createStorage = () => {
   return {
-    /**
-     * @param {Types.Activity} activity
-     */
-    add: activity => {
+    saveConversation: activity => {
       const ref = TurnContext.getConversationReference(activity)
       const conversationId = ref.conversation.id
       log.debug('[db] updating conversation #%s', conversationId)
@@ -32,20 +29,7 @@ const createStorage = () => {
         db.users[username] = conversationId
       }
     },
-    /**
-     * @param {Types.Activity} activity
-     * @param {string} topic
-     */
-    subscribe: (activity, topic) => {
-      if (activity.from.role === 'user') {
-        const username = activity.from.name
-        log.debug('[db] updating <user-topic> pair: <%s, %s>', username, topic)
-        if (!db.subscriptions[username]) {
-          db.subscriptions[username] = new Set()
-        }
-        db.subscriptions[username].add(topic)
-      }
-    },
+
     getConversation: username => {
       log.debug('[db] reading conversation for user "%s"', username)
       const conversationId = db.users[username]
@@ -54,14 +38,48 @@ const createStorage = () => {
       }
       return db.conversations[conversationId]
     },
-    getSubscriptions: username => {
-      log.debug('[db] reading subscriptions for user "%s"', username)
-      const subscriptions = db.subscriptions[username] || new Set()
-      return Array.from(subscriptions)
+
+    subscribe: (activity, topic) => {
+      if (activity.from.role === 'user') {
+        const username = activity.from.name
+        log.debug('[db] updating <user-topic> pair: <%s, %s>', username, topic)
+        if (!db.topics[topic]) {
+          db.topics[topic] = []
+        }
+        if (db.topics[topic].indexOf(username) < 0) {
+          db.topics[topic].push(username)
+        }
+      }
     },
-    resetSubscriptions: username => {
+
+    getSubscribedTopics: username => {
       log.debug('[db] reading subscriptions for user "%s"', username)
-      db.subscriptions[username] = new Set()
+      const subscriptions = []
+      for (const topic in db.topics) {
+        if (db.topics[topic].indexOf(username) > -1) {
+          subscriptions.push(topic)
+        }
+      }
+      return subscriptions
+    },
+
+    getSubscribers: topic => {
+      return db.topics[topic] || []
+    },
+
+    resetSubscriptions: username => {
+      log.debug('[db] removing every subscription for user "%s"', username)
+      for (const topic in db.topics) {
+        const index = db.topics[topic].indexOf(username)
+        if (index > -1) {
+          db.topics[topic].splice(index, 1)
+        }
+      }
+    },
+
+    removeSubscribers: topic => {
+      log.debug('[db] removing every subscriber to topic "%s"', topic)
+      db.topics[topic] = []
     }
   }
 }

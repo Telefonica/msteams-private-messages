@@ -4,13 +4,15 @@ declare namespace Types {
   type ConversationReference = import("botbuilder").ConversationReference;
 
   interface Storage {
-    add: (activity: Activity) => void;
-    subscribe: (activity: Activity, topic: string) => void;
+    saveConversation: (activity: Activity) => void;
     getConversation: (
       username: string
     ) => Partial<ConversationReference> | null;
-    getSubscriptions: (username: string) => string[];
+    subscribe: (activity: Activity, topic: string) => void;
+    getSubscribedTopics: (username: string) => string[];
+    getSubscribers: (topic: string) => string[];
     resetSubscriptions: (username: string) => void;
+    removeSubscribers: (topic: string) => void;
   }
 
   interface Handlers {

@@ -9,6 +9,7 @@ const { createBotAdapter } = require('./src/bot-adapter')
 const { createBot } = require('./src/bot')
 const { createServer } = require('./src/server')
 const { createStorage } = require('./src/storage')
+const { createConversation } = require('./src/conversation')
 
 log.info('[STARTUP]', log.fields.name)
 log.info('[STARTUP]', '.env file read')
@@ -16,6 +17,7 @@ log.info('[STARTUP]', '.env file read')
 const adapter = createBotAdapter()
 const storage = createStorage()
 const bot = createBot(storage)
+const conversation = createConversation(adapter)
 
 /** @type {Types.Handlers} */
 const handlers = {
@@ -37,19 +39,7 @@ const handlers = {
         }
       }
     }
-
-    /**
-     * @doc https://docs.microsoft.com/en-us/azure/bot-service/bot-builder-howto-proactive-message?view=azure-bot-service-4.0&tabs=javascript
-     */
-    await adapter.continueConversation(conversationRef, async context => {
-      const conversationId = conversationRef.conversation.id
-      log.debug('conversation #%s restored', conversationId)
-      try {
-        await context.sendActivity(message)
-      } catch (err) {
-        log.error(err, 'sending activity to conversation #%s', conversationId)
-      }
-    })
+    await conversation.sendMessage(conversationRef, message)
 
     return {
       status: 202,
@@ -58,10 +48,25 @@ const handlers = {
   },
 
   broadcast: async (topic, message) => {
-    // TODO
+    const subscribers = storage.getSubscribers(topic)
+    const conversationRefs = []
+    for (const username of subscribers) {
+      const conversationRef = storage.getConversation(username)
+      if (!conversationRef) {
+        log.warn(
+          'weird status: user "%s" seems to be subscribed to "%s" but conversationRef not found\nSKIPPING.',
+          username,
+          topic
+        )
+      } else {
+        conversationRefs.push(conversationRef)
+        conversation.sendMessage(conversationRef, message)
+      }
+    }
+
     return {
-      status: 200,
-      response: null
+      status: 202,
+      response: { conversationRefs }
     }
   }
 }

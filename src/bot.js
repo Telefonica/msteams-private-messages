@@ -16,7 +16,7 @@ const createBot = storage => {
    * A party (including the bot) joins or leaves a conversation
    */
   bot.onConversationUpdate(async (context, next) => {
-    storage.add(context.activity)
+    storage.saveConversation(context.activity)
     await next()
   })
 
@@ -38,27 +38,27 @@ const createBot = storage => {
    * Main handler: Message activity received
    */
   bot.onMessage(async (context, next) => {
-    storage.add(context.activity)
+    storage.saveConversation(context.activity)
     const username = context.activity.from.name
     const text = context.activity.text
 
     const { check, reset, subscriptions } = cards.registeredKeywords()
     if (text === check) {
-      const info = storage.getSubscriptions(username)
+      const info = storage.getSubscribedTopics(username)
       // TODO: cool card instead
       await context.sendActivity(
         `subscribed to ${info.length} topics (${info.toString()})`
       )
     } else if (text === reset) {
       storage.resetSubscriptions(username)
-      const info = storage.getSubscriptions(username)
+      const info = storage.getSubscribedTopics(username)
       // TODO: cool card instead
       await context.sendActivity(
         `subscribed to ${info.length} topics (${info.toString()})`
       )
     } else if (subscriptions.indexOf(text) > -1) {
       storage.subscribe(context.activity, text)
-      const info = storage.getSubscriptions(username)
+      const info = storage.getSubscribedTopics(username)
       // TODO: cool card instead
       await context.sendActivity(
         `subscribed to ${info.length} topics (${info.toString()})`
