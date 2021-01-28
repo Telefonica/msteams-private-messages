@@ -1,6 +1,6 @@
 const { ActivityHandler } = require('botbuilder')
 const { prepareCards } = require('./cards')
-const { readYaml } = require('./yaml')
+const { readConfig } = require('./config')
 const { log } = require('./log')
 
 /**
@@ -8,8 +8,7 @@ const { log } = require('./log')
  */
 const createBot = storage => {
   const bot = new ActivityHandler()
-  /** @type {Types.Config} */
-  const config = readYaml('bot')
+  const config = readConfig()
   const cards = prepareCards(config)
   log.info('[STARTUP]', 'bot.yaml config read')
 

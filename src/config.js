@@ -4,12 +4,12 @@ const yaml = require('js-yaml')
 const { log } = require('./log')
 
 /**
- * @param {string} filename "bot"
+ * @param {string} filename "config"
  * @return {any}
  */
 const readYaml = filename => {
   try {
-    const filePath = path.join(process.cwd(), 'config', filename)
+    const filePath = path.join(process.cwd(), filename)
     const file = fs.readFileSync(filePath + '.yaml', 'utf8')
     const doc = yaml.load(file)
     return doc
@@ -19,4 +19,9 @@ const readYaml = filename => {
   }
 }
 
-module.exports = { readYaml }
+/**
+ * @return {Types.Config}
+ */
+const readConfig = (path = 'config') => readYaml(path)
+
+module.exports = { readConfig }
