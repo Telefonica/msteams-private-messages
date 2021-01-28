@@ -14,14 +14,24 @@ const readYaml = filename => {
     const doc = yaml.load(file)
     return doc
   } catch (err) {
-    log.error(err, `${filename}.yaml`)
-    return {}
+    log.error(err, `${filename}.yaml not found`)
+    return undefined
   }
 }
 
 /**
  * @return {Types.Config}
  */
-const readConfig = (path = 'config') => readYaml(path)
+const readConfig = (path = 'config') => {
+  const config = readYaml(path)
+  if (!config) {
+    log.warn(
+      'using default (example) config\n',
+      'you must add a "config.yaml" file at root folder.'
+    )
+    return readYaml('config.example') // example by default
+  }
+  return config
+}
 
 module.exports = { readConfig }
