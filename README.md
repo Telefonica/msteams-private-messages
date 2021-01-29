@@ -57,14 +57,27 @@ POST /api/v1/notify
 |     Name     | Required |           Type           |                Description                 |
 | :----------- | :------- | :----------------------- | :----------------------------------------- |
 | **username** | Required | `string`                 | Name of the recipient for the notification |
-| **message**  | Required | `string` or _`IMessage`_ | Text or the notification                   |
+| **message**  | Required | `string` or _`ICard`_    | Text or the notification                   |
 | mention      | Optional | `boolean`                | Append a mention to the user (@user)       |
+
+```typescript
+interface ICard {
+  title: string;
+  text: string;
+}
+```
 
 #### Examples
 
-```
+```bash
 curl -H "content-type: application/json"\
  -d '{"username": "User", "message": "hi there"}'\
+ localhost:3978/api/v1/notify
+```
+
+```bash
+curl -H "content-type: application/json"\
+ -d '{"username": "User", "message": {"text": "this is the text", "title": "this is the title"}}'\
  localhost:3978/api/v1/notify
 ```
 
@@ -84,9 +97,15 @@ POST /api/v1/broadcast
 
 #### Examples
 
-```
+```bash
 curl -H "content-type: application/json"\
  -d '{"topic": "banana", "message": "broadcasting to banana subscribers"}'\
+ localhost:3978/api/v1/broadcast
+```
+
+```bash
+curl -H "content-type: application/json"\
+ -d '{"topic": "banana", "message": {"text": "this is the text", "title": "this is the title"}}'\
  localhost:3978/api/v1/broadcast
 ```
 

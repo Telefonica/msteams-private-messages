@@ -40,52 +40,34 @@ const createServer = ({ processMessage, notify, broadcast }) => {
   })
 
   server.post('/api/v1/notify', async (req, res, next) => {
-    if (!req.body) {
-      res.send(400, {
-        code: 'BadRequest',
-        required: ['username', 'message'],
-        got: req.body
-      })
-      return next()
-    }
-
-    const username = req.body.username
-    const message = req.body.message
+    const username = req.body ? req.body.username : undefined
+    const message = req.body ? req.body.message : undefined
     if (!username || !message) {
       res.send(400, {
         code: 'BadRequest',
         required: ['username', 'message'],
         got: { username, message }
       })
-    } else {
-      const { status, response } = await notify(username, message)
-      res.send(status, response)
+      return next()
     }
+    const { status, response } = await notify(username, message)
+    res.send(status, response)
     next()
   })
 
   server.post('/api/v1/broadcast', async (req, res, next) => {
-    if (!req.body) {
-      res.send(400, {
-        code: 'BadRequest',
-        required: ['topic', 'message'],
-        got: req.body
-      })
-      return next()
-    }
-
-    const topic = req.body.topic
-    const message = req.body.message
+    const topic = req.body ? req.body.topic : undefined
+    const message = req.body ? req.body.message : undefined
     if (!topic || !message) {
       res.send(400, {
         code: 'BadRequest',
         required: ['topic', 'message'],
         got: { topic, message }
       })
-    } else {
-      const { status, response } = await broadcast(topic, message)
-      res.send(status, response)
+      return next()
     }
+    const { status, response } = await broadcast(topic, message)
+    res.send(status, response)
     next()
   })
 }

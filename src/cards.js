@@ -9,7 +9,7 @@ const { CardFactory, MessageFactory, ActionTypes } = require('botbuilder')
 const asMessage = card => MessageFactory.attachment(card)
 
 /**
- * @param {{title: string, text: string}} param0
+ * @param {Types.ICard} param0
  */
 const simpleCard = ({ title, text }) => {
   const card = CardFactory.heroCard(title, text)
@@ -64,5 +64,6 @@ const prepareCards = ({ cards }) => {
 }
 
 module.exports = {
-  prepareCards
+  prepareCards,
+  simpleCard
 }
