@@ -10,12 +10,12 @@ const createBot = storage => {
   const bot = new ActivityHandler()
   const config = readConfig()
   const cards = prepareCards(config)
-  log.info('[STARTUP]', 'bot.yaml config read')
 
   /**
    * A party (including the bot) joins or leaves a conversation
    */
   bot.onConversationUpdate(async (context, next) => {
+    log.debug('[bot] onConversationUpdate')
     storage.saveConversation(context.activity)
     await next()
   })
@@ -25,6 +25,7 @@ const createBot = storage => {
    * @note As observed, seems `onConversationUpdate()` is called first with the same info.
    */
   bot.onMembersAdded(async (context, next) => {
+    log.debug('[bot] onMembersAdded')
     const membersAdded = context.activity.membersAdded
     for (let cnt = 0; cnt < membersAdded.length; cnt++) {
       if (membersAdded[cnt].id !== context.activity.recipient.id) {
@@ -38,6 +39,7 @@ const createBot = storage => {
    * Main handler: Message activity received
    */
   bot.onMessage(async (context, next) => {
+    log.debug('[bot] onMessage')
     storage.saveConversation(context.activity)
     const username = context.activity.from.name
     const text = context.activity.text

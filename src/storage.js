@@ -23,11 +23,9 @@ const createStorage = () => {
       const conversationId = ref.conversation.id
       log.debug('[db] updating conversation #%s', conversationId)
       db.conversations[conversationId] = ref
-      if (activity.from.role === 'user') {
-        const username = activity.from.name
-        log.debug('[db] updating user "%s"', username)
-        db.users[username] = conversationId
-      }
+      const username = activity.from.name
+      log.debug('[db] updating user "%s"', username)
+      db.users[username] = conversationId
     },
 
     getConversation: username => {
@@ -40,15 +38,13 @@ const createStorage = () => {
     },
 
     subscribe: (activity, topic) => {
-      if (activity.from.role === 'user') {
-        const username = activity.from.name
-        log.debug('[db] updating <user-topic> pair: <%s, %s>', username, topic)
-        if (!db.topics[topic]) {
-          db.topics[topic] = []
-        }
-        if (db.topics[topic].indexOf(username) < 0) {
-          db.topics[topic].push(username)
-        }
+      const username = activity.from.name
+      log.debug('[db] updating <user-topic> pair: <%s, %s>', username, topic)
+      if (!db.topics[topic]) {
+        db.topics[topic] = []
+      }
+      if (db.topics[topic].indexOf(username) < 0) {
+        db.topics[topic].push(username)
       }
     },
 

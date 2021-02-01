@@ -14,7 +14,7 @@ const readYaml = filename => {
     const doc = yaml.load(file)
     return doc
   } catch (err) {
-    log.error(err, `${filename}.yaml not found`)
+    log.warn(err, `${filename}.yaml not found`)
     return undefined
   }
 }
@@ -26,11 +26,14 @@ const readConfig = (path = 'config') => {
   const config = readYaml(path)
   if (!config) {
     log.warn(
-      'using default (example) config\n',
-      'you must add a "config.yaml" file at root folder.'
+      'using default (example) config\n' +
+        'you must add a "config.yaml" file at root folder\n' +
+        'try:\n' +
+        '\tcp config.example.yaml config.yaml'
     )
     return readYaml('config.example') // example by default
   }
+  log.info('[STARTUP]', 'config.yaml read')
   return config
 }
 
