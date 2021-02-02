@@ -19,9 +19,10 @@ This is a NodeJs service exposing:
 1. [Our Use Case 🎯](#our-use-case)
 2. [API 🎨](#api)
 3. [Configuration 🏗](#configuration)
-4. [Local Development 🖥](#local-development)
-5. [FAQ 🙋‍♀️](#faq)
-6. [Additional Doc 📚](#doc)
+4. [Azure ☁️](#azure)
+5. [Local Development 🖥](#local-development)
+6. [FAQ 🙋‍♀️](#faq)
+7. [Additional Doc 📚](#doc)
 
 ***
 
@@ -200,6 +201,48 @@ This `.yaml` file would render as:
 
 ***
 
+<a id="azure">
+
+## Azure ☁️
+
+This section aims to be a quick summary of which are the minimal needs to have a bot application (Azure App registration) connected to an external web service.
+
+`msteams-private-messages` is, essentially, a server that can receive and send JSON. We'll need to register our service as a "Bot Channel" on Azure.
+
+**Note**: It's possible to host also the service on Azure. There is [official documentation regarding 'how to deploy'](https://docs.microsoft.com/en-us/azure/bot-service/bot-builder-deploy-az-cli?view=azure-bot-service-4.0&tabs=javascript). In our case we're hosting the web service in our own platform, keeping the interaction with Azure to the minimum.
+
+We'll need a few resources from the [Azure portal](https://portal.azure.com/#home)
+
+1. **Resource group**.
+    - Whatever you want to name it.
+2. **Bot Channel Registration**.
+    - Bot handle: internal naming. Can't be changed after creation. Won't be displayed when proper naming is set.
+    - Messaging endpoint: the web address of the `msteams-private-messages` service. Can be changed after creation. Will look like:
+      ```
+      https://{domain}/api/v1/messages
+      ```
+      <img src="doc/azure-create-bot-channel.png" height=600 />
+3. Go to the settings of your **Bot Channel Registration**
+    - Select "Settings": <img src="doc/azure-bot-management.png" />
+    - Copy the **Microsoft App ID** value (the one that can't be changed)
+    - Click "Manage", then "Certificate & secrets": <img src="doc/azure-manage-appid.png" height=300 />
+    - Create a "New client secret" and copy its value (you won't see it again). This will be our **Microsoft App Secret**
+4. Go back to the settings of your **Bot Channel Registration**
+    - Select "Channels": <img src="doc/azure-bot-management2.png" width=250 />
+    - Connect to Microsoft Teams channel. It should say "Running" <img src="doc/azure-connect-to-channels.png" />
+
+### Remote Connection
+
+We've ended up with 2 values: **Microsoft App Id** & **Microsoft App Secret**.</br>
+Copy those values in your `.env` file for enabling remote connection (!LOCAL).
+
+```dotenv
+LOCAL=false
+MICROSOFT_APP_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+MICROSOFT_APP_PASSWORD=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
+
+***
 <a id="local-development">
 
 ## Local Development 🖥
