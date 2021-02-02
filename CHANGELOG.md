@@ -1,3 +1,10 @@
+# [0.2.0](https://github.com/Telefonica/msteams-private-messages/compare/v0.1.1...v0.2.0) (2021-02-02)
+
+
+### Features
+
+* including mention to the user ([@user](https://github.com/user)) ([5aeab81](https://github.com/Telefonica/msteams-private-messages/commit/5aeab8127350dd20bf8997c5d2cfba668553cd26))
+
 ## [0.1.1](https://github.com/Telefonica/msteams-private-messages/compare/v0.1.0...v0.1.1) (2021-02-01)
 
 
