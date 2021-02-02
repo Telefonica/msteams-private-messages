@@ -18,9 +18,10 @@ This is a NodeJs service exposing:
 
 1. [Our Use Case 🎯](#our-use-case)
 2. [API 🎨](#api)
-3. [Local Development 🖥](#local-development)
-4. [FAQ 🙋‍♀️](#faq)
-5. [Additional Doc 📚](#doc)
+3. [Configuration 🏗](#configuration)
+4. [Local Development 🖥](#local-development)
+5. [FAQ 🙋‍♀️](#faq)
+6. [Additional Doc 📚](#doc)
 
 ***
 
@@ -140,6 +141,62 @@ curl -H "content-type: application/json"\
  -d '{"topic": "banana", "message": "hi there", "mention": true}'\
  localhost:3978/api/v1/broadcast
 ```
+
+***
+
+<a id="configuration">
+
+## Configuration 🏗
+
+### `.env`
+
+A `.env.template` file is provided:
+
+```bash
+cp .env.template .env
+```
+
+| env var                      | use                                          |
+| :--------------------------- | :------------------------------------------- |
+| `LOCAL`                      | flag: connect to a running BotApp on Azure   |
+| `PORT`                       | listen to a different port on startup        |
+| `LOG_LEVEL`                  | logging level (debug, info, warn...)         |
+| `MICROSOFT_APP_ID`           | ClientId registered at Azure's ADD (app id)  |
+| `MICROSOFT_APP_PASSWORD`     | SecretId registered at Azure's ADD (app key) |
+
+### Topics
+
+As we said, the bot offers the user a menu of topics to subscribe. On broadcast requests (`/api/v1/broadcast`), this service will check who is subscribed to the desired topic.
+
+The available options to subscribe are configurable via `.yaml` file. An example file is provided at the root folder, just change the `value` strings to fit your system.
+
+```bash
+cp config.example.yaml config.yaml
+```
+
+```yaml
+cards:
+  [...]
+  menuCard:
+    title: Available Options
+    checkButton:
+      title: Check my subscribed notifications 🧾
+      value: check
+    resetButton:
+      title: Reset all my subscribed notifications ❌
+      value: reset
+    subscriptionButtons:
+      - title: Subscribe to banana notifications 🍌
+        value: banana
+      - title: Subscribe to apple notifications 🍎
+        value: apple
+      - title: Subscribe to orange notifications 🍊
+        value: orange
+```
+
+This `.yaml` file would render as:
+
+![default-options](doc/default-options.png)
 
 ***
 
