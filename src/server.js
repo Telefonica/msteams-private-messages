@@ -2,6 +2,12 @@ const restify = require('restify')
 const { log } = require('./log')
 
 /**
+ * @param {import('restify').Request} req
+ */
+const includeMention = req =>
+  req.body.mention === true || req.body.mention === 'true'
+
+/**
  * restify server in charge of:
  *  - routing + parsing
  *  - logging requests and responses
@@ -50,7 +56,11 @@ const createServer = ({ processMessage, notify, broadcast }) => {
       })
       return next()
     }
-    const { status, response } = await notify(username, message)
+    const { status, response } = await notify(
+      username,
+      message,
+      includeMention(req)
+    )
     res.send(status, response)
     next()
   })
@@ -66,7 +76,11 @@ const createServer = ({ processMessage, notify, broadcast }) => {
       })
       return next()
     }
-    const { status, response } = await broadcast(topic, message)
+    const { status, response } = await broadcast(
+      topic,
+      message,
+      includeMention(req)
+    )
     res.send(status, response)
     next()
   })

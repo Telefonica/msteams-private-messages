@@ -14,13 +14,13 @@ This is a NodeJs service exposing:
 
 ***
 
-Table of contents
+**Table of contents**
 
 1. [Our Use Case 🎯](#our-use-case)
 2. [API 🎨](#api)
-3. [Local Development](#local-development)
+3. [Local Development 🖥](#local-development)
 4. [FAQ 🙋‍♀️](#faq)
-5. [Additional Doc](#doc)
+5. [Additional Doc 📚](#doc)
 
 ***
 
@@ -94,6 +94,12 @@ curl -H "content-type: application/json"\
  localhost:3978/api/v1/notify
 ```
 
+```bash
+curl -H "content-type: application/json"\
+ -d '{"username": "Jane Doe", "message": "hi there", "mention": true}'\
+ localhost:3978/api/v1/notify
+```
+
 ### Broadcast notification to subscribers
 
 ```
@@ -126,6 +132,12 @@ curl -H "content-type: application/json"\
 ```bash
 curl -H "content-type: application/json"\
  -d '{"topic": "banana", "message": {"text": "this is the text", "title": "this is the title"}}'\
+ localhost:3978/api/v1/broadcast
+```
+
+```bash
+curl -H "content-type: application/json"\
+ -d '{"topic": "banana", "message": "hi there", "mention": true}'\
  localhost:3978/api/v1/broadcast
 ```
 
@@ -208,6 +220,9 @@ You may test that everything is up requesting server info:
 
 **Q: Do I really need a whole service & db for just private notifications on MSTeams?**<br/>
 **R:** Yes. [You can't send messages to the users but rather continue a prev. conversation they started](https://github.com/microsoft/botframework-sdk/issues/4339). You need to store the reference of every conversation.
+
+**Q: I've tried to mention the user on Bot Framework Emulator and it doesn't work**</br>
+**R:** We know. Appending a mention does work on Microsoft Teams but won't render on the Emulator. Probably this is a issue related to the Emulator itself.
 
 **Q: Why the pixeled icon?**</br>
 **R:** One of the devs thought it was cool.

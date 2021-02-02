@@ -2,6 +2,7 @@ declare namespace Types {
   /* alias */
   type Activity = import("botbuilder").Activity;
   type ConversationReference = import("botbuilder").ConversationReference;
+  type Context = import("botbuilder").TurnContext;
 
   interface Storage {
     saveConversation: (activity: Activity) => void;
@@ -22,11 +23,13 @@ declare namespace Types {
     ) => Promise<void>;
     notify: (
       username: string,
-      message: string
+      message: string,
+      mention?: boolean
     ) => Promise<{ status: number; response: any }>;
     broadcast: (
       topic: string,
-      message: string
+      message: string,
+      mention?: boolean
     ) => Promise<{ status: number; response: any }>;
   }
 

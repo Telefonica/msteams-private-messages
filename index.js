@@ -28,7 +28,7 @@ const handlers = {
     })
   },
 
-  notify: async (username, message) => {
+  notify: async (username, message, mention) => {
     const conversationRef = storage.getConversation(username)
     if (!conversationRef) {
       return {
@@ -39,7 +39,7 @@ const handlers = {
         }
       }
     }
-    await conversation.sendMessage(conversationRef, message)
+    await conversation.sendMessage(conversationRef, message, mention)
 
     return {
       status: 202,
@@ -47,7 +47,7 @@ const handlers = {
     }
   },
 
-  broadcast: async (topic, message) => {
+  broadcast: async (topic, message, mention) => {
     const subscribers = storage.getSubscribers(topic)
     const conversationRefs = []
     for (const username of subscribers) {
@@ -60,7 +60,7 @@ const handlers = {
         )
       } else {
         conversationRefs.push(conversationRef)
-        conversation.sendMessage(conversationRef, message)
+        conversation.sendMessage(conversationRef, message, mention)
       }
     }
 
