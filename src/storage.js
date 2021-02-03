@@ -63,6 +63,10 @@ const createStorage = () => {
       return db.topics[topic] || []
     },
 
+    listTopics: () => Object.keys(db.topics),
+
+    listUsernames: () => Object.keys(db.users),
+
     resetSubscriptions: username => {
       log.debug('[db] removing every subscription for user "%s"', username)
       for (const topic in db.topics) {

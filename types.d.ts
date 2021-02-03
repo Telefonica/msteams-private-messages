@@ -12,6 +12,8 @@ declare namespace Types {
     subscribe: (activity: Activity, topic: string) => void;
     getSubscribedTopics: (username: string) => string[];
     getSubscribers: (topic: string) => string[];
+    listUsernames: () => string[];
+    listTopics: () => string[];
     resetSubscriptions: (username: string) => void;
     removeSubscribers: (topic: string) => void;
   }
@@ -31,6 +33,8 @@ declare namespace Types {
       message: string,
       mention?: boolean
     ) => Promise<{ status: number; response: any }>;
+    getTopics: () => Promise<{ status: number; response: any }>;
+    getUsernames: () => Promise<{ status: number; response: any }>;
   }
 
   interface ICard {

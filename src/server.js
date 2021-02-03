@@ -14,7 +14,13 @@ const includeMention = req =>
  *  - extracting input from request
  * @param {Types.Handlers} param0
  */
-const createServer = ({ processMessage, notify, broadcast }) => {
+const createServer = ({
+  processMessage,
+  notify,
+  broadcast,
+  getUsernames,
+  getTopics
+}) => {
   // TODO use log.child()
   const server = restify.createServer({ log })
   server.use(restify.plugins.queryParser())
@@ -37,6 +43,18 @@ const createServer = ({ processMessage, notify, broadcast }) => {
 
   server.get('/', (_, res, next) => {
     res.send(log.fields.name)
+    next()
+  })
+
+  server.get('/api/v1/topics', async (_, res, next) => {
+    const { status, response } = await getTopics()
+    res.send(status, response)
+    next()
+  })
+
+  server.get('/api/v1/usernames', async (_, res, next) => {
+    const { status, response } = await getUsernames()
+    res.send(status, response)
     next()
   })
 

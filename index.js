@@ -63,11 +63,29 @@ const handlers = {
         conversation.sendMessage(conversationRef, message, mention)
       }
     }
-
     return {
       status: 202,
       response: { conversationRefs }
     }
+  },
+
+  getTopics: async () => {
+    const topicNames = storage.listTopics()
+    /** @type {{[name: string]: string[]}} */
+    const topics = topicNames.reduce((acc, cur) => {
+      // @ts-ignore
+      acc[cur] = []
+      return acc
+    }, {})
+    for (const topic of topicNames) {
+      topics[topic] = topics[topic].concat(storage.getSubscribers(topic))
+    }
+    log.debug(topics)
+    return { status: 200, response: topics }
+  },
+
+  getUsernames: async () => {
+    return { status: 200, response: storage.listUsernames() }
   }
 }
 

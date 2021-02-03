@@ -64,6 +64,8 @@ We've implemented a MSTeams Bot that allows us to interact with users through te
 | Private notification to user          | `/api/v1/notify`    | `POST` | `{username*, message*, mention}` |
 | Broadcast notification to subscribers | `/api/v1/broadcast` | `POST` | `{topic*, message*, mention}`    |
 | Bot-SDK entry-point                   | `/api/v1/messages`  | `POST` | _used by Bot-SDK_                |
+| Inspect: list usernames               | `/api/v1/usernames` | `GET`  | ---                              |
+| Inspect: list topics & subscribers    | `/api/v1/topics`    | `GET`  | ---                              |
 
 ### Private notification to user
 
@@ -147,6 +149,45 @@ curl -H "content-type: application/json"\
  localhost:3978/api/v1/broadcast
 ```
 
+### Inspect: list usernames
+
+```
+GET /api/v1/usernames
+```
+
+### Examples
+
+```bash
+curl -s localhost:3978/api/v1/usernames | jq
+[
+  "Jane Doe",
+  "Jhon Smith"
+]
+```
+
+### Inspect: list topics & subscribers
+
+```
+GET /api/v1/topics
+```
+
+### Examples
+
+````bash
+curl -s localhost:3978/api/v1/topics | jq
+{
+  "banana": [
+    "Jane Doe"
+  ],
+  "orange": [
+    "Jane Doe",
+    "Jhon Smith"
+  ],
+  "apple": [
+    "Jhon Smith"
+  ]
+}
+
 ---
 
 <a id="configuration">
@@ -161,7 +202,7 @@ A `.env.template` file is provided, you may use it as reference:
 
 ```bash
 cp .env.template .env
-```
+````
 
 | env var                  | default value | usage                                                                |
 | :----------------------- | :------------ | :------------------------------------------------------------------- |
