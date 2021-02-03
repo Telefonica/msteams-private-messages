@@ -1,4 +1,6 @@
-<img src="https://github.com/Telefonica/msteams-private-messages/workflows/.github/workflows/test.yaml/badge.svg?branch=main">[![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
+<p align="right">
+  <img src="https://github.com/Telefonica/msteams-private-messages/workflows/.github/workflows/test.yaml/badge.svg?branch=main"><a href="https://github.com/semantic-release/semantic-release"><img src="https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg"></a>
+</p>
 
 # msteams-private-messages
 
@@ -9,10 +11,11 @@
 </p>
 
 This is a NodeJs service exposing:
- - A messaging endpoint which routes to a [MSTeams bot application](https://docs.microsoft.com/en-us/microsoftteams/platform/bots/what-are-bots)
- - Additional HTTP endpoints for triggering private notifications to users on demand.
 
-***
+- A messaging endpoint which routes to a [MSTeams bot application](https://docs.microsoft.com/en-us/microsoftteams/platform/bots/what-are-bots)
+- Additional HTTP endpoints for triggering private notifications to users on demand.
+
+---
 
 **Table of contents**
 
@@ -21,10 +24,11 @@ This is a NodeJs service exposing:
 3. [Configuration 🏗](#configuration)
 4. [Azure ☁️](#azure)
 5. [Local Development 🖥](#local-development)
-6. [FAQ 🙋‍♀️](#faq)
-7. [Additional Doc 📚](#doc)
+6. [Upload to Teams 🚀](#upload-to-teams)
+7. [FAQ 🙋‍♀️](#faq)
+8. [Additional Doc 📚](#doc)
 
-***
+---
 
 <a id="our-use-case">
 
@@ -38,15 +42,15 @@ We used to have Slack as communication platform. When an event occur in our infr
 
 We've implemented a MSTeams Bot that allows us to interact with users through text and cards while exposing a regular HTTP API.
 
- - `msteams-private-messages` is a web service.
- - This web service is registered on Azure as a [Bot Channel](https://docs.microsoft.com/en-us/azure/bot-service/bot-service-quickstart-registration?view=azure-bot-service-4.0)
- - As conversational bot, when a user starts a conversation, the service saves a reference to that conversation as well as the name of the user.
- - The bot offers the user a menu of topics to subscribe, if the user subscribes to any of those, the service saves the relation `user-topics`.
- - The web service exposes a regular API able to:
-    1. `notify` a message to an specific user (we need that user to have started a conversation with the bot in first place)
-    2. `broadcast` a message related to a topic to every user subscribed to the topic
+- `msteams-private-messages` is a web service.
+- This web service is registered on Azure as a [Bot Channel](https://docs.microsoft.com/en-us/azure/bot-service/bot-service-quickstart-registration?view=azure-bot-service-4.0)
+- As conversational bot, when a user starts a conversation, the service saves a reference to that conversation as well as the name of the user.
+- The bot offers the user a menu of topics to subscribe, if the user subscribes to any of those, the service saves the relation `user-topics`.
+- The web service exposes a regular API able to:
+  1. `notify` a message to an specific user (we need that user to have started a conversation with the bot in first place)
+  2. `broadcast` a message related to a topic to every user subscribed to the topic
 
-***
+---
 
 <a id="api">
 
@@ -54,7 +58,7 @@ We've implemented a MSTeams Bot that allows us to interact with users through te
 
 ### Summary
 
-|                                       |      endpoint       | method |               body               |
+|                                       | endpoint            | method | body                             |
 | :------------------------------------ | :------------------ | :----- | :------------------------------- |
 | Server Info                           | `/`                 | `GET`  | ---                              |
 | Private notification to user          | `/api/v1/notify`    | `POST` | `{username*, message*, mention}` |
@@ -69,11 +73,11 @@ POST /api/v1/notify
 
 #### Parameters
 
-|     Name     | Required |           Type           |                Description                 |
-| :----------- | :------- | :----------------------- | :----------------------------------------- |
-| **username** | Required | `string`                 | Name of the recipient for the notification |
-| **message**  | Required | `string` or _`ICard`_    | The notification                           |
-| mention      | Optional | `boolean`                | Append a mention to the user (@user)       |
+| Name         | Required | Type                | Description                                |
+| :----------- | :------- | :------------------ | :----------------------------------------- |
+| **username** | Required | `string`            | Name of the recipient for the notification |
+| **message**  | Required | `string` or `ICard` | The notification                           |
+| mention      | Optional | `boolean`           | Append a mention to the user (@user)       |
 
 ```typescript
 interface ICard {
@@ -110,11 +114,11 @@ POST /api/v1/broadcast
 
 #### Parameters
 
-|    Name     | Required |           Type           |                                     Description                                      |
-| :---------- | :------- | :----------------------- | :----------------------------------------------------------------------------------- |
-| **topic**   | Required | `string`                 | Name of the topic: every user subscribed to this topic will receive the notification |
-| **message** | Required | `string` or _`ICard`_    | The notification                                                                     |
-| mention     | Optional | `boolean`                | Append a mention to the user (@user)                                                 |
+| Name        | Required | Type                | Description                                                                          |
+| :---------- | :------- | :------------------ | :----------------------------------------------------------------------------------- |
+| **topic**   | Required | `string`            | Name of the topic: every user subscribed to this topic will receive the notification |
+| **message** | Required | `string` or `ICard` | The notification                                                                     |
+| mention     | Optional | `boolean`           | Append a mention to the user (@user)                                                 |
 
 ```typescript
 interface ICard {
@@ -143,7 +147,7 @@ curl -H "content-type: application/json"\
  localhost:3978/api/v1/broadcast
 ```
 
-***
+---
 
 <a id="configuration">
 
@@ -151,29 +155,63 @@ curl -H "content-type: application/json"\
 
 ### `.env`
 
-A `.env.template` file is provided:
+`.env` file is read on startup (no hot loading).
+
+A `.env.template` file is provided, you may use it as reference:
 
 ```bash
 cp .env.template .env
 ```
 
-| env var                      | use                                          |
-| :--------------------------- | :------------------------------------------- |
-| `LOCAL`                      | flag: connect to a running BotApp on Azure   |
-| `PORT`                       | listen to a different port on startup        |
-| `LOG_LEVEL`                  | logging level (debug, info, warn...)         |
-| `MICROSOFT_APP_ID`           | ClientId registered at Azure's ADD (app id)  |
-| `MICROSOFT_APP_PASSWORD`     | SecretId registered at Azure's ADD (app key) |
+| env var                  | default value | usage                                                                |
+| :----------------------- | :------------ | :------------------------------------------------------------------- |
+| `LOCAL`                  | `false`       | flag: connect to a running BotApp on Azure or local development      |
+| `MICROSOFT_APP_ID`       | `undefined`   | ClientId registered at Azure's ADD (**app id**) - apply if `!LOCAL`  |
+| `MICROSOFT_APP_PASSWORD` | `undefined`   | SecretId registered at Azure's ADD (**app key**) - apply if `!LOCAL` |
+| `PORT`                   | 3978          | listening port on startup                                            |
+| `LOG_LEVEL`              | info          | logging level (debug, info, warn...)                                 |
 
-### Topics
+**tip:** a minimal `.env` file for production may looks like:
 
-As we said, the bot offers the user a menu of topics to subscribe. On broadcast requests (`/api/v1/broadcast`), this service will check who is subscribed to the desired topic.
+```dotenv
+MICROSOFT_APP_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+MICROSOFT_APP_PASSWORD=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
 
-The available options to subscribe are configurable via `.yaml` file. An example file is provided at the root folder, just change the `value` strings to fit your system.
+### Bot Cards
+
+The cards that the bot sends as well as the available options to subscribe are configurable via `.yaml` file. `config.yaml` file is read on startup (no hot loading implemented).
+
+An example file is provided at the root folder, just change the `title` & `value` strings to fit your needs.</br>
+Note: If no `config.yaml` is provided, the service will use `config.example.yaml` by default.
 
 ```bash
 cp config.example.yaml config.yaml
 ```
+
+**Welcome message: `welcomeCard`**
+
+```yaml
+cards:
+  [...]
+  welcomeCard:
+    title: Welcome to the Private Notifications Center
+    text: ""
+```
+
+**Unknown command: `unknownCard`**
+
+```yaml
+cards:
+  [...]
+  unknownCard:
+    title: ""
+    text: Unknown command...
+```
+
+**Topics: `menuCard`**
+
+As we mentioned, the bot offers the user a menu of topics to subscribe. On broadcast requests (`/api/v1/broadcast`), this service will check who is subscribed to the desired topic.
 
 ```yaml
 cards:
@@ -199,7 +237,7 @@ This `.yaml` file would render as:
 
 ![default-options](doc/default-options.png)
 
-***
+---
 
 <a id="azure">
 
@@ -214,27 +252,27 @@ This section aims to be a quick summary of which are the minimal needs to have a
 We'll need a few resources from the [Azure portal](https://portal.azure.com/#home)
 
 1. **Resource group**.
-    - Whatever you want to name it.
+   - Whatever you want to name it.
 2. **Bot Channel Registration**.
-    - Bot handle: internal naming. Can't be changed after creation. Won't be displayed when proper naming is set.
-    - Messaging endpoint: the web address of the `msteams-private-messages` service. Can be changed after creation. Will look like:
-      ```
-      https://{domain}/api/v1/messages
-      ```
-      <img src="doc/azure-create-bot-channel.png" height=600 />
+   - Bot handle: internal naming. Can't be changed after creation. Won't be displayed when proper naming is set.
+   - Messaging endpoint: the web address of the `msteams-private-messages` service. Can be changed after creation. Will look like:
+     ```
+     https://{domain}/api/v1/messages
+     ```
+     <img src="doc/azure-create-bot-channel.png" height=600 />
 3. Go to the settings of your **Bot Channel Registration**
-    - Select "Settings": <img src="doc/azure-bot-management.png" />
-    - Copy the **Microsoft App ID** value (the one that can't be changed)
-    - Click "Manage", then "Certificate & secrets": <img src="doc/azure-manage-appid.png" height=300 />
-    - Create a "New client secret" and copy its value (you won't see it again). This will be our **Microsoft App Secret**
+   - Select "Settings": <img src="doc/azure-bot-management.png" />
+   - Copy the **Microsoft App ID** value (the one that can't be changed)
+   - Click "Manage", then "Certificate & secrets": <img src="doc/azure-manage-appid.png" height=300 />
+   - Create a "New client secret" and copy its value (you won't see it again). This will be our **Microsoft App Secret**
 4. Go back to the settings of your **Bot Channel Registration**
-    - Select "Channels": <img src="doc/azure-bot-management2.png" width=250 />
-    - Connect to Microsoft Teams channel. It should say "Running" <img src="doc/azure-connect-to-channels.png" />
+   - Select "Channels": <img src="doc/azure-bot-management2.png" width=250 />
+   - Connect to Microsoft Teams channel. It should say "Running" <img src="doc/azure-connect-to-channels.png" />
 
 ### Remote Connection
 
 We've ended up with 2 values: **Microsoft App Id** & **Microsoft App Secret**.</br>
-Copy those values in your `.env` file for enabling remote connection (!LOCAL).
+Copy those values in your `.env` file for enabling remote connection.
 
 ```dotenv
 LOCAL=false
@@ -242,17 +280,16 @@ MICROSOFT_APP_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 MICROSOFT_APP_PASSWORD=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
-***
+---
+
 <a id="local-development">
 
 ## Local Development 🖥
 
-### Prerequisites
+**Prerequisites**
 
 - Node (>=10.14)
 - Bot Framework Emulator (>=4.3.0); you can obtain it from [here](https://github.com/Microsoft/BotFramework-Emulator/releases)
-
-### Start the server
 
 1. Install modules
 
@@ -260,14 +297,13 @@ MICROSOFT_APP_PASSWORD=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 npm install
 ```
 
-2. write `.env` file; you may start using `.env.template`
+2. write `.env` file; you may start using `.env.template` for local development
 
 ```bash
 cp .env.template .env
 ```
 
-3. (OPTIONAL) write `config.yaml` file; you may use `config.example.yaml` as reference. </br>
-Note: If no `config.yaml` is provided, the service will use `config.example.yaml` by default.
+3. (OPTIONAL) write `config.yaml` file; you may use `config.example.yaml` as reference.
 
 ```bash
 cp config.example.yaml config.yaml
@@ -279,25 +315,25 @@ cp config.example.yaml config.yaml
 npm start
 ```
 
-### Emulator
+### Run on the Emulator
 
 5. Connect to the bot endpoint using Bot Framework Emulator
-    - Bot URL would be `http://localhost:3978/api/v1/messages`
-    - Leave app id and password empty for local development
-    <p align="center"><img src="doc/open-bot-emulator.png" alt="open-bot-emulator" width="300" /></p>
+   - Bot URL would be `http://localhost:3978/api/v1/messages`
+   - Leave app id and password empty for local development
+   <p align="center"><img src="doc/open-bot-emulator.png" alt="open-bot-emulator" width="300" /></p>
 
 ![local-bot-emulator](doc/local-bot-emulator.png)
 _Bot Emulator connected to local service_
 
-### Debugging on Teams app
+### Run on Teams app
 
 **prerequisites**
 
--  [`ngrok`](https://ngrok.com/) or equivalent tunneling solution
--  [M365 developer account](https://docs.microsoft.com/en-us/microsoftteams/platform/concepts/build-and-test/prepare-your-o365-tenant) or access to a Teams account with the appropriate permissions to install an app.
+- [`ngrok`](https://ngrok.com/) or equivalent tunneling solution
+- [M365 developer account](https://docs.microsoft.com/en-us/microsoftteams/platform/concepts/build-and-test/prepare-your-o365-tenant) or access to a Teams account with the appropriate permissions to install an app.
 
 1. `ngrox`: Your app will be run from a localhost server. You will need to setup `ngrok` in order to tunnel from the Teams client to localhost.</br>
-Run `ngrok` point to port 3978:
+   Run `ngrok` point to port 3978:
 
 ```bash
 ngrok http -host-header=rewrite 3978
@@ -310,24 +346,40 @@ You may test that everything is up requesting server info:
 "msteams-private-messages@x.y.z"
 ```
 
-2. TODO
+2. Make sure you've checked the [Azure ☁️](#azure) section. At settings, change the **Messaging endpoint** pointing to your `ngrok` subdomain
 
-***
+```
+Messaging endpoint:
+https://{subdomain}.ngrok.io/api/v1/messages
+```
+
+3. Click on **Channels**, then click on **Try on Microsoft Teams**
+   <img src="doc/azure-try-on-teams.png" />
+
+---
+
+<a id="upload-to-teams">
+
+## Upload to Teams 🚀
+
+TODO
+
+---
 
 <a id="faq">
 
 ## FAQ 🙋‍♀️
 
 **Q: Do I really need a whole service & db for just private notifications on MSTeams?**<br/>
-**R:** Yes. [You can't send messages to the users but rather continue a prev. conversation they started](https://github.com/microsoft/botframework-sdk/issues/4339). You need to store the reference of every conversation.
+**A:** Yes. [You can't send messages to the users but rather continue a prev. conversation they started](https://github.com/microsoft/botframework-sdk/issues/4339). You need to store the reference of every conversation.
 
 **Q: I've tried to mention the user on Bot Framework Emulator and it doesn't work**</br>
-**R:** We know. Appending a mention does work on Microsoft Teams but won't render on the Emulator. Probably this is a issue related to the Emulator itself.
+**A:** We know. Appending a mention does work on Microsoft Teams but won't render on the Emulator. Probably this is a issue related to the Emulator itself.
 
 **Q: Why the pixeled icon?**</br>
-**R:** One of the devs thought it was cool.
+**A:** One of the devs thought it was cool.
 
-***
+---
 
 <a id="doc">
 
