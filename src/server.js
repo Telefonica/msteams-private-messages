@@ -19,7 +19,8 @@ const createServer = ({
   notify,
   broadcast,
   getUsernames,
-  getTopics
+  getTopics,
+  getChannelNames
 }) => {
   // TODO use log.child()
   const server = restify.createServer({ log })
@@ -54,6 +55,12 @@ const createServer = ({
 
   server.get('/api/v1/usernames', async (_, res, next) => {
     const { status, response } = await getUsernames()
+    res.send(status, response)
+    next()
+  })
+
+  server.get('/api/v1/channels', async (_, res, next) => {
+    const { status, response } = await getChannelNames()
     res.send(status, response)
     next()
   })

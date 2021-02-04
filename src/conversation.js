@@ -6,6 +6,16 @@ const { simpleCard } = require('./cards')
 const encoder = new TextEncoder()
 
 /**
+ * @param {Partial<Types.ConversationReference>} conversationRef
+ */
+const isPrivateConversation = conversationRef => {
+  if (!conversationRef.conversation) {
+    throw Error('EMPTY_CONVERSATION')
+  }
+  return conversationRef.conversation.conversationType === 'personal'
+}
+
+/**
  * `"hi there"` => `"hi there @jane"`
  *
  * @param {Types.Context} context
@@ -61,4 +71,4 @@ const createConversation = adapter => {
   return { sendMessage }
 }
 
-module.exports = { createConversation }
+module.exports = { createConversation, isPrivateConversation }

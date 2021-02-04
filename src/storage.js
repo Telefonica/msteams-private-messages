@@ -1,5 +1,6 @@
 const { TurnContext } = require('botbuilder')
 const { log } = require('./log')
+const { isPrivateConversation } = require('./conversation')
 
 /* memory object: playground */
 const db = {
@@ -8,6 +9,9 @@ const db = {
 
   /** @type {{[username:string]: string}} */
   users: {},
+
+  /** @type {{[channelName: string]: string}} */
+  channels: {},
 
   /** @type {{[topic:string]: string[]}} */
   topics: {}
@@ -23,9 +27,26 @@ const createStorage = () => {
       const conversationId = ref.conversation.id
       log.debug('[db] updating conversation #%s', conversationId)
       db.conversations[conversationId] = ref
-      const username = activity.from.name
-      log.debug('[db] updating user "%s"', username)
-      db.users[username] = conversationId
+      try {
+        if (isPrivateConversation(ref)) {
+          const username = activity.from.name
+          log.debug('[db] updating user "%s"', username)
+          db.users[username] = conversationId
+        } else {
+          log.info(ref)
+          const channelName = activity.from.name // XXX
+          log.debug('[db] updating channel "%s"', channelName)
+          db.channels[channelName] = conversationId
+        }
+      } catch (_) {
+        log.warn(
+          'weird status: conversation #s seems to be corrupted\n' +
+            'unable to determine if its a private conversation\n' +
+            'SKIPPING conversation',
+          ref
+        )
+        // XXX remove db.conversations[conversationId]?
+      }
     },
 
     getConversation: username => {
@@ -66,6 +87,8 @@ const createStorage = () => {
     listTopics: () => Object.keys(db.topics),
 
     listUsernames: () => Object.keys(db.users),
+
+    listChannelNames: () => Object.keys(db.channels),
 
     resetSubscriptions: username => {
       log.debug('[db] removing every subscription for user "%s"', username)

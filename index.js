@@ -86,6 +86,10 @@ const handlers = {
 
   getUsernames: async () => {
     return { status: 200, response: storage.listUsernames() }
+  },
+
+  getChannelNames: async () => {
+    return { status: 200, response: storage.listChannelNames() }
   }
 }
 

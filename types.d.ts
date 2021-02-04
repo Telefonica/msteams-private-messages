@@ -14,8 +14,14 @@ declare namespace Types {
     getSubscribers: (topic: string) => string[];
     listUsernames: () => string[];
     listTopics: () => string[];
+    listChannelNames: () => string[];
     resetSubscriptions: (username: string) => void;
     removeSubscribers: (topic: string) => void;
+  }
+
+  interface HandlerResponse {
+    status: number;
+    response: any;
   }
 
   interface Handlers {
@@ -27,14 +33,15 @@ declare namespace Types {
       username: string,
       message: string,
       mention?: boolean
-    ) => Promise<{ status: number; response: any }>;
+    ) => Promise<HandlerResponse>;
     broadcast: (
       topic: string,
       message: string,
       mention?: boolean
-    ) => Promise<{ status: number; response: any }>;
-    getTopics: () => Promise<{ status: number; response: any }>;
-    getUsernames: () => Promise<{ status: number; response: any }>;
+    ) => Promise<HandlerResponse>;
+    getTopics: () => Promise<HandlerResponse>;
+    getUsernames: () => Promise<HandlerResponse>;
+    getChannelNames: () => Promise<HandlerResponse>;
   }
 
   interface ICard {

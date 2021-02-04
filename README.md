@@ -58,14 +58,17 @@ We've implemented a MSTeams Bot that allows us to interact with users through te
 
 ### Summary
 
-|                                       | endpoint            | method | body                             |
-| :------------------------------------ | :------------------ | :----- | :------------------------------- |
-| Server Info                           | `/`                 | `GET`  | ---                              |
-| Private notification to user          | `/api/v1/notify`    | `POST` | `{username*, message*, mention}` |
-| Broadcast notification to subscribers | `/api/v1/broadcast` | `POST` | `{topic*, message*, mention}`    |
-| Bot-SDK entry-point                   | `/api/v1/messages`  | `POST` | _used by Bot-SDK_                |
-| Inspect: list usernames               | `/api/v1/usernames` | `GET`  | ---                              |
-| Inspect: list topics & subscribers    | `/api/v1/topics`    | `GET`  | ---                              |
+|                                                     | endpoint            | method | body                             |
+| :-------------------------------------------------- | :------------------ | :----- | :------------------------------- |
+| Server Info                                         | `/`                 | `GET`  | ---                              |
+| [Private notification to user](#notify)             | `/api/v1/notify`    | `POST` | `{username*, message*, mention}` |
+| [Broadcast notification to subscribers](#broadcast) | `/api/v1/broadcast` | `POST` | `{topic*, message*, mention}`    |
+| Bot-SDK entry-point                                 | `/api/v1/messages`  | `POST` | _used by Bot-SDK_                |
+| [Debugging: list usernames](#usernames)             | `/api/v1/usernames` | `GET`  | ---                              |
+| [Debugging: list topics & subscribers](#topics)     | `/api/v1/topics`    | `GET`  | ---                              |
+| [Debugging: list channels](#channels)               | `/api/v1/channels`  | `GET`  | ---                              |
+
+<a id="notify" />
 
 ### Private notification to user
 
@@ -108,6 +111,8 @@ curl -H "content-type: application/json"\
  localhost:3978/api/v1/notify
 ```
 
+<a id="broadcast" />
+
 ### Broadcast notification to subscribers
 
 ```
@@ -149,11 +154,17 @@ curl -H "content-type: application/json"\
  localhost:3978/api/v1/broadcast
 ```
 
-### Inspect: list usernames
+<a id="usernames" />
+
+### Debugging: list usernames
 
 ```
 GET /api/v1/usernames
 ```
+
+### Query params
+
+None
 
 ### Examples
 
@@ -165,15 +176,21 @@ curl -s localhost:3978/api/v1/usernames | jq
 ]
 ```
 
-### Inspect: list topics & subscribers
+<a id="topics" />
+
+### Debugging: list topics & subscribers
 
 ```
 GET /api/v1/topics
 ```
 
+### Query params
+
+None
+
 ### Examples
 
-````bash
+```bash
 curl -s localhost:3978/api/v1/topics | jq
 {
   "banana": [
@@ -187,10 +204,30 @@ curl -s localhost:3978/api/v1/topics | jq
     "Jhon Smith"
   ]
 }
+```
+
+<a id="channels" />
+
+### Debugging: list channels
+
+```
+GET /api/v1/channels
+```
+
+### Query params
+
+None
+
+### Examples
+
+```bash
+curl -s localhost:3978/api/v1/channels | jq
+[]
+```
 
 ---
 
-<a id="configuration">
+<a id="configuration" />
 
 ## Configuration 🏗
 
