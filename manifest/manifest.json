@@ -1,0 +1,91 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.8/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.8",
+  "version": "0.3.0",
+  "id": "9c725fae-7870-4016-84b6-e3b96a3994eb",
+  "packageName": "com.telefonica.lifecycle.msteams-private-messages",
+  "localizationInfo": {
+    "defaultLanguageTag": "en-us",
+    "additionalLanguages": [
+      {
+        "languageTag": "es-es",
+        "file": "en-us.json"
+      }
+    ]
+  },
+  "developer": {
+    "name": "Lifecycle@telefonica.com",
+    "websiteUrl": "https://github.com/Telefonica/msteams-private-messages",
+    "privacyUrl": "https://www.telefonica.com/es/web/shareholders-investors/proteccion-de-datos-de-caracter-personal",
+    "termsOfUseUrl": "https://www.telefonica.com/es/web/shareholders-investors/aviso_legal"
+  },
+  "name": {
+    "short": "Notifications",
+    "full": "Private Notifications Center"
+  },
+  "description": {
+    "short": "Private Notifications Center",
+    "full": "As conversational bot, when the user starts a conversation, this service saves a reference to that conversation as well as the username. The bot offers the user a menu of topics to subscribe, if the user subscribes to any of those, the service stores this preferences for messaging the user"
+  },
+  "icons": {
+    "outline": "icon-32.png",
+    "color": "icon-196.png"
+  },
+  "accentColor": "#ffffff",
+  "bots": [
+    {
+      "botId": "9c725fae-7870-4016-84b6-e3b96a3994eb",
+      "scopes": [
+        "team",
+        "personal",
+        "groupchat"
+      ],
+      "needsChannelSelector": false,
+      "isNotificationOnly": false,
+      "supportsFiles": false,
+      "supportsCalling": false,
+      "supportsVideo": false
+    }
+  ],
+  "permissions": [
+    "identity",
+    "messageTeamMembers"
+  ],
+  "devicePermissions": [
+    "notifications"
+  ],
+  "validDomains": [
+  ],
+  "webApplicationInfo": {
+    "id": "9c725fae-7870-4016-84b6-e3b96a3994eb",
+    "resource": "Resource URL for acquiring auth token for SSO",
+    "applicationPermissions": [
+      "TeamSettings.Read.Group",
+      "ChannelSettings.Read.Group",
+      "ChannelSettings.Edit.Group",
+      "Channel.Create.Group",
+      "Channel.Delete.Group",
+      "ChannelMessage.Read.Group",
+      "TeamsApp.Read.Group",
+      "TeamsTab.Read.Group",
+      "TeamsTab.Create.Group",
+      "TeamsTab.Edit.Group",
+      "TeamsTab.Delete.Group",
+      "Member.Read.Group",
+      "Owner.Read.Group",
+      "Member.ReadWrite.Group",
+      "Owner.ReadWrite.Group"
+    ]
+  },
+  "showLoadingIndicator": true,
+  "isFullScreen": false,
+  "activities": {
+    "activityTypes": [
+      {
+        "type": "userMention",
+        "description": "Personal mention activity",
+        "templateText": "<team member> mentioned you"
+      }
+    ]
+  }
+}

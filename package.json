@@ -7,7 +7,8 @@
     "start": "node index.js | ./node_modules/.bin/bunyan",
     "lint": "eslint . -f table .",
     "types": "tsc --build tsconfig.json",
-    "test": "jest"
+    "test": "jest",
+    "manifest": "zip manifest/manifest-$npm_package_version.zip -j manifest/manifest.json manifest/icon-196.png manifest/icon-32.png -q -9"
   },
   "keywords": [
     "Microsoft Teams",
