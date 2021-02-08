@@ -5,17 +5,28 @@ declare namespace Types {
   type Context = import("botbuilder").TurnContext;
 
   interface Storage {
-    saveConversation: (activity: Activity) => void;
+    saveConversation: (
+      user: string,
+      conversation: Partial<ConversationReference>
+    ) => Promise<boolean>;
+
     getConversation: (
-      username: string
-    ) => Partial<ConversationReference> | null;
-    subscribe: (activity: Activity, topic: string) => void;
-    getSubscribedTopics: (username: string) => string[];
-    getSubscribers: (topic: string) => string[];
-    listUsernames: () => string[];
-    listTopics: () => string[];
-    resetSubscriptions: (username: string) => void;
-    removeSubscribers: (topic: string) => void;
+      user: string
+    ) => Promise<Partial<ConversationReference> | null>;
+
+    subscribe: (user: string, topic: string) => Promise<boolean>;
+
+    getSubscribedTopics: (user: string) => Promise<string[]>;
+
+    getSubscribers: (topic: string) => Promise<string[]>;
+
+    listUsers: () => Promise<string[]>;
+
+    listTopics: () => Promise<string[]>;
+
+    resetSubscriptions: (user: string) => Promise<boolean>;
+
+    removeSubscribers: (topic: string) => Promise<boolean>;
   }
 
   interface Handlers {
@@ -24,7 +35,7 @@ declare namespace Types {
       res: import("restify").Response
     ) => Promise<void>;
     notify: (
-      username: string,
+      user: string,
       message: string,
       mention?: boolean
     ) => Promise<{ status: number; response: any }>;
@@ -33,8 +44,8 @@ declare namespace Types {
       message: string,
       mention?: boolean
     ) => Promise<{ status: number; response: any }>;
+    getUsers: () => Promise<{ status: number; response: any }>;
     getTopics: () => Promise<{ status: number; response: any }>;
-    getUsernames: () => Promise<{ status: number; response: any }>;
   }
 
   interface ICard {

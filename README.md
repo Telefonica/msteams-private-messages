@@ -58,14 +58,14 @@ We've implemented a MSTeams Bot that allows us to interact with users through te
 
 ### Summary
 
-|                                       | endpoint            | method | body                             |
-| :------------------------------------ | :------------------ | :----- | :------------------------------- |
-| Server Info                           | `/`                 | `GET`  | ---                              |
-| Private notification to user          | `/api/v1/notify`    | `POST` | `{username*, message*, mention}` |
-| Broadcast notification to subscribers | `/api/v1/broadcast` | `POST` | `{topic*, message*, mention}`    |
-| Bot-SDK entry-point                   | `/api/v1/messages`  | `POST` | _used by Bot-SDK_                |
-| Inspect: list usernames               | `/api/v1/usernames` | `GET`  | ---                              |
-| Inspect: list topics & subscribers    | `/api/v1/topics`    | `GET`  | ---                              |
+|                                       | endpoint            | method | body                                                    |
+| :------------------------------------ | :------------------ | :----- | :------------------------------------------------------ |
+| Server Info                           | `/`                 | `GET`  | ---                                                     |
+| Private notification to user          | `/api/v1/notify`    | `POST` | <pre>{<br> user*,<br> message*,<br> mention<br>}</pre>  |
+| Broadcast notification to subscribers | `/api/v1/broadcast` | `POST` | <pre>{<br> topic*,<br> message*,<br> mention<br>}</pre> |
+| Bot-SDK entry-point                   | `/api/v1/messages`  | `POST` | _used by Bot-SDK_                                       |
+| Inspect: list users                   | `/api/v1/users`     | `GET`  | ---                                                     |
+| Inspect: list topics & subscribers    | `/api/v1/topics`    | `GET`  | ---                                                     |
 
 ### Private notification to user
 
@@ -75,11 +75,11 @@ POST /api/v1/notify
 
 #### Parameters
 
-| Name         | Required | Type                | Description                                |
-| :----------- | :------- | :------------------ | :----------------------------------------- |
-| **username** | Required | `string`            | Name of the recipient for the notification |
-| **message**  | Required | `string` or `ICard` | The notification                           |
-| mention      | Optional | `boolean`           | Append a mention to the user (@user)       |
+| Name        | Required | Type                | Description                                |
+| :---------- | :------- | :------------------ | :----------------------------------------- |
+| **user**    | Required | `string`            | Name of the recipient for the notification |
+| **message** | Required | `string` or `ICard` | The notification                           |
+| mention     | Optional | `boolean`           | Append a mention to the user (@user)       |
 
 ```typescript
 interface ICard {
@@ -92,19 +92,19 @@ interface ICard {
 
 ```bash
 curl -H "content-type: application/json"\
- -d '{"username": "Jane Doe", "message": "hi there"}'\
+ -d '{"user": "jane.doe@megacoorp.com", "message": "hi there"}'\
  localhost:3978/api/v1/notify
 ```
 
 ```bash
 curl -H "content-type: application/json"\
- -d '{"username": "Jane Doe", "message": {"text": "this is the text", "title": "this is the title"}}'\
+ -d '{"user": "jane.doe@megacoorp.com", "message": {"text": "this is the text", "title": "this is the title"}}'\
  localhost:3978/api/v1/notify
 ```
 
 ```bash
 curl -H "content-type: application/json"\
- -d '{"username": "Jane Doe", "message": "hi there", "mention": true}'\
+ -d '{"user": "jane.doe@megacoorp.com", "message": "hi there", "mention": true}'\
  localhost:3978/api/v1/notify
 ```
 
@@ -152,16 +152,16 @@ curl -H "content-type: application/json"\
 ### Inspect: list usernames
 
 ```
-GET /api/v1/usernames
+GET /api/v1/users
 ```
 
 ### Examples
 
 ```bash
-curl -s localhost:3978/api/v1/usernames | jq
+curl -s localhost:3978/api/v1/users | jq
 [
-  "Jane Doe",
-  "Jhon Smith"
+  "jane.doe@megacoorp.com",
+  "jhon.smith@contractor.com"
 ]
 ```
 
@@ -177,20 +177,21 @@ GET /api/v1/topics
 curl -s localhost:3978/api/v1/topics | jq
 {
   "banana": [
-    "Jane Doe"
+    "jane.doe@megacoorp.com"
   ],
   "orange": [
-    "Jane Doe",
-    "Jhon Smith"
+    "jane.doe@megacoorp.com",
+    "jhon.smith@contractor.com"
   ],
   "apple": [
-    "Jhon Smith"
+    "jhon.smith@contractor.com"
   ]
 }
+```
 
 ---
 
-<a id="configuration">
+<a id="configuration" />
 
 ## Configuration 🏗
 
@@ -416,6 +417,16 @@ TODO
 
 **Q: I've tried to mention the user on Bot Framework Emulator and it doesn't work**</br>
 **A:** We know. Appending a mention does work on Microsoft Teams but won't render on the Emulator. Probably this is a issue related to the Emulator itself.
+
+**Q: Getting 401 error all the time. Already checked my Azure App ID + pass**
+```bash
+Error: BotFrameworkAdapter.processActivity(): 401 ERROR
+ Error: Unauthorized. Invalid AppId passed on token: <YOUR APP ID>
+```
+**A:** Assuming you've provided correct credentials (ID + pass), check that you aren't launching the server using `LOCAL` mode (you wouldn't believe how many times this happened to me)
+```dotenv
+LOCAL=false
+```
 
 **Q: Why the pixeled icon?**</br>
 **A:** One of the devs thought it was cool.

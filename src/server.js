@@ -18,7 +18,7 @@ const createServer = ({
   processMessage,
   notify,
   broadcast,
-  getUsernames,
+  getUsers,
   getTopics
 }) => {
   // TODO use log.child()
@@ -52,8 +52,8 @@ const createServer = ({
     next()
   })
 
-  server.get('/api/v1/usernames', async (_, res, next) => {
-    const { status, response } = await getUsernames()
+  server.get('/api/v1/users', async (_, res, next) => {
+    const { status, response } = await getUsers()
     res.send(status, response)
     next()
   })
@@ -64,18 +64,18 @@ const createServer = ({
   })
 
   server.post('/api/v1/notify', async (req, res, next) => {
-    const username = req.body ? req.body.username : undefined
+    const user = req.body ? req.body.user : undefined
     const message = req.body ? req.body.message : undefined
-    if (!username || !message) {
+    if (!user || !message) {
       res.send(400, {
         code: 'BadRequest',
-        required: ['username', 'message'],
-        got: { username, message }
+        required: ['user', 'message'],
+        got: { user, message }
       })
       return next()
     }
     const { status, response } = await notify(
-      username,
+      user,
       message,
       includeMention(req)
     )

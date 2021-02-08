@@ -1,7 +1,38 @@
-const { ActivityHandler } = require('botbuilder')
+const {
+  ActivityHandler,
+  TeamsInfo,
+  teamsGetTeamId,
+  teamsGetChannelId,
+  TurnContext
+} = require('botbuilder')
 const { prepareCards } = require('./cards')
 const { readConfig } = require('./config')
 const { log } = require('./log')
+
+const USE_EMAIL_AS_KEY = true // read from /env
+
+/**
+ * @param {Types.Context} context
+ */
+const extractInfoFromContext = async context => {
+  const conversation = TurnContext.getConversationReference(context.activity)
+  log.debug(conversation)
+  let user = context.activity.from.name
+  if (USE_EMAIL_AS_KEY) {
+    try {
+      const memeberInfo = await TeamsInfo.getMember(
+        context,
+        context.activity.from.id
+      )
+      /* check if we need .email or .userPrincipalName (seems to be the same) */
+      user = memeberInfo.email
+    } catch (err) {
+      // we've tried our best, lets keep the username
+      log.warn(err, 'considering username (%s) instead of user.email', user)
+    }
+  }
+  return { conversation, user }
+}
 
 /**
  * @param {Types.Storage} storage
@@ -16,7 +47,9 @@ const createBot = storage => {
    */
   bot.onConversationUpdate(async (context, next) => {
     log.debug('[bot] onConversationUpdate')
-    storage.saveConversation(context.activity)
+    /* perf: check if needed to save on db */
+    const { user, conversation } = await extractInfoFromContext(context)
+    await storage.saveConversation(user, conversation)
     await next()
   })
 
@@ -26,6 +59,7 @@ const createBot = storage => {
    */
   bot.onMembersAdded(async (context, next) => {
     log.debug('[bot] onMembersAdded')
+    /* perf: check if needed to do this loop */
     const membersAdded = context.activity.membersAdded
     for (let cnt = 0; cnt < membersAdded.length; cnt++) {
       if (membersAdded[cnt].id !== context.activity.recipient.id) {
@@ -40,31 +74,38 @@ const createBot = storage => {
    */
   bot.onMessage(async (context, next) => {
     log.debug('[bot] onMessage')
-    storage.saveConversation(context.activity)
-    const username = context.activity.from.name
-    const text = context.activity.text
+    /* perf: call only db if needed */
+    const { user, conversation } = await extractInfoFromContext(context)
+    await storage.saveConversation(user, conversation)
 
     const { check, reset, subscriptions } = cards.registeredKeywords()
+    const text = context.activity.text
+
     if (text === check) {
-      const info = storage.getSubscribedTopics(username)
+      const info = await storage.getSubscribedTopics(user)
       // TODO: cool card instead
       await context.sendActivity(
         `subscribed to ${info.length} topics (${info.toString()})`
       )
     } else if (text === reset) {
-      storage.resetSubscriptions(username)
-      const info = storage.getSubscribedTopics(username)
+      storage.resetSubscriptions(user)
+      const info = await storage.getSubscribedTopics(user)
       // TODO: cool card instead
       await context.sendActivity(
         `subscribed to ${info.length} topics (${info.toString()})`
       )
     } else if (subscriptions.indexOf(text) > -1) {
-      storage.subscribe(context.activity, text)
-      const info = storage.getSubscribedTopics(username)
+      await storage.subscribe(user, text)
+      const info = await storage.getSubscribedTopics(user)
       // TODO: cool card instead
       await context.sendActivity(
         `subscribed to ${info.length} topics (${info.toString()})`
       )
+    } else if (text === 'DEBUG') {
+      const teamId = await teamsGetTeamId(context.activity)
+      log.info('teamId: %s', teamId)
+      const channelId = await teamsGetChannelId(context.activity)
+      log.info('channelId: %s', channelId)
     } else {
       await context.sendActivities([cards.unknownCard(), cards.menuCard()])
     }

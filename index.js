@@ -28,14 +28,14 @@ const handlers = {
     })
   },
 
-  notify: async (username, message, mention) => {
-    const conversationRef = storage.getConversation(username)
+  notify: async (user, message, mention) => {
+    const conversationRef = await storage.getConversation(user)
     if (!conversationRef) {
       return {
         status: 404,
         response: {
           code: 'NotFound',
-          input: { username, message }
+          input: { user, message }
         }
       }
     }
@@ -48,14 +48,14 @@ const handlers = {
   },
 
   broadcast: async (topic, message, mention) => {
-    const subscribers = storage.getSubscribers(topic)
+    const subscribers = await storage.getSubscribers(topic)
     const conversationRefs = []
-    for (const username of subscribers) {
-      const conversationRef = storage.getConversation(username)
+    for (const user of subscribers) {
+      const conversationRef = await storage.getConversation(user)
       if (!conversationRef) {
         log.warn(
           'weird status: user "%s" seems to be subscribed to "%s" but conversationRef not found\nSKIPPING.',
-          username,
+          user,
           topic
         )
       } else {
@@ -70,7 +70,7 @@ const handlers = {
   },
 
   getTopics: async () => {
-    const topicNames = storage.listTopics()
+    const topicNames = await storage.listTopics()
     /** @type {{[name: string]: string[]}} */
     const topics = topicNames.reduce((acc, cur) => {
       // @ts-ignore
@@ -78,14 +78,16 @@ const handlers = {
       return acc
     }, {})
     for (const topic of topicNames) {
-      topics[topic] = topics[topic].concat(storage.getSubscribers(topic))
+      const subscribers = await storage.getSubscribers(topic)
+      topics[topic] = topics[topic].concat(subscribers)
     }
     log.debug(topics)
     return { status: 200, response: topics }
   },
 
-  getUsernames: async () => {
-    return { status: 200, response: storage.listUsernames() }
+  getUsers: async () => {
+    const users = await storage.listUsers()
+    return { status: 200, response: users }
   }
 }
 
