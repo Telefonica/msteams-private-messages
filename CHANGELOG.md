@@ -1,3 +1,10 @@
+# [0.4.0](https://github.com/Telefonica/msteams-private-messages/compare/v0.3.0...v0.4.0) (2021-02-08)
+
+
+### Features
+
+* considering "user" instead of user name ([e65941f](https://github.com/Telefonica/msteams-private-messages/commit/e65941fe9538fab1966a2b2748e3ec5b25c0e631))
+
 # [0.3.0](https://github.com/Telefonica/msteams-private-messages/compare/v0.2.0...v0.3.0) (2021-02-03)
 
 
