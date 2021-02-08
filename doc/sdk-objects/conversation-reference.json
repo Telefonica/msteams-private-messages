@@ -1,0 +1,20 @@
+{
+    "activityId": "16123xxxxxxxx",
+    "user": {
+        "id": "29:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "name": "Jane Doe",
+        "aadObjectId": "1xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+    },
+    "bot": {
+        "id": "28:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "name": "Private Notifications Center"
+    },
+    "conversation": {
+        "conversationType": "personal",
+        "tenantId": "9xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx",
+        "id": "a:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "channelId": "msteams",
+    "locale": "en-US",
+    "serviceUrl": "https://smba.trafficmanager.net/emea/"
+}

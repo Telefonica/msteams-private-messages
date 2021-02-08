@@ -1,0 +1,12 @@
+{
+    "id": "29:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "name": "Jane Doe",
+    "objectId": "6xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    "givenName": "JANE",
+    "surname": "DOE",
+    "email": "jane.doe@megacoorp.com",
+    "userPrincipalName": "jane.doe@megacoorp.com",
+    "tenantId":  "9xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx",
+    "userRole": "user",
+    "aadObjectId": "1xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+}
