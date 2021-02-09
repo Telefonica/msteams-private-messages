@@ -11,3 +11,5 @@ plugins:
   - "json"
   - "jest"
 rules: {}
+ignorePatterns:
+  - db

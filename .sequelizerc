@@ -1,0 +1,11 @@
+#!/usr/bin/env node
+//@see https://sequelize.org/master/manual/migrations.html#the--code--sequelizerc--code--file
+
+const path = require('path');
+
+module.exports = {
+  'config': path.resolve('db', 'sequelize', 'config', 'database.js'),
+  'models-path': path.resolve('db', 'sequelize', 'models'),
+  'seeders-path': path.resolve('db', 'sequelize', 'seeders'),
+  'migrations-path': path.resolve('db', 'sequelize', 'migrations')
+};

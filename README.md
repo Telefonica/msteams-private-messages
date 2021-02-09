@@ -444,3 +444,4 @@ LOCAL=false
 - [Docs: Send proactive notifications to users](https://docs.microsoft.com/en-us/azure/bot-service/bot-builder-howto-proactive-message?view=azure-bot-service-4.0&tabs=csharp)
 - [Docs: Bot channels registration](https://docs.microsoft.com/en-us/azure/bot-service/bot-service-quickstart-registration?view=azure-bot-service-4.0)
 - [Code: microsoft/BotBuilder-Samples](https://github.com/microsoft/BotBuilder-Samples)
+- [Post: Sequelize relationships - Ultimate guide](https://medium.com/@eth3rnit3/sequelize-relationships-ultimate-guide-f26801a75554)
