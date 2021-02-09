@@ -1,0 +1,8 @@
+.github
+.vscode
+doc
+*.md
+*.png
+
+node_modules
+npm-debug.log
