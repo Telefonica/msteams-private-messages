@@ -1,13 +1,15 @@
 // @ts-nocheck
+const { log } = require('../log')
 const { memoryStorage } = require('./memory')
 
 /** @return {Types.Storage} */
 const createStorage = () => {
-  const selection = process.env.STORAGE || 'memory'
-  const selectedStorage = {
-    memory: memoryStorage
-    // TODO
-  }[selection]
+  const selectedStorage =
+    {
+      memory: memoryStorage
+      // TODO
+    }[process.env.STORAGE] || memoryStorage
+  log.info('[STARTUP]', `storage selected: ${process.env.STORAGE || 'memory'}`)
   return selectedStorage
 }
 
