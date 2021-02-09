@@ -1,3 +1,15 @@
+# [0.5.0](https://github.com/Telefonica/msteams-private-messages/compare/v0.4.0...v0.5.0) (2021-02-09)
+
+
+### Bug Fixes
+
+* selecting memory storage by default ([5c5b831](https://github.com/Telefonica/msteams-private-messages/commit/5c5b8319a7c191d88f9affc8db5916a264045897))
+
+
+### Features
+
+* dockerfile ([453f282](https://github.com/Telefonica/msteams-private-messages/commit/453f282140e98cc0d9174207015be100b1c34a62))
+
 # [0.4.0](https://github.com/Telefonica/msteams-private-messages/compare/v0.3.0...v0.4.0) (2021-02-08)
 
 
