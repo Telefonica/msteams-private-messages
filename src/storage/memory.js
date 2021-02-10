@@ -41,6 +41,18 @@ const getConversation = async user => {
 }
 
 /**
+ * @param {string} topic
+ */
+const registerTopic = async topic => {
+  log.debug('[db] registering new topic: "%s"', topic)
+  if (!db.topics[topic]) {
+    db.topics[topic] = []
+    return true
+  }
+  return false
+}
+
+/**
  * @param {string} user
  * @param {string} topic
  */
@@ -107,9 +119,10 @@ const removeSubscribers = async topic => {
 /**
  * @type {Types.Storage}
  */
-const memoryStorage = {
+const storage = {
   saveConversation,
   getConversation,
+  registerTopic,
   subscribe,
   getSubscribedTopics,
   getSubscribers,
@@ -119,4 +132,7 @@ const memoryStorage = {
   removeSubscribers
 }
 
-module.exports = { memoryStorage }
+module.exports = {
+  tryConnection: () => Promise.resolve(true),
+  storage
+}

@@ -5,7 +5,8 @@ services:
     build: .
     image: lifecycle/msteams-private-messages
     container_name: mpm-server
-    environment: []
+    environment:
+      - MYSQL_HOST=mpm-db
     depends_on:
       - mpm-db
     ports:

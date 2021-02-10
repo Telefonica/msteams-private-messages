@@ -14,9 +14,11 @@ declare namespace Types {
       user: string
     ) => Promise<Partial<ConversationReference> | null>;
 
+    registerTopic: (topic: string) => Promise<boolean>;
+
     subscribe: (user: string, topic: string) => Promise<boolean>;
 
-    getSubscribedTopics: (user: string) => Promise<string[]>;
+    getSubscribedTopics: (user: string) => Promise<string[] | null>;
 
     getSubscribers: (topic: string) => Promise<string[]>;
 
@@ -30,10 +32,12 @@ declare namespace Types {
   }
 
   interface Handlers {
+    /* bot-SDK entry point */
     processMessage: (
       req: import("restify").Request,
       res: import("restify").Response
     ) => Promise<void>;
+    /* main methods */
     notify: (
       user: string,
       message: string,
@@ -44,8 +48,15 @@ declare namespace Types {
       message: string,
       mention?: boolean
     ) => Promise<{ status: number; response: any }>;
+    /* debugging */
     getUsers: () => Promise<{ status: number; response: any }>;
     getTopics: () => Promise<{ status: number; response: any }>;
+    /* ops */
+    createTopic: (topic: string) => Promise<{ status: number; response: any }>;
+    forceSubscription: (
+      user: string,
+      topic: string
+    ) => Promise<{ status: number; response: any }>;
   }
 
   interface ICard {
