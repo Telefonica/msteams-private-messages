@@ -28,10 +28,11 @@ const appendMentionToMsg = (context, message) => {
  */
 const createConversation = adapter => {
   /**
+   * @doc https://docs.microsoft.com/en-us/azure/bot-service/bot-builder-howto-proactive-message?view=azure-bot-service-4.0&tabs=javascript
+   *
    * @param {Partial<Types.ConversationReference>} conversationRef
    * @param {string | Types.ICard} message
    * @param {boolean} includeMention
-   * @doc https://docs.microsoft.com/en-us/azure/bot-service/bot-builder-howto-proactive-message?view=azure-bot-service-4.0&tabs=javascript
    */
   const sendMessage = async (
     conversationRef,
@@ -40,7 +41,7 @@ const createConversation = adapter => {
   ) => {
     await adapter.continueConversation(conversationRef, async context => {
       const conversationId = conversationRef.conversation.id
-      log.debug('conversation #%s restored', conversationId)
+      log.debug('[adapter] conversation #%s restored', conversationId)
       let messageAsActivity
       if (typeof message === 'string') {
         messageAsActivity = includeMention
