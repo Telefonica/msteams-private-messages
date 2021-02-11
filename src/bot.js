@@ -9,14 +9,14 @@ const { prepareCards } = require('./cards')
 const { readConfig } = require('./config')
 const { log } = require('./log')
 
-const USE_EMAIL_AS_KEY = true // read from /env
+const USE_EMAIL_AS_KEY = true // FIXME read from .env
 
 /**
  * @param {Types.Context} context
  */
 const extractInfoFromContext = async context => {
   const conversation = TurnContext.getConversationReference(context.activity)
-  log.debug(conversation)
+  log.debug('[bot] conversation: ', conversation)
   let user = context.activity.from.name
   if (USE_EMAIL_AS_KEY) {
     try {
@@ -88,7 +88,7 @@ const createBot = storage => {
         `subscribed to ${info.length} topics (${info.toString()})`
       )
     } else if (text === reset) {
-      storage.resetSubscriptions(user)
+      await storage.resetSubscriptions(user)
       const info = await storage.getSubscribedTopics(user)
       // TODO: cool card instead
       await context.sendActivity(
