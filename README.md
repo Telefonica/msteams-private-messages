@@ -215,16 +215,22 @@ cp .env.template .env
 ```bash
 cp config.example.yaml config.yaml
 ```
-
-4. Start the server
+4. Configure the mysql database
+```
+docker-compose up -d
+mysql -h 127.0.0.1 -u root -e "create database flowboteams;"
+npx sequelize-cli db:migrate
+```
+5. Start the database and server
 
 ```bash
-npm start
+docker-compose up -d
 ```
 
 ### Run on the Emulator
 
 5. Connect to the bot endpoint using Bot Framework Emulator
+   - add "172.17.0.1" to the setting "localhost override" in the Emulator
    - Bot URL would be `http://localhost:3978/api/v1/messages`
    - Leave app id and password empty for local development
    <p align="center"><img src="doc/open-bot-emulator.png" alt="open-bot-emulator" width="300" /></p>
