@@ -11,6 +11,6 @@ module.exports = {
     port: process.env.MYSQL_PORT || 3306,
     dialect: 'mysql',
     dialectModule: mysql2,
-    logging: msg => log.debug(msg) /* route db log to app's log - DEBUG level */
+    logging: msg => log.trace(msg) /* route db log to app's log - TRACE level */
   }
 }
