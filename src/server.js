@@ -55,12 +55,11 @@ const createServer = ({
   })
 
   server.post('/api/v1/topics', async (req, res, next) => {
-    const topic = req.body ? req.body.topic : undefined
+    const topic = req.body ? req.body.name : undefined
     if (!topic) {
       res.send(400, {
         code: 'BadRequest',
-        required: ['topic'],
-        got: { topic }
+        required: ['name']
       })
       return next()
     }

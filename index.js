@@ -35,21 +35,20 @@ const run = async () => {
           status: 404,
           response: {
             code: 'NotFound',
-            input: { user, message }
+            input: { user }
           }
         }
       }
       await conversation.sendMessage(conversationRef, message, mention)
-
       return {
         status: 202,
-        response: { conversationRef }
+        response: { conversationKey: conversationRef.conversation.id }
       }
     },
 
     broadcast: async (topic, message, mention) => {
       const subscribers = await storage.getSubscribers(topic)
-      const conversationRefs = []
+      const conversationKeys = []
       for (const user of subscribers) {
         const conversationRef = await storage.getConversation(user)
         if (!conversationRef) {
@@ -57,13 +56,13 @@ const run = async () => {
             `weird status: user "${user}" seems to be subscribed to "${topic}" but conversationRef not found. SKIPPING.`
           )
         } else {
-          conversationRefs.push(conversationRef)
+          conversationKeys.push(conversationRef.conversation.id)
           conversation.sendMessage(conversationRef, message, mention)
         }
       }
       return {
         status: 202,
-        response: { conversationRefs }
+        response: { conversationKeys }
       }
     },
 
@@ -97,7 +96,7 @@ const run = async () => {
     forceSubscription: async (user, topic) => {
       const success = await storage.subscribe(user, topic)
       const subscriptions = await storage.getSubscribedTopics(user)
-      const status = success ? 201 : 500
+      const status = success && subscriptions ? 200 : 500
       return { status, response: subscriptions }
     }
   }
