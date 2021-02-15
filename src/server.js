@@ -19,7 +19,9 @@ const createServer = ({
   notify,
   broadcast,
   getUsers,
-  getTopics
+  getTopics,
+  createTopic,
+  forceSubscription
 }) => {
   // TODO use log.child()
   const server = restify.createServer({ log })
@@ -48,6 +50,37 @@ const createServer = ({
 
   server.get('/api/v1/topics', async (_, res, next) => {
     const { status, response } = await getTopics()
+    res.send(status, response)
+    next()
+  })
+
+  server.post('/api/v1/topics', async (req, res, next) => {
+    const topic = req.body ? req.body.topic : undefined
+    if (!topic) {
+      res.send(400, {
+        code: 'BadRequest',
+        required: ['topic'],
+        got: { topic }
+      })
+      return next()
+    }
+    const { status, response } = await createTopic(topic)
+    res.send(status, response)
+    next()
+  })
+
+  server.post('/api/v1/topics/:topic', async (req, res, next) => {
+    const user = req.body ? req.body.user : undefined
+    if (!user) {
+      res.send(400, {
+        code: 'BadRequest',
+        required: ['user'],
+        got: { user }
+      })
+      return next()
+    }
+    const topic = req.params.topic
+    const { status, response } = await forceSubscription(user, topic)
     res.send(status, response)
     next()
   })

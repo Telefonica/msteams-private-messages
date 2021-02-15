@@ -20,7 +20,7 @@ This is a NodeJs service exposing:
 **Table of contents**
 
 1. [Our Use Case 🎯](#our-use-case)
-2. [API 🎨](#api)
+2. [API 🎨](doc/api.md)
 3. [Configuration 🏗](#configuration)
 4. [Azure ☁️](#azure)
 5. [Local Development 🖥](#local-development)
@@ -52,142 +52,7 @@ We've implemented a MSTeams Bot that allows us to interact with users through te
 
 ---
 
-<a id="api">
 
-## API 🎨
-
-### Summary
-
-|                                       | endpoint            | method | body                                                    |
-| :------------------------------------ | :------------------ | :----- | :------------------------------------------------------ |
-| Server Info                           | `/`                 | `GET`  | ---                                                     |
-| Private notification to user          | `/api/v1/notify`    | `POST` | <pre>{<br> user*,<br> message*,<br> mention<br>}</pre>  |
-| Broadcast notification to subscribers | `/api/v1/broadcast` | `POST` | <pre>{<br> topic*,<br> message*,<br> mention<br>}</pre> |
-| Bot-SDK entry-point                   | `/api/v1/messages`  | `POST` | _used by Bot-SDK_                                       |
-| Inspect: list users                   | `/api/v1/users`     | `GET`  | ---                                                     |
-| Inspect: list topics & subscribers    | `/api/v1/topics`    | `GET`  | ---                                                     |
-
-### Private notification to user
-
-```
-POST /api/v1/notify
-```
-
-#### Parameters
-
-| Name        | Required | Type                | Description                                |
-| :---------- | :------- | :------------------ | :----------------------------------------- |
-| **user**    | Required | `string`            | Name of the recipient for the notification |
-| **message** | Required | `string` or `ICard` | The notification                           |
-| mention     | Optional | `boolean`           | Append a mention to the user (@user)       |
-
-```typescript
-interface ICard {
-  title: string;
-  text: string;
-}
-```
-
-#### Examples
-
-```bash
-curl -H "content-type: application/json"\
- -d '{"user": "jane.doe@megacoorp.com", "message": "hi there"}'\
- localhost:3978/api/v1/notify
-```
-
-```bash
-curl -H "content-type: application/json"\
- -d '{"user": "jane.doe@megacoorp.com", "message": {"text": "this is the text", "title": "this is the title"}}'\
- localhost:3978/api/v1/notify
-```
-
-```bash
-curl -H "content-type: application/json"\
- -d '{"user": "jane.doe@megacoorp.com", "message": "hi there", "mention": true}'\
- localhost:3978/api/v1/notify
-```
-
-### Broadcast notification to subscribers
-
-```
-POST /api/v1/broadcast
-```
-
-#### Parameters
-
-| Name        | Required | Type                | Description                                                                          |
-| :---------- | :------- | :------------------ | :----------------------------------------------------------------------------------- |
-| **topic**   | Required | `string`            | Name of the topic: every user subscribed to this topic will receive the notification |
-| **message** | Required | `string` or `ICard` | The notification                                                                     |
-| mention     | Optional | `boolean`           | Append a mention to the user (@user)                                                 |
-
-```typescript
-interface ICard {
-  title: string;
-  text: string;
-}
-```
-
-#### Examples
-
-```bash
-curl -H "content-type: application/json"\
- -d '{"topic": "banana", "message": "broadcasting to banana subscribers"}'\
- localhost:3978/api/v1/broadcast
-```
-
-```bash
-curl -H "content-type: application/json"\
- -d '{"topic": "banana", "message": {"text": "this is the text", "title": "this is the title"}}'\
- localhost:3978/api/v1/broadcast
-```
-
-```bash
-curl -H "content-type: application/json"\
- -d '{"topic": "banana", "message": "hi there", "mention": true}'\
- localhost:3978/api/v1/broadcast
-```
-
-### Inspect: list usernames
-
-```
-GET /api/v1/users
-```
-
-### Examples
-
-```bash
-curl -s localhost:3978/api/v1/users | jq
-[
-  "jane.doe@megacoorp.com",
-  "jhon.smith@contractor.com"
-]
-```
-
-### Inspect: list topics & subscribers
-
-```
-GET /api/v1/topics
-```
-
-### Examples
-
-````bash
-curl -s localhost:3978/api/v1/topics | jq
-{
-  "banana": [
-    "jane.doe@megacoorp.com"
-  ],
-  "orange": [
-    "jane.doe@megacoorp.com",
-    "jhon.smith@contractor.com"
-  ],
-  "apple": [
-    "jhon.smith@contractor.com"
-  ]
-}
-```
 
 ---
 
@@ -350,16 +215,22 @@ cp .env.template .env
 ```bash
 cp config.example.yaml config.yaml
 ```
-
-4. Start the server
+4. Configure the mysql database
+```
+docker-compose up -d
+mysql -h 127.0.0.1 -u root -e "create database msteamsbot;"
+npx sequelize-cli db:migrate
+```
+5. Start the database and server
 
 ```bash
-npm start
+docker-compose up -d
 ```
 
 ### Run on the Emulator
 
 5. Connect to the bot endpoint using Bot Framework Emulator
+   - add "172.17.0.1" to the setting "localhost override" in the Emulator
    - Bot URL would be `http://localhost:3978/api/v1/messages`
    - Leave app id and password empty for local development
    <p align="center"><img src="doc/open-bot-emulator.png" alt="open-bot-emulator" width="300" /></p>
@@ -444,3 +315,4 @@ LOCAL=false
 - [Docs: Send proactive notifications to users](https://docs.microsoft.com/en-us/azure/bot-service/bot-builder-howto-proactive-message?view=azure-bot-service-4.0&tabs=csharp)
 - [Docs: Bot channels registration](https://docs.microsoft.com/en-us/azure/bot-service/bot-service-quickstart-registration?view=azure-bot-service-4.0)
 - [Code: microsoft/BotBuilder-Samples](https://github.com/microsoft/BotBuilder-Samples)
+- [Post: Sequelize relationships - Ultimate guide](https://medium.com/@eth3rnit3/sequelize-relationships-ultimate-guide-f26801a75554)
