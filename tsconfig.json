@@ -14,5 +14,8 @@
         "types.d.ts",
         "index.js",
         "./src"
+    ],
+    "exclude": [
+        "./node_modules/*"
     ]
 }

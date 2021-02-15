@@ -18,10 +18,5 @@ mysql -h 127.0.0.1 -u root -P 3306
 
 ```bash
 npx sequelize db:create
-
-npx sequelize model:generate --name Conversation --attributes user:STRING,conversationKey:STRING,conversationRef:JSON
-npx sequelize model:generate --name Topics --attributes name:STRING
-npx sequelize model:generate --name ConversationTopics --attributes conversationId:INTEGER,topicId:INTEGER
-
 npx sequelize db:migrate
 ```

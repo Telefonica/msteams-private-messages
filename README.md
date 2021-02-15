@@ -218,7 +218,7 @@ cp config.example.yaml config.yaml
 4. Configure the mysql database
 ```
 docker-compose up -d
-mysql -h 127.0.0.1 -u root -e "create database flowboteams;"
+mysql -h 127.0.0.1 -u root -e "create database msteamsbot;"
 npx sequelize-cli db:migrate
 ```
 5. Start the database and server

@@ -15,7 +15,7 @@ const tryConnection = async () => {
 }
 
 const Topics = db.models.Topics
-const Conversations = db.models.Conversations
+const Users = db.models.Users
 
 /**
  * @param {string} user
@@ -23,8 +23,8 @@ const Conversations = db.models.Conversations
  */
 const saveConversation = async (user, conversationRef) => {
   const conversationKey = conversationRef.conversation.id
-  log.debug(`[db] updating conversation #${conversationKey}`)
-  return Conversations.findOrCreate({
+  log.debug(`[db] updating conversation #${conversationKey} (user: "${user}")`)
+  return Users.findOrCreate({
     where: { user },
     defaults: {
       user,
@@ -32,15 +32,15 @@ const saveConversation = async (user, conversationRef) => {
       conversationRef
     }
   })
-    .then(([conversation, created]) => {
+    .then(([user, created]) => {
       if (created) {
-        log.debug('[db] created new conversation', conversation)
+        log.debug(`[db] created new user: "${user}"`)
       }
       // FIXME check conversationKey?
       return true
     })
     .catch(err => {
-      log.error('[db] unable to create conversation', err)
+      log.error('[db] unable to create user', err)
       return false
     })
 }
@@ -51,14 +51,14 @@ const saveConversation = async (user, conversationRef) => {
  */
 const getConversation = async user => {
   log.debug(`[db] reading conversation for user "${user}"`)
-  return Conversations.findOne({ where: { user } })
-    .then(conversation => {
+  return Users.findOne({ where: { user } })
+    .then(userInstance => {
       log.debug(`[db] recovered conversation for user "${user}"`)
       // @ts-ignore
-      return conversation.conversationRef
+      return userInstance.conversationRef
     })
     .catch(err => {
-      log.error(`[db] unable to find Conversation for user "${user}"`, err)
+      log.error(`[db] unable to find User "${user}"`, err)
       return null
     })
 }
@@ -91,15 +91,15 @@ const registerTopic = async topic =>
 
 /**
  * @param {string} user
- * @return {Promise<{conversation: any, topics: string[]|null}>}
+ * @return {Promise<{userInstance: any, topics: string[]|null}>}
  */
-const getDetailedConversation = async user => {
+const getAllUserInfo = async user => {
   log.debug(`[db] reading subscriptions for user "${user}"`)
-  return Conversations.findOne({ where: { user }, include: ['subscriptions'] })
-    .then(conversation => ({
-      conversation,
+  return Users.findOne({ where: { user }, include: ['subscriptions'] })
+    .then(userInstance => ({
+      userInstance,
       // @ts-ignore
-      topics: conversation.subscriptions.map(topic => topic.name)
+      topics: userInstance.subscriptions.map(topic => topic.name)
     }))
     .catch(err => {
       log.error(`[db] unable to read subscriptions for user "${user}"`, err)
@@ -112,7 +112,7 @@ const getDetailedConversation = async user => {
  * @return {Promise<string[]|null>}
  */
 const getSubscribedTopics = async user =>
-  getDetailedConversation(user).then(({ topics }) => topics)
+  getAllUserInfo(user).then(({ topics }) => topics)
 
 /**
  * @param {string} user
@@ -120,20 +120,20 @@ const getSubscribedTopics = async user =>
  * @return {Promise<boolean>}
  */
 const subscribe = async (user, topic) => {
-  log.debug(`[db] updating <user-topic>: <${user}, ${topic}>`)
-  return getDetailedConversation(user)
-    .then(({ conversation, topics }) => {
-      if (topics.indexOf(topic) >= 0) {
+  log.debug(`[db] subscribing <user-topic>: <${user}, ${topic}>`)
+  return getAllUserInfo(user)
+    .then(({ userInstance, topics }) => {
+      if (topics.includes(topic)) {
         log.debug(`[db] already subscribed <user-topic> <${user}-${topic}>`)
         return true
       }
       return ensureTopic(topic).then(topicInstance =>
         // @ts-ignore
-        conversation.addSubscription(topicInstance.id)
+        userInstance.addSubscription(topicInstance.id)
       )
     })
     .catch(err => {
-      log.error(`[db] unable to update <user-topic>: <${user}, ${topic}>`, err)
+      log.error(`[db] unable to subscribe <user-topic>: <${user}, ${topic}>`, err)
       return false
     })
 }
@@ -152,7 +152,7 @@ const getSubscribers = async topic => {
         return null
       }
       // @ts-ignore
-      return topicInstance.subscribers.map(conversation => conversation.user)
+      return topicInstance.subscribers.map(userInstance => userInstance.user)
     })
     .catch(err => {
       log.error(`[db] unable to read subscribers of "${topic}"`, err)
@@ -171,7 +171,7 @@ const listTopics = async () => {
       return topics.map(topic => topic.name)
     })
     .catch(err => {
-      log.error('[db] unable to list Conversations', err)
+      log.error('[db] unable to list Topics', err)
       return []
     })
 }
@@ -180,14 +180,14 @@ const listTopics = async () => {
  * @return {Promise<string[]>}
  */
 const listUsers = async () => {
-  return Conversations.findAll({})
-    .then(conversations => {
-      log.debug(`[db] recovered ${conversations.length} conversations`)
+  return Users.findAll({})
+    .then(users => {
+      log.debug(`[db] recovered ${users.length} users`)
       // @ts-ignore
-      return conversations.map(conversation => conversation.user)
+      return users.map(userInstance => userInstance.user)
     })
     .catch(err => {
-      log.error('[db] unable to list Conversations', err)
+      log.error('[db] unable to list Users', err)
       return []
     })
 }
@@ -198,15 +198,15 @@ const listUsers = async () => {
  */
 const resetSubscriptions = async user => {
   log.debug(`[db] removing every subscription for user "${user}"`)
-  return Conversations.findOne({ where: { user }, include: ['subscriptions'] })
-    .then(conversation => {
+  return Users.findOne({ where: { user }, include: ['subscriptions'] })
+    .then(userInstance => {
       // FIXME check this condition
-      if (!conversation) {
+      if (!userInstance) {
         log.debug(`[db] user "${user}" not found`)
         return false
       }
       // @ts-ignore
-      return conversation.setSubscriptions([]).then(() => {
+      return userInstance.setSubscriptions([]).then(() => {
         log.debug(`[db] removed every subscription for user "${user}"`)
         return true
       })

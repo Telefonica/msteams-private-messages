@@ -1,19 +1,18 @@
 ```
- Conversations                                                                      Topics
-
+ Users                                                                              Topics
 +---+--------------------------+-------------------+-------------------+           +---+--------+
-|id | user                     | conversationKey   | conversationRef|  |           |id | name   |
+|id | user                     | conversationKey   | conversationRef   |           |id | name   |
 +----------------------------------------------------------------------+           +------------+
-| 1 |jane.doe@megacoorp.com    | xxxx|xxx|xxxx     |  { ... }          |           | 1 | banana |
+| 1 |jane.doe@megacoorp.com    | xxxx-xxx-xxxx     |  { ... }          |           | 1 | banana |
 | 2 |jhon.smith@contractor.com | yyyy-yyy-yyyy     |  { ... }          |           | 2 | orange |
 |   |                          |                   |                   |           | 3 | apple  |
 +-^-+--------------------------+-------------------+-------------------+           |   |        |
   |                                                                                +-^-+--------+
   |                                                                                  |
-  |                                          ConversationTopics                      |
   |                                                                                  |
+  |                                          Subscriptions                           |
   |                                         +----------------+----------------+      |
-  +-----------------------------------------+ conversationId | topicId        +------+
+  +-----------------------------------------+ userId         | topicId        +------+
                                             +---------------------------------+
                                             |  1  [[jane]]   |  1  [[banana]] |
                                             |  2  [[jhon]]   |  1  [[banana]] |

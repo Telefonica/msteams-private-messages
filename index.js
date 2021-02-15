@@ -22,12 +22,11 @@ const run = async () => {
 
   /** @type {Types.Handlers} */
   const handlers = {
-    processMessage: async (req, res) => {
+    processMessage: (req, res) =>
       adapter.processActivity(req, res, async turnContext => {
         /* route to main dialog */
         await bot.run(turnContext)
-      })
-    },
+      }),
 
     notify: async (user, message, mention) => {
       const conversationRef = await storage.getConversation(user)
@@ -55,9 +54,7 @@ const run = async () => {
         const conversationRef = await storage.getConversation(user)
         if (!conversationRef) {
           log.warn(
-            'weird status: user "%s" seems to be subscribed to "%s" but conversationRef not found\nSKIPPING.',
-            user,
-            topic
+            `weird status: user "${user}" seems to be subscribed to "${topic}" but conversationRef not found. SKIPPING.`
           )
         } else {
           conversationRefs.push(conversationRef)
@@ -82,7 +79,6 @@ const run = async () => {
         const subscribers = await storage.getSubscribers(topic)
         topics[topic] = topics[topic].concat(subscribers)
       }
-      log.debug(topics)
       return { status: 200, response: topics }
     },
 
