@@ -28,10 +28,6 @@ const createServer = ({
   server.use(restify.plugins.queryParser())
   server.use(restify.plugins.bodyParser())
 
-  server.listen(process.env.PORT || 3978, () => {
-    log.info(`[STARTUP] ${server.name} listening to ${server.url}`)
-  })
-
   /* log every request */
   server.pre((req, _, next) => {
     req.log.info('[>> REQUEST]', req.toString())
@@ -45,6 +41,12 @@ const createServer = ({
 
   server.get('/', (_, res, next) => {
     res.send(log.fields.name)
+    next()
+  })
+
+  server.get('/api/v1/users', async (_, res, next) => {
+    const { status, response } = await getUsers()
+    res.send(status, response)
     next()
   })
 
@@ -84,12 +86,6 @@ const createServer = ({
     next()
   })
 
-  server.get('/api/v1/users', async (_, res, next) => {
-    const { status, response } = await getUsers()
-    res.send(status, response)
-    next()
-  })
-
   /** Resolves 202: Accepted */
   server.post('/api/v1/messages', async (req, res, next) => {
     await processMessage(req, res)
@@ -107,8 +103,7 @@ const createServer = ({
     if (!user || !message) {
       res.send(400, {
         code: 'BadRequest',
-        required: ['user', 'message'],
-        got: { user, message }
+        required: ['user', 'message']
       })
       return next()
     }
@@ -140,6 +135,24 @@ const createServer = ({
     res.send(status, response)
     next()
   })
+
+  return {
+    start: () =>
+      new Promise((resolve, reject) => {
+        server.listen(process.env.PORT || 3978, () => {
+          log.info(`[STARTUP] ${server.name} listening to ${server.url}`)
+          resolve()
+        })
+      }),
+
+    stop: () =>
+      new Promise((resolve, reject) => {
+        server.close(() => {
+          log.info(`[CLOSE] ${server.name} stopped`)
+          resolve()
+        })
+      })
+  }
 }
 
 module.exports = { createServer }

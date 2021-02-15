@@ -1,3 +1,6 @@
+/* modules with no declaration file */
+declare module 'restify-clients';
+
 declare namespace Types {
   /* alias */
   type Activity = import("botbuilder").Activity;
