@@ -1,3 +1,10 @@
+## [0.6.1](https://github.com/Telefonica/msteams-private-messages/compare/v0.6.0...v0.6.1) (2021-02-15)
+
+
+### Bug Fixes
+
+* (bot) reset subscriptions returning updated (empty) subscriptions ([16f28bb](https://github.com/Telefonica/msteams-private-messages/commit/16f28bb35e93f29622dec6349a4dbcecbcbae76d))
+
 # [0.6.0](https://github.com/Telefonica/msteams-private-messages/compare/v0.5.0...v0.6.0) (2021-02-15)
 
 
