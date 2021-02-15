@@ -1,3 +1,10 @@
+# [0.6.0](https://github.com/Telefonica/msteams-private-messages/compare/v0.5.0...v0.6.0) (2021-02-15)
+
+
+### Features
+
+* MySQL storage ([#1](https://github.com/Telefonica/msteams-private-messages/issues/1)) ([9e13945](https://github.com/Telefonica/msteams-private-messages/commit/9e13945db7c66bac8696531ce77e9e46fbb9632b))
+
 # [0.5.0](https://github.com/Telefonica/msteams-private-messages/compare/v0.4.0...v0.5.0) (2021-02-09)
 
 
