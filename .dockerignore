@@ -1,6 +1,9 @@
 .github
 .vscode
 doc
+local-development
+.env
+
 *.md
 *.png
 

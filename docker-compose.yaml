@@ -1,35 +1,10 @@
-version: "3.3"
+version: '2.2'
 
 services:
-  mpm-server:
-    build: .
-    image: lifecycle/msteams-private-messages
-    container_name: mpm-server
+  builder:
+    image: "docker.tuenti.io/voice-builder:2.1.0"
     volumes:
-      - ${PWD}:/usr/src/app/
+      - "${PWD}/:/sources"
+      - "/var/run/docker.sock:/var/run/docker.sock"
     environment:
-      - MYSQL_HOST=mpm-db
-    depends_on:
-      - mpm-db
-    ports:
-      - ${PORT:-3978}:${PORT:-3978}
-    expose:
-      - ${PORT:-3978}
-
-  mpm-db:
-    image: mysql:5.7
-    container_name: mpm-db
-    restart: always
-    environment:
-      - MYSQL_ALLOW_EMPTY_PASSWORD=true
-    ports:
-      # <Port exposed> : < MySQL Port running inside container>
-      - "3306:3306"
-    expose:
-      # Opens port 3306 on the container
-      - "3306"
-    volumes:
-      - data-storage:/var/lib/mysql
-
-volumes:
-  data-storage: {}
+      - "WORKDIR=${PWD}"

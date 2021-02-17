@@ -7,7 +7,11 @@
     "start": "node index.js | ./node_modules/.bin/bunyan",
     "lint": "eslint . -f table .",
     "types": "tsc --build tsconfig.json",
-    "test": "jest"
+    "test": "jest",
+    "build-container": "docker build --rm -t docker.tuenti.io/sre/msteamsbot:$npm_package_version .",
+    "push-container": "docker push docker.tuenti.io/sre/msteamsbot:$npm_package_version",
+    "prepare-artifact": "docker-compose run builder set-version . $npm_package_version",
+    "publish-artifact": "docker-compose run --rm builder publish ."
   },
   "keywords": [
     "Microsoft Teams",
@@ -33,6 +37,9 @@
   ],
   "license": "ISC",
   "private": true,
+  "engines": {
+    "node": ">=14"
+  },
   "husky": {
     "hooks": {
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
