@@ -7,4 +7,9 @@ const log = new Logger({
   level: process.env.LOG_LEVEL || 'info'
 })
 
+/* disable logging for testing */
+if (process.env.NODE_ENV === 'test') {
+  log.level(Logger.FATAL + 1)
+}
+
 module.exports = { log }

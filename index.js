@@ -101,7 +101,7 @@ const run = async () => {
     }
   }
 
-  createServer(handlers)
+  createServer(handlers).start()
 }
 
 try {
