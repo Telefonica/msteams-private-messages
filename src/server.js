@@ -90,8 +90,14 @@ const createServer = ({
     next()
   })
 
+  /** Resolves 202: Accepted */
   server.post('/api/v1/messages', async (req, res, next) => {
     await processMessage(req, res)
+    /* do not
+     * `res.send(202)`
+     *  -> headers already sent to the client
+     *  -> [ERR_HTTP_HEADERS_SENT] err
+     */
     next()
   })
 
