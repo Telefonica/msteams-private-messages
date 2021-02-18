@@ -1,4 +1,4 @@
-version: "3.3"
+version: "2.2"
 
 services:
   msteamsbot:
@@ -12,7 +12,7 @@ services:
       - MYSQL_PASSWORD=${MSTEAMSBOT_DATABASE_PASSWORD}
       - MYSQL_HOST=${MYSQL_HOST}
       - MYSQL_PORT=${MYSQL_PORT}
-      - MYSQL_DATABASE=msteamsbot
+      - MYSQL_DATABASE=${MSTEAMSBOT_DATABASE}
       - LOG_LEVEL=info
       - USE_EMAIL_AS_KEY=true
     ports:
