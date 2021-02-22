@@ -1,3 +1,10 @@
+## [0.6.3](https://github.com/Telefonica/msteams-private-messages/compare/v0.6.2...v0.6.3) (2021-02-22)
+
+
+### Bug Fixes
+
+* publishing artifact (compose.yaml) with explicit version ([39bae7b](https://github.com/Telefonica/msteams-private-messages/commit/39bae7b9b2baf4c96c2d6f2d816c7c195f317dea))
+
 ## [0.6.2](https://github.com/Telefonica/msteams-private-messages/compare/v0.6.1...v0.6.2) (2021-02-18)
 
 
