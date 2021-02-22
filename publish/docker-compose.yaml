@@ -2,7 +2,7 @@ version: "2.2"
 
 services:
   msteamsbot:
-    image: docker.tuenti.io/sre/msteamsbot:$MSTEAMSBOT_VERSION
+    image: docker.tuenti.io/sre/msteamsbot:_SERVICE_VERSION_
     environment:
       - LOCAL=false
       - MICROSOFT_APP_ID=${MSTEAMSBOT_AZURE_APP_ID}
@@ -17,5 +17,3 @@ services:
       - USE_EMAIL_AS_KEY=true
     ports:
       - 3978:3978
-    expose:
-      - 3978

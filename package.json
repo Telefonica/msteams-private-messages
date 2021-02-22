@@ -10,8 +10,8 @@
     "test": "NODE_ENV=test jest",
     "build-container": "docker build --rm -t docker.tuenti.io/sre/msteamsbot:$npm_package_version .",
     "push-container": "docker push docker.tuenti.io/sre/msteamsbot:$npm_package_version",
-    "prepare-artifact": "docker-compose run builder set-version . $npm_package_version",
-    "publish-artifact": "docker-compose run --rm builder publish ."
+    "prepare-artifact": "docker-compose run builder set-version . $npm_package_version && sed -i '' s/_SERVICE_VERSION_/${npm_package_version}/g publish/docker-compose.yaml",
+    "publish-artifact": "docker-compose run --rm builder publish . && git checkout publish docker-compose.yaml"
   },
   "keywords": [
     "Microsoft Teams",
@@ -66,6 +66,13 @@
       "@semantic-release/changelog",
       "@semantic-release/npm",
       [
+        "@semantic-release/exec",
+        {
+          "prepareCmd": "npm run prepare-artifact",
+          "publishCmd": "npm run publish-artifact"
+        }
+      ],
+      [
         "@semantic-release/git",
         {
           "assets": [
@@ -86,6 +93,7 @@
     "@commitlint/cli": "^11.0.0",
     "@commitlint/config-conventional": "^11.0.0",
     "@semantic-release/changelog": "^5.0.1",
+    "@semantic-release/exec": "^5.0.0",
     "@semantic-release/git": "^9.0.0",
     "@semantic-release/npm": "^7.0.10",
     "@types/jest": "^26.0.20",
