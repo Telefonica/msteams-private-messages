@@ -32,15 +32,24 @@ const saveConversation = async (user, conversationRef) => {
       conversationRef
     }
   })
-    .then(([user, created]) => {
+    .then(([userInstance, created]) => {
       if (created) {
         log.debug(`[db] created new user: "${user}"`)
+        return true
+        // @ts-ignore
+      } else if (userInstance.conversationKey !== conversationKey) {
+        log.warn(`[db] need to update conversationRef for user "${user}"`)
+        // @ts-ignore
+        userInstance.conversationKey = conversationKey
+        // @ts-ignore
+        userInstance.conversationRef = conversationRef
+        return userInstance.save().then(() => true)
+      } else {
+        return true
       }
-      // FIXME check conversationKey?
-      return true
     })
     .catch(err => {
-      log.error('[db] unable to create user', err)
+      log.error(`[db] unable to create user "${user}`, err)
       return false
     })
 }
@@ -133,7 +142,10 @@ const subscribe = async (user, topic) => {
       )
     })
     .catch(err => {
-      log.error(`[db] unable to subscribe <user-topic>: <${user}, ${topic}>`, err)
+      log.error(
+        `[db] unable to subscribe <user-topic>: <${user}, ${topic}>`,
+        err
+      )
       return false
     })
 }

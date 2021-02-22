@@ -1,3 +1,10 @@
+## [0.6.2](https://github.com/Telefonica/msteams-private-messages/compare/v0.6.1...v0.6.2) (2021-02-18)
+
+
+### Bug Fixes
+
+* override conversationRef on 'conversation update' ([8835b09](https://github.com/Telefonica/msteams-private-messages/commit/8835b099c12feb0d9ab344ecbddc16d1961dd0a6))
+
 ## [0.6.1](https://github.com/Telefonica/msteams-private-messages/compare/v0.6.0...v0.6.1) (2021-02-15)
 
 
