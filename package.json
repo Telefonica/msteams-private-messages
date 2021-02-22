@@ -66,13 +66,6 @@
       "@semantic-release/changelog",
       "@semantic-release/npm",
       [
-        "@semantic-release/exec",
-        {
-          "prepareCmd": "npm run prepare-artifact",
-          "publishCmd": "npm run publish-artifact"
-        }
-      ],
-      [
         "@semantic-release/git",
         {
           "assets": [
