@@ -1,0 +1,21 @@
+version: "2.2"
+
+services:
+  msteamsbot:
+    image: docker.tuenti.io/sre/msteamsbot:$MSTEAMSBOT_VERSION
+    environment:
+      - LOCAL=false
+      - MICROSOFT_APP_ID=${MSTEAMSBOT_AZURE_APP_ID}
+      - MICROSOFT_APP_PASSWORD=${MSTEAMSBOT_AZURE_APP_PASSWORD}
+      - STORAGE=mysql
+      - MYSQL_USER=${MSTEAMSBOT_DATABASE_USER}
+      - MYSQL_PASSWORD=${MSTEAMSBOT_DATABASE_PASSWORD}
+      - MYSQL_HOST=${MYSQL_HOST}
+      - MYSQL_PORT=${MYSQL_PORT}
+      - MYSQL_DATABASE=${MSTEAMSBOT_DATABASE}
+      - LOG_LEVEL=info
+      - USE_EMAIL_AS_KEY=true
+    ports:
+      - 3978:3978
+    expose:
+      - 3978

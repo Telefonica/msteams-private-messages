@@ -1,0 +1,7 @@
+# input for docker.tuenti.io/voice-builder
+publish:
+    artifact: publish/docker-compose.yaml
+    artifactory: 'http://artifacts.tuenti.io/msteamsbot-${service.version}.yaml'
+service:
+    version: 0.6.1
+    type: tuenti-deployer
