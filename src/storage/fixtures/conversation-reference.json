@@ -10,6 +10,8 @@
         "name": "Private Notifications Center"
     },
     "conversation": {
+        "name": "",
+        "isGroup": false,
         "conversationType": "personal",
         "tenantId": "9xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx",
         "id": "a:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
