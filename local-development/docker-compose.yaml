@@ -6,7 +6,7 @@ services:
     image: lifecycle/msteams-private-messages
     container_name: mpm-server
     volumes:
-      - ${PWD}:/usr/src/app/
+      - ${PWD}/..:/usr/src/app/
     environment:
       - MYSQL_HOST=mpm-db
     depends_on:
