@@ -1,5 +1,5 @@
 const restifyClients = require('restify-clients')
-const { createServer } = require('./server')
+const { createRestifyServer } = require('./restify-server')
 
 const mockedResponse = {
   status: 200,
@@ -16,9 +16,9 @@ const mockedHandlers = {
   forceSubscription: jest.fn().mockResolvedValue(mockedResponse)
 }
 
-describe('createServer()', () => {
+describe('createRestifyServer()', () => {
   const client = restifyClients.createJsonClient('http://127.0.0.1:3978')
-  const server = createServer(mockedHandlers)
+  const server = createRestifyServer(mockedHandlers)
 
   beforeAll(done => {
     server.start().then(done)

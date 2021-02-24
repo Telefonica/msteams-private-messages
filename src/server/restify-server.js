@@ -1,5 +1,5 @@
 const restify = require('restify')
-const { log } = require('./log')
+const { log } = require('../log')
 
 /**
  * @param {import('restify').Request} req
@@ -9,12 +9,13 @@ const includeMention = req =>
 
 /**
  * restify server in charge of:
- *  - routing + parsing
+ *  - routing to handlers
  *  - logging requests and responses
- *  - extracting input from request
+ *  - extracting input from request (parsing)
+ *
  * @param {Types.Handlers} param0
  */
-const createServer = ({
+const createRestifyServer = ({
   processMessage,
   notify,
   broadcast,
@@ -155,4 +156,4 @@ const createServer = ({
   }
 }
 
-module.exports = { createServer }
+module.exports = { createRestifyServer }
