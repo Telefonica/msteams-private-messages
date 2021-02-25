@@ -1,4 +1,4 @@
-### [0.6.5](https://github.com/Telefonica/msteams-private-messages/compare/v0.6.4...v0.6.5) (2021-02-25)
+## [0.6.5](https://github.com/Telefonica/msteams-private-messages/compare/v0.6.4...v0.6.5) (2021-02-25)
 
 
 ### Internal
@@ -9,12 +9,24 @@
 
 ## [0.6.4](https://github.com/Telefonica/msteams-private-messages/compare/v0.6.3...v0.6.4) (2021-02-23)
 
+
+### Internal
+
+* change env vars at publish/docker-compose.yaml ([d7878f8](https://github.com/Telefonica/msteams-private-messages/commit/d7878f838a16143937f54279894f08929dcd7335))
+* npm script for local dev: 'npm run blue-ball' ([48d98dd](https://github.com/Telefonica/msteams-private-messages/commit/48d98dd60eec5199d29db01ac1334cafadae8253))
+* new unit test storage/memory.test.js ([dd48c23](https://github.com/Telefonica/msteams-private-messages/commit/dd48c237502375290a053803b90072fc957441c5))
+
 ## [0.6.3](https://github.com/Telefonica/msteams-private-messages/compare/v0.6.2...v0.6.3) (2021-02-22)
 
 
 ### Bug Fixes
 
 * publishing artifact (compose.yaml) with explicit version ([39bae7b](https://github.com/Telefonica/msteams-private-messages/commit/39bae7b9b2baf4c96c2d6f2d816c7c195f317dea))
+
+### Internal
+
+* remove 'publish-artifact' from @semantic-release ([4eac96e](https://github.com/Telefonica/msteams-private-messages/commit/4eac96e2415aecbd426ac8975266e756f2aa36c0))
+* 4x scripts (build-container, push-container, prepare-artifact, publish-artifact) ([#3](https://github.com/Telefonica/msteams-private-messages/issues/3)) ([64cb644](https://github.com/Telefonica/msteams-private-messages/commit/64cb6449294b18eed8dbf77fb6e2fd3db279e2bd))
 
 ## [0.6.2](https://github.com/Telefonica/msteams-private-messages/compare/v0.6.1...v0.6.2) (2021-02-18)
 
@@ -23,12 +35,23 @@
 
 * override conversationRef on 'conversation update' ([8835b09](https://github.com/Telefonica/msteams-private-messages/commit/8835b099c12feb0d9ab344ecbddc16d1961dd0a6))
 
+### Internal
+
+* server.test.js ([4248885](https://github.com/Telefonica/msteams-private-messages/commit/4248885eaf8fa012e005862d82aee53e659a4f62))
+* refactor commits triggering 'patch' release ([c53efcc](https://github.com/Telefonica/msteams-private-messages/commit/c53efcc79e9d6db62a668661c8e7749b10c35077))
+
 ## [0.6.1](https://github.com/Telefonica/msteams-private-messages/compare/v0.6.0...v0.6.1) (2021-02-15)
 
 
 ### Bug Fixes
 
 * (bot) reset subscriptions returning updated (empty) subscriptions ([16f28bb](https://github.com/Telefonica/msteams-private-messages/commit/16f28bb35e93f29622dec6349a4dbcecbcbae76d))
+
+### Internal
+
+* improved logging at conversation.js
+* minor tuning at API handlers (index.js)
+* db log down to trace() level
 
 # [0.6.0](https://github.com/Telefonica/msteams-private-messages/compare/v0.5.0...v0.6.0) (2021-02-15)
 
