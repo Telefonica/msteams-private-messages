@@ -1,7 +1,7 @@
 const { MessageFactory } = require('botbuilder')
 const { TextEncoder } = require('util')
-const { log } = require('./log')
-const { simpleCard } = require('./cards')
+const { log } = require('../log')
+const { simpleCard } = require('../cards')
 
 const encoder = new TextEncoder()
 
@@ -26,7 +26,7 @@ const appendMentionToMsg = (context, message) => {
 /**
  * @param {import('botbuilder').BotFrameworkAdapter} adapter
  */
-const createConversation = adapter => {
+const createConversationHelper = adapter => {
   /**
    * @doc https://docs.microsoft.com/en-us/azure/bot-service/bot-builder-howto-proactive-message?view=azure-bot-service-4.0&tabs=javascript
    *
@@ -62,4 +62,4 @@ const createConversation = adapter => {
   return { sendMessage }
 }
 
-module.exports = { createConversation }
+module.exports = { createConversationHelper }
