@@ -1,3 +1,12 @@
+### [0.6.5](https://github.com/Telefonica/msteams-private-messages/compare/v0.6.4...v0.6.5) (2021-02-25)
+
+
+### Internal
+
+* create server package ([f4fbc16](https://github.com/Telefonica/msteams-private-messages/commit/f4fbc164de19fd2670d89bb8927c7b1b3baa7000))
+* fix at local-development/docker-compose.yaml ([3972e9b](https://github.com/Telefonica/msteams-private-messages/commit/3972e9b4a09d0e80dd73256b043f39cc8a8b2988))
+* review of [@semantic-release](https://github.com/semantic-release) setup ([fc14c86](https://github.com/Telefonica/msteams-private-messages/commit/fc14c86dbc8491d884df162458a1af05390bcf20))
+
 ## [0.6.4](https://github.com/Telefonica/msteams-private-messages/compare/v0.6.3...v0.6.4) (2021-02-23)
 
 ## [0.6.3](https://github.com/Telefonica/msteams-private-messages/compare/v0.6.2...v0.6.3) (2021-02-22)
