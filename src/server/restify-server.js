@@ -28,6 +28,7 @@ const createRestifyServer = ({
   const server = restify.createServer({ log })
   server.use(restify.plugins.queryParser())
   server.use(restify.plugins.bodyParser())
+  server.pre(restify.plugins.pre.dedupeSlashes())
 
   /* log every request */
   server.pre((req, _, next) => {
