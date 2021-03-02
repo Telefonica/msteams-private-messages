@@ -105,11 +105,15 @@ const registerTopic = async topic =>
 const getAllUserInfo = async user => {
   log.debug(`[db] reading subscriptions for user "${user}"`)
   return Users.findOne({ where: { user }, include: ['subscriptions'] })
-    .then(userInstance => ({
-      userInstance,
-      // @ts-ignore
-      topics: userInstance.subscriptions.map(topic => topic.name)
-    }))
+    .then(userInstance =>
+      userInstance
+        ? {
+            userInstance,
+            // @ts-ignore
+            topics: userInstance.subscriptions.map(topic => topic.name)
+          }
+        : null
+    )
     .catch(err => {
       log.error(`[db] unable to read subscriptions for user "${user}"`, err)
       return null
@@ -121,7 +125,9 @@ const getAllUserInfo = async user => {
  * @return {Promise<string[]|null>}
  */
 const getSubscribedTopics = async user =>
-  getAllUserInfo(user).then(({ topics }) => topics)
+  getAllUserInfo(user)
+    .then(({ topics }) => topics)
+    .catch(() => null)
 
 /**
  * @param {string} user

@@ -1,5 +1,5 @@
 const { storage } = require('./memory')
-const conversationRef = require('./fixtures/conversation-reference.json')
+const conversationRef = require('../fixtures/conversation-reference.json')
 
 describe('memory.storage', () => {
   beforeAll(async () => {
