@@ -1,3 +1,16 @@
+### [0.6.6](https://github.com/Telefonica/msteams-private-messages/compare/v0.6.5...v0.6.6) (2021-03-02)
+
+
+### Bug Fixes
+
+* catching potential bug at mysql.js ([d1f4bd5](https://github.com/Telefonica/msteams-private-messages/commit/d1f4bd5d873dae9be5b25379a5e2a56286d07cbf))
+
+
+### Internal
+
+* new unit test 'handlers.test.js' ([a820ede](https://github.com/Telefonica/msteams-private-messages/commit/a820ede3ab5a09edbd98c69911c7dddfead11962))
+* npm update semantic-release (dependanbot alert) ([fcc3ca0](https://github.com/Telefonica/msteams-private-messages/commit/fcc3ca0deae7bd4b2304537306837aecf6c2c7c5))
+
 ## [0.6.5](https://github.com/Telefonica/msteams-private-messages/compare/v0.6.4...v0.6.5) (2021-02-25)
 
 
