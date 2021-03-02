@@ -1,3 +1,10 @@
+### [0.6.7](https://github.com/Telefonica/msteams-private-messages/compare/v0.6.6...v0.6.7) (2021-03-02)
+
+
+### Bug Fixes
+
+* honouring HTTPS_PROXY env var (global-agent) ([7fbc25b](https://github.com/Telefonica/msteams-private-messages/commit/7fbc25b87189694166c3cd50a4e6042a281d0341))
+
 ### [0.6.6](https://github.com/Telefonica/msteams-private-messages/compare/v0.6.5...v0.6.6) (2021-03-02)
 
 
