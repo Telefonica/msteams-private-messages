@@ -1,8 +1,12 @@
 const dotenv = require('dotenv')
 const path = require('path')
+const globalAgent = require('global-agent')
 
 /* load .env file before instanciating dependent objects (do NOT move) */
 dotenv.config({ path: path.join(__dirname, '.env') })
+
+/* globalAgent: HTTP/HTTPS proxy configurable using environment variables */
+globalAgent.bootstrap()
 
 const { log } = require('./src/log')
 const { createBotAdapter } = require('./src/bot-adapter')
