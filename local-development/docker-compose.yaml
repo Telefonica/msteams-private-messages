@@ -13,8 +13,6 @@ services:
       - mpm-db
     ports:
       - ${PORT:-3978}:${PORT:-3978}
-    expose:
-      - ${PORT:-3978}
 
   mpm-db:
     image: mysql:5.7
@@ -24,10 +22,7 @@ services:
       - MYSQL_ALLOW_EMPTY_PASSWORD=true
     ports:
       # <Port exposed> : < MySQL Port running inside container>
-      - "3306:3306"
-    expose:
-      # Opens port 3306 on the container
-      - "3306"
+      - "3307:3306"
     volumes:
       - data-storage:/var/lib/mysql
 
