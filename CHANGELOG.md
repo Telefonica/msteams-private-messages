@@ -1,3 +1,15 @@
+### [0.6.8](https://github.com/Telefonica/msteams-private-messages/compare/v0.6.7...v0.6.8) (2021-03-05)
+
+
+### Bug Fixes
+
+* **server:** deduple slashes for incoming requests ([a3ff243](https://github.com/Telefonica/msteams-private-messages/commit/a3ff24385d54f8e0e446c252bf7039d7068e8b23))
+
+
+### Internal
+
+* **local-dev:** mpm-db exposing port 3307 (instead of 3306) ([0aa2a98](https://github.com/Telefonica/msteams-private-messages/commit/0aa2a985befa2849404e69e10470cfaed7a9e606))
+
 ### [0.6.7](https://github.com/Telefonica/msteams-private-messages/compare/v0.6.6...v0.6.7) (2021-03-02)
 
 
