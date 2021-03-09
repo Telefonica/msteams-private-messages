@@ -62,6 +62,16 @@ describe('createHandlers()', () => {
       )
       expect(response).toEqual([conversationRef.conversation.id])
     })
+    it("calls 'storage.registerTopic' depending on opts", async () => {
+      await handlers.broadcast('orange', 'an orange event did occur', {
+        ensureTopic: true
+      })
+      expect(storage.registerTopic).toHaveBeenCalledWith('orange')
+      expect(adapter.continueConversation).toHaveBeenCalledWith(
+        conversationRef,
+        expect.any(Function)
+      )
+    })
   })
 
   describe('handlers.getUsers()', () => {

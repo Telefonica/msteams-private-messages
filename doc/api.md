@@ -2,22 +2,22 @@
 
 ## Summary
 
-|                                                     | endpoint                     | method | body                                                      |
-| :-------------------------------------------------- | :--------------------------- | :----- | :-------------------------------------------------------- |
-| Server Info                                         | `/`                          | GET    | ---                                                       |
-|                                                     |                              |        |                                                           |
-| Main endpoints                                      |                              |        |                                                           |
-| [Private notification to user](#notify)             | **`/api/v1/notify`**         | POST   | <pre>{<br> user\*,<br> message\*,<br> mention<br>}</pre>  |
-| [Broadcast notification to subscribers](#broadcast) | **`/api/v1/broadcast`**      | POST   | <pre>{<br> topic\*,<br> message\*,<br> mention<br>}</pre> |
-| Bot-SDK entry-point                                 | **`/api/v1/messages`**       | POST   | _used by Bot-SDK_                                         |
-|                                                     |                              |        |                                                           |
-| Debugging                                           |                              |        |                                                           |
-| [List users](#users)                                | **`/api/v1/users`**          | GET    | ---                                                       |
-| [List topics & subscribers](#topics)                | **`/api/v1/topics`**         | GET    | ---                                                       |
-|                                                     |                              |        |                                                           |
-| Manual ops                                          |                              |        |                                                           |
-| [Register topic](#create-topic)                     | **`/api/v1/topics`**         | POST   | <pre>{<br> name\*<br>}</pre>                              |
-| [Force subscriptions](#subscribe)                   | **`/api/v1/topics/{topic}`** | PUT    | <pre>{<br> user\*<br>}</pre>                              |
+|                                                     | endpoint                     | method | body                                                                                  |
+| :-------------------------------------------------- | :--------------------------- | :----- | :------------------------------------------------------------------------------------ |
+| Server Info                                         | `/`                          | GET    | ---                                                                                   |
+|                                                     |                              |        |                                                                                       |
+| Main endpoints                                      |                              |        |                                                                                       |
+| [Private notification to user](#notify)             | **`/api/v1/notify`**         | POST   | <pre>{<br> user\*,<br> message\*,<br> mention<br>}</pre>                              |
+| [Broadcast notification to subscribers](#broadcast) | **`/api/v1/broadcast`**      | POST   | <pre>{<br> topic\*,<br> message\*,<br> mention,<br> createTopicIfNotExists<br>}</pre> |
+| Bot-SDK entry-point                                 | **`/api/v1/messages`**       | POST   | _used by Bot-SDK_                                                                     |
+|                                                     |                              |        |                                                                                       |
+| Debugging                                           |                              |        |                                                                                       |
+| [List users](#users)                                | **`/api/v1/users`**          | GET    | ---                                                                                   |
+| [List topics & subscribers](#topics)                | **`/api/v1/topics`**         | GET    | ---                                                                                   |
+|                                                     |                              |        |                                                                                       |
+| Manual ops                                          |                              |        |                                                                                       |
+| [Register topic](#create-topic)                     | **`/api/v1/topics`**         | POST   | <pre>{<br> name\*<br>}</pre>                                                          |
+| [Force subscriptions](#subscribe)                   | **`/api/v1/topics/{topic}`** | PUT    | <pre>{<br> user\*<br>}</pre>                                                          |
 
 <a id="notify" />
 
@@ -115,11 +115,12 @@ POST /api/v1/broadcast
 
 ### Parameters
 
-| Name        | Required | Type                | Description                                                                          |
-| :---------- | :------- | :------------------ | :----------------------------------------------------------------------------------- |
-| **topic**   | Required | `string`            | Name of the topic: every user subscribed to this topic will receive the notification |
-| **message** | Required | `string` or `ICard` | The notification                                                                     |
-| mention     | Optional | `boolean`           | Append a mention to the user (@user)                                                 |
+| Name                   | Required | Type                | Description                                                                          |
+| :--------------------- | :------- | :------------------ | :----------------------------------------------------------------------------------- |
+| **topic**              | Required | `string`            | Name of the topic: every user subscribed to this topic will receive the notification |
+| **message**            | Required | `string` or `ICard` | The notification                                                                     |
+| mention                | Optional | `boolean`           | Append a mention to the user (@user)                                                 |
+| createTopicIfNotExists | Optional | `boolean`           | Ensure topic is created if wasn't registered on db                                   |
 
 ```typescript
 interface ICard {
@@ -166,7 +167,7 @@ curl -s -H "content-type: application/json"\
 
 ```bash
 # 202
-curl -H "content-type: application/json"\
+curl -s -H "content-type: application/json"\
  -d '{"topic": "banana", "message": "hi there", "mention": true}'\
  localhost:3978/api/v1/broadcast | jq
 {
@@ -178,8 +179,18 @@ curl -H "content-type: application/json"\
 
 ```bash
 # 202
-curl -H "content-type: application/json"\
+curl -s -H "content-type: application/json"\
  -d '{"topic": "tangerine", "message": "anyone there?"}'\
+ localhost:3978/api/v1/broadcast | jq
+{
+  "conversationKeys": []
+}
+```
+
+```bash
+# 202
+curl -s -H "content-type: application/json"\
+ -d '{"topic": "tangerine", "message": "anyone there?", "createTopicIfNotExists": true}'\
  localhost:3978/api/v1/broadcast | jq
 {
   "conversationKeys": []
@@ -337,9 +348,9 @@ PUT /api/v1/topics/{topic}
 
 ```bash
 # 200
-curl -X PUT -H "content-type: application/json"\
+curl -s -X PUT -H "content-type: application/json"\
  -d '{"user": "jane.doe@megacoorp.com"}'\
- localhost:3978/api/v1/topics/tangerine
+ localhost:3978/api/v1/topics/tangerine | jq
 {
   "subscribers": ["jane.doe@megacoorp.com"]
 }
@@ -347,7 +358,7 @@ curl -X PUT -H "content-type: application/json"\
 
 ```bash
 # 400
-curl -X PUT -H "content-type: application/json"\
+curl -s -X PUT -H "content-type: application/json"\
  -d '{}'\
  localhost:3978/api/v1/topics/tangerine | jq
 {

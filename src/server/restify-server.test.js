@@ -245,7 +245,7 @@ describe('createRestifyServer()', () => {
           expect(mockedHandlers.broadcast).toHaveBeenCalledWith(
             'orange',
             'orange event',
-            false
+            { includeMention: false, ensureTopic: false }
           )
           done()
         }
@@ -258,14 +258,26 @@ describe('createRestifyServer()', () => {
         { topic: 'orange', message: 'orange event', mention: true },
         // @ts-ignore
         (_, __, res, data) => {
-          expect(res.statusCode).toEqual(202)
-          expect(data).toEqual({
-            conversationKeys: ['conversation_key_jane', 'conversation_key_jhon']
-          })
           expect(mockedHandlers.broadcast).toHaveBeenCalledWith(
             'orange',
             'orange event',
-            true
+            { includeMention: true, ensureTopic: false }
+          )
+          done()
+        }
+      )
+    })
+
+    it('[202] routes to broadcast() (considering registering topic)', done => {
+      client.post(
+        '/api/v1/broadcast',
+        { topic: 'orange', message: 'orange event', createTopicIfNotExists: true },
+        // @ts-ignore
+        (_, __, res, data) => {
+          expect(mockedHandlers.broadcast).toHaveBeenCalledWith(
+            'orange',
+            'orange event',
+            { includeMention: false, ensureTopic: true }
           )
           done()
         }

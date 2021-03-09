@@ -42,6 +42,11 @@ declare namespace Types {
     removeSubscribers: (topic: string) => Promise<boolean>;
   }
 
+  interface BroadcastOpts {
+    includeMention?: boolean;
+    ensureTopic?: boolean;
+  }
+
   interface Handlers {
     /* bot-SDK entry point */
     processMessage: (
@@ -62,7 +67,7 @@ declare namespace Types {
     broadcast: (
       topic: string,
       message: string,
-      mention?: boolean
+      opts?: BroadcastOpts
     ) => Promise<string[]>;
 
     /* debugging */

@@ -43,7 +43,17 @@ const createHandlers = (adapter, storage, bot) => {
       return conversationRef.conversation.id
     },
 
-    broadcast: async (topic, message, includeMention) => {
+    broadcast: async (
+      topic,
+      message,
+      { includeMention, ensureTopic } = {
+        includeMention: false,
+        ensureTopic: false
+      }
+    ) => {
+      if (ensureTopic) {
+        await storage.registerTopic(topic) // may already exist
+      }
       const subscribers = await storage.getSubscribers(topic)
       const conversationKeys = []
       for (const user of subscribers) {

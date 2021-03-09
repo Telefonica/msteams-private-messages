@@ -1,11 +1,19 @@
 const restify = require('restify')
 const { BadRequestError } = require('restify-errors')
 const { log } = require('../log')
+
 /**
  * @param {import('restify').Request} req
  */
 const includeMention = req =>
   req.body.mention === true || req.body.mention === 'true'
+
+/**
+ * @param {import('restify').Request} req
+ */
+const ensureTopic = req =>
+  req.body.createTopicIfNotExists === true ||
+  req.body.createTopicIfNotExists === 'true'
 
 /**
  * restify server in charge of:
@@ -115,11 +123,10 @@ const createRestifyServer = ({
       const err = new BadRequestError("required: 'topic', 'message'")
       return next(err)
     }
-    const conversationKeys = await broadcast(
-      topic,
-      message,
-      includeMention(req)
-    )
+    const conversationKeys = await broadcast(topic, message, {
+      includeMention: includeMention(req),
+      ensureTopic: ensureTopic(req)
+    })
     res.send(202, { conversationKeys })
     next()
   })
