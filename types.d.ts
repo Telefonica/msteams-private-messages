@@ -95,13 +95,17 @@ declare namespace Types {
 
   interface Config {
     cards: {
-      welcomeCard: ICard;
-      unknownCard: ICard;
-      menuCard: {
+      welcome: ICard;
+      unknown: ICard;
+      menu: {
         title: string;
         checkButton: IButton;
         resetButton: IButton;
-        subscriptionButtons: IButton[];
+        listButton: IButton;
+      };
+      topics: {
+        title: string;
+        subscriptionButton: IButton;
       };
     };
   }

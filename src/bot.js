@@ -78,7 +78,8 @@ const createBot = storage => {
     const { user, conversation } = await extractInfoFromContext(context)
     await storage.saveConversation(user, conversation)
 
-    const { check, reset, subscriptions } = cards.registeredKeywords()
+    const { check, reset, list } = cards.registeredKeywords()
+    const topics = await storage.listTopics()
     const text = context.activity.text
 
     if (text === check) {
@@ -87,6 +88,9 @@ const createBot = storage => {
       await context.sendActivity(
         `subscribed to ${info.length} topics (${info.toString()})`
       )
+    } else if (text === list) {
+      // TODO: cool card instead
+      await context.sendActivity(cards.topicsCard(topics))
     } else if (text === reset) {
       await storage.resetSubscriptions(user)
       const info = await storage.getSubscribedTopics(user)
@@ -94,7 +98,7 @@ const createBot = storage => {
       await context.sendActivity(
         `subscribed to ${info.length} topics (${info.toString()})`
       )
-    } else if (subscriptions.indexOf(text) > -1) {
+    } else if (topics.indexOf(text) > -1) {
       await storage.subscribe(user, text)
       const info = await storage.getSubscribedTopics(user)
       // TODO: cool card instead
