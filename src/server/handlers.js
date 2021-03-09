@@ -1,3 +1,4 @@
+const { NotFoundError } = require('restify-errors')
 const { log } = require('../log')
 const { createConversationHelper } = require('./conversation-helper')
 
@@ -29,19 +30,10 @@ const createHandlers = (adapter, storage, bot) => {
   const notify = async (user, message, mention) => {
     const conversationRef = await storage.getConversation(user)
     if (!conversationRef) {
-      return {
-        status: 404,
-        response: {
-          code: 'NotFound',
-          input: { user }
-        }
-      }
+      throw new NotFoundError(`user not found: '${user}'`)
     }
     await conversationHelper.sendMessage(conversationRef, message, mention)
-    return {
-      status: 202,
-      response: { conversationKey: conversationRef.conversation.id }
-    }
+    return conversationRef.conversation.id
   }
 
   /**
@@ -63,10 +55,7 @@ const createHandlers = (adapter, storage, bot) => {
         conversationHelper.sendMessage(conversationRef, message, mention)
       }
     }
-    return {
-      status: 202,
-      response: { conversationKeys }
-    }
+    return conversationKeys
   }
 
   const getTopics = async () => {
@@ -81,22 +70,20 @@ const createHandlers = (adapter, storage, bot) => {
       const subscribers = await storage.getSubscribers(topic)
       topics[topic] = topics[topic].concat(subscribers)
     }
-    return { status: 200, response: topics }
+    return topics
   }
 
   const getUsers = async () => {
     const users = await storage.listUsers()
-    return { status: 200, response: users }
+    return users
   }
 
   /**
    * @param {string} topic
    */
   const createTopic = async topic => {
-    const created = await storage.registerTopic(topic)
-    const topicNames = await storage.listTopics()
-    const status = created ? 201 : 200
-    return { status, response: topicNames }
+    await storage.registerTopic(topic) // may already exist
+    return getTopics()
   }
 
   /**
@@ -104,10 +91,9 @@ const createHandlers = (adapter, storage, bot) => {
    * @param {string} topic
    */
   const forceSubscription = async (user, topic) => {
-    const success = await storage.subscribe(user, topic)
-    const subscriptions = await storage.getSubscribedTopics(user)
-    const status = success && subscriptions ? 200 : 500
-    return { status, response: subscriptions }
+    await storage.subscribe(user, topic)
+    const subscribers = await storage.getSubscribers(topic)
+    return subscribers
   }
 
   return {

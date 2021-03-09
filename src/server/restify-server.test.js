@@ -1,19 +1,28 @@
 const restifyClients = require('restify-clients')
 const { createRestifyServer } = require('./restify-server')
 
-const mockedResponse = {
-  status: 200,
-  response: 'mocked'
-}
-
 const mockedHandlers = {
-  processMessage: jest.fn().mockResolvedValue(mockedResponse),
-  notify: jest.fn().mockResolvedValue(mockedResponse),
-  broadcast: jest.fn().mockResolvedValue(mockedResponse),
-  getUsers: jest.fn().mockResolvedValue(mockedResponse),
-  getTopics: jest.fn().mockResolvedValue(mockedResponse),
-  createTopic: jest.fn().mockResolvedValue(mockedResponse),
-  forceSubscription: jest.fn().mockResolvedValue(mockedResponse)
+  /* real implementation does call res.send(); we need this behaviour for resolving the test */
+  processMessage: jest.fn().mockImplementation((_, res) => res.send(202)),
+  notify: jest.fn().mockResolvedValue('conversation_key_jane'),
+  broadcast: jest
+    .fn()
+    .mockResolvedValue(['conversation_key_jane', 'conversation_key_jhon']),
+  getUsers: jest
+    .fn()
+    .mockResolvedValue(['jane.doe@megacoorp.com', 'jhon.smith@contractor.com']),
+  getTopics: jest.fn().mockResolvedValue({
+    banana: ['jane.doe@megacoorp.com'],
+    orange: ['jane.doe@megacoorp.com', 'jhon.smith@contractor.com']
+  }),
+  createTopic: jest.fn().mockResolvedValue({
+    banana: ['jane.doe@megacoorp.com'],
+    orange: ['jane.doe@megacoorp.com', 'jhon.smith@contractor.com'],
+    tangerine: []
+  }),
+  forceSubscription: jest
+    .fn()
+    .mockResolvedValue(['jane.doe@megacoorp.com', 'jhon.smith@contractor.com'])
 }
 
 describe('createRestifyServer()', () => {
@@ -28,23 +37,34 @@ describe('createRestifyServer()', () => {
     server.stop().then(done)
   })
 
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
   describe('[GET] /api/v1/users', () => {
-    it("[200] routes to 'getUsers()'", done => {
+    it('[200] routes to getUsers()', done => {
       // @ts-ignore
       client.get('/api/v1/users', (_, __, res, data) => {
         expect(res.statusCode).toEqual(200)
-        expect(data).toEqual('mocked')
+        expect(data).toEqual([
+          'jane.doe@megacoorp.com',
+          'jhon.smith@contractor.com'
+        ])
+        expect(mockedHandlers.getUsers).toHaveBeenCalledWith()
         done()
       })
     })
   })
 
   describe('[GET] /api/v1/topics', () => {
-    it("[200] routes to 'getTopics()'", done => {
+    it('[200] routes to getTopics()', done => {
       // @ts-ignore
       client.get('/api/v1/topics', (_, __, res, data) => {
         expect(res.statusCode).toEqual(200)
-        expect(data).toEqual('mocked')
+        expect(data).toEqual({
+          banana: ['jane.doe@megacoorp.com'],
+          orange: ['jane.doe@megacoorp.com', 'jhon.smith@contractor.com']
+        })
         expect(mockedHandlers.getTopics).toHaveBeenCalledWith()
         done()
       })
@@ -61,20 +81,25 @@ describe('createRestifyServer()', () => {
           expect(res.statusCode).toEqual(400)
           expect(data).toEqual({
             code: 'BadRequest',
-            required: ['name']
+            message: "required: 'name'"
           })
           done()
         }
       )
     })
-    it("[201] routes to 'createTopic()'", done => {
+
+    it('[200] routes to createTopic()', done => {
       client.post(
         '/api/v1/topics',
         { name: 'tangerine' },
         // @ts-ignore
         (_, __, res, data) => {
-          expect(res.statusCode).toEqual(200) // FIXME
-          expect(data).toEqual('mocked')
+          expect(res.statusCode).toEqual(200)
+          expect(data).toEqual({
+            banana: ['jane.doe@megacoorp.com'],
+            orange: ['jane.doe@megacoorp.com', 'jhon.smith@contractor.com'],
+            tangerine: []
+          })
           expect(mockedHandlers.createTopic).toHaveBeenCalledWith('tangerine')
           done()
         }
@@ -82,9 +107,9 @@ describe('createRestifyServer()', () => {
     })
   })
 
-  describe('[POST] /api/v1/topics/{topic}', () => {
+  describe('[PUT] /api/v1/topics/{topic}', () => {
     it("[400] requires 'user'", done => {
-      client.post(
+      client.put(
         '/api/v1/topics/orange',
         {},
         // @ts-ignore
@@ -92,24 +117,26 @@ describe('createRestifyServer()', () => {
           expect(res.statusCode).toEqual(400)
           expect(data).toEqual({
             code: 'BadRequest',
-            got: {},
-            required: ['user']
+            message: "required: 'user'"
           })
           done()
         }
       )
     })
-    it("[200] routes to 'forceSubscription()'", done => {
-      client.post(
-        '/api/v1/topics/orange',
-        { user: 'jane.doe@megacoorp.com' },
+
+    it('[200] routes to forceSubscription()', done => {
+      client.put(
+        '/api/v1/topics/banana',
+        { user: 'jhon.smith@contractor.com' },
         // @ts-ignore
         (_, __, res, data) => {
           expect(res.statusCode).toEqual(200)
-          expect(data).toEqual('mocked')
+          expect(data).toEqual({
+            subscribers: ['jane.doe@megacoorp.com', 'jhon.smith@contractor.com']
+          })
           expect(mockedHandlers.forceSubscription).toHaveBeenCalledWith(
-            'jane.doe@megacoorp.com',
-            'orange'
+            'jhon.smith@contractor.com',
+            'banana'
           )
           done()
         }
@@ -117,11 +144,12 @@ describe('createRestifyServer()', () => {
     })
   })
 
-  describe.skip('[POST] /api/v1/messages', () => {
-    it("routes to 'processMessage'", done => {
+  describe('[POST] /api/v1/messages', () => {
+    it('routes to processMessage()', done => {
       // @ts-ignore
-      client.post('/api/v1/messages', {}, () => {
+      client.post('/api/v1/messages', {}, (_, __, res) => {
         expect(mockedHandlers.processMessage).toHaveBeenCalled()
+        expect(res.statusCode).toEqual(202)
         done()
       })
     })
@@ -134,12 +162,12 @@ describe('createRestifyServer()', () => {
         expect(res.statusCode).toEqual(400)
         expect(data).toEqual({
           code: 'BadRequest',
-          required: ['user', 'message']
+          message: "required: 'user', 'message'"
         })
         done()
       })
     })
-    it("[200] routes to 'notify()'", done => {
+    it('[202] routes to notify()', done => {
       client.post(
         '/api/v1/notify',
         {
@@ -148,8 +176,10 @@ describe('createRestifyServer()', () => {
         },
         // @ts-ignore
         (_, __, res, data) => {
-          expect(res.statusCode).toEqual(200)
-          expect(data).toEqual('mocked')
+          expect(res.statusCode).toEqual(202)
+          expect(data).toEqual({
+            conversationKey: 'conversation_key_jane'
+          })
           expect(mockedHandlers.notify).toHaveBeenCalledWith(
             'jane@megacoorp.com',
             'hi there',
@@ -159,7 +189,8 @@ describe('createRestifyServer()', () => {
         }
       )
     })
-    it("[200] routes to 'notify()'' II", done => {
+
+    it('[202] routes to notify() (considering mention)', done => {
       client.post(
         '/api/v1/notify',
         {
@@ -169,8 +200,10 @@ describe('createRestifyServer()', () => {
         },
         // @ts-ignore
         (_, __, res, data) => {
-          expect(res.statusCode).toEqual(200)
-          expect(data).toEqual('mocked')
+          expect(res.statusCode).toEqual(202)
+          expect(data).toEqual({
+            conversationKey: 'conversation_key_jane'
+          })
           expect(mockedHandlers.notify).toHaveBeenCalledWith(
             'jane@megacoorp.com',
             'hi there',
@@ -192,41 +225,46 @@ describe('createRestifyServer()', () => {
           expect(res.statusCode).toEqual(400)
           expect(data).toEqual({
             code: 'BadRequest',
-            got: {},
-            required: ['topic', 'message']
+            message: "required: 'topic', 'message'"
           })
           done()
         }
       )
     })
-    it("[200] routes to 'broadcast()'", done => {
+
+    it('[202] routes to broadcast()', done => {
       client.post(
         '/api/v1/broadcast',
-        { topic: 'banana', message: 'banana event' },
+        { topic: 'orange', message: 'orange event' },
         // @ts-ignore
         (_, __, res, data) => {
-          expect(res.statusCode).toEqual(200)
-          expect(data).toEqual('mocked')
+          expect(res.statusCode).toEqual(202)
+          expect(data).toEqual({
+            conversationKeys: ['conversation_key_jane', 'conversation_key_jhon']
+          })
           expect(mockedHandlers.broadcast).toHaveBeenCalledWith(
-            'banana',
-            'banana event',
+            'orange',
+            'orange event',
             false
           )
           done()
         }
       )
     })
-    it("[200] routes to 'broadcast()' II", done => {
+
+    it('[202] routes to broadcast() (considering mention)', done => {
       client.post(
         '/api/v1/broadcast',
-        { topic: 'banana', message: 'banana event', mention: true },
+        { topic: 'orange', message: 'orange event', mention: true },
         // @ts-ignore
         (_, __, res, data) => {
-          expect(res.statusCode).toEqual(200)
-          expect(data).toEqual('mocked')
+          expect(res.statusCode).toEqual(202)
+          expect(data).toEqual({
+            conversationKeys: ['conversation_key_jane', 'conversation_key_jhon']
+          })
           expect(mockedHandlers.broadcast).toHaveBeenCalledWith(
-            'banana',
-            'banana event',
+            'orange',
+            'orange event',
             true
           )
           done()

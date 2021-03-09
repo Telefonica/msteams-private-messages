@@ -48,26 +48,34 @@ declare namespace Types {
       req: import("restify").Request,
       res: import("restify").Response
     ) => Promise<void>;
+
     /* main methods */
+
+    /** @return conversationKey */
     notify: (
       user: string,
       message: string,
       mention?: boolean
-    ) => Promise<{ status: number; response: any }>;
+    ) => Promise<string>;
+
+    /** @return conversationKeys */
     broadcast: (
       topic: string,
       message: string,
       mention?: boolean
-    ) => Promise<{ status: number; response: any }>;
+    ) => Promise<string[]>;
+
     /* debugging */
-    getUsers: () => Promise<{ status: number; response: any }>;
-    getTopics: () => Promise<{ status: number; response: any }>;
+
+    getUsers: () => Promise<string[]>;
+    getTopics: () => Promise<{ [topic: string]: string[] }>;
+
     /* ops */
-    createTopic: (topic: string) => Promise<{ status: number; response: any }>;
-    forceSubscription: (
-      user: string,
-      topic: string
-    ) => Promise<{ status: number; response: any }>;
+
+    /** @return topics */
+    createTopic: (topic: string) => Promise<{ [topic: string]: string[] }>;
+    /** @return subscribers */
+    forceSubscription: (user: string, topic: string) => Promise<string[]>;
   }
 
   interface ICard {

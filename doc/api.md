@@ -17,7 +17,7 @@
 |                                                     |                              |        |                                                           |
 | Manual ops                                          |                              |        |                                                           |
 | [Register topic](#create-topic)                     | **`/api/v1/topics`**         | POST   | <pre>{<br> name\*<br>}</pre>                              |
-| [Force subscriptions](#subscribe)                   | **`/api/v1/topics/{topic}`** | PUT    | <pre>{<br>user\*<br>}</pre>                               |
+| [Force subscriptions](#subscribe)                   | **`/api/v1/topics/{topic}`** | PUT    | <pre>{<br> user\*<br>}</pre>                              |
 
 <a id="notify" />
 
@@ -45,7 +45,7 @@ interface ICard {
 ### Response Codes
 
 - **202 Accepted**: notification has been submitted to Microsoft's endpoint.<br>
-  Returns the used `conversationId` for traceability.
+  Returns the used `conversationKey` for traceability.
 - **400 Bad Request**: request body doesn't fulfill the requirements.<br>
   Returns the expected parameter list.
 - **404 Not Found**: requested user isn't registered in db.<br>
@@ -90,10 +90,7 @@ curl -s -H "content-type: application/json"\
  localhost:3978/api/v1/notify | jq
 {
   "code": "BadRequest",
-  "required": [
-    "user",
-    "message"
-  ]
+  "message": "required: 'name', 'message'"
 }
 ```
 
@@ -104,9 +101,7 @@ curl -s -H "content-type: application/json"\
  localhost:3978/api/v1/notify | jq
 {
   "code": "NotFound",
-  "input": {
-    "user": "bill@unknown.com"
-  }
+  "message": "user not found: 'bill@unknown.com'"
 }
 ```
 
@@ -198,23 +193,7 @@ curl -s -H "content-type: application/json"\
  localhost:3978/api/v1/broadcast | jq
 {
   "code": "BadRequest",
-  "required": [
-    "topic",
-    "message"
-  ]
-}
-```
-
-```bash
-# 404
-curl -H "content-type: application/json"\
- -d '{"topic": "unknown", "message": "what is this"}'\
- localhost:3978/api/v1/broadcast | jq
-{
-  "code": "NotFound",
-  "input": {
-    "topic": "unknown"
-  }
+  "message": "required: 'topic', 'message'"
 }
 ```
 
@@ -296,9 +275,7 @@ POST /api/v1/topics
 
 ### Response Codes
 
-- **201 Created**: new topic registered.<br>
-  Returns the updated list of topics (equivalent to GET request)
-- **200 Ok**: topic already exists.<br>
+- **200 Ok**: topic registered (could already exist).<br>
   Returns the updated list of topics (equivalent to GET request)
 - **400 Bad Request**: request body doesn't fulfill the requirements.<br>
   Returns the expected parameter list
@@ -306,29 +283,23 @@ POST /api/v1/topics
 ### Examples
 
 ```bash
-# 201
-curl -s -H "content-type: application/json"\
- -d '{"name": "tangerine"}'\
- localhost:3978/api/v1/topics | jq
-[
-  "banana",
-  "apple",
-  "orange",
-  "tangerine"
-]
-```
-
-```bash
 # 200
 curl -s -H "content-type: application/json"\
  -d '{"name": "tangerine"}'\
  localhost:3978/api/v1/topics | jq
-[
-  "banana",
-  "apple",
-  "orange",
-  "tangerine"
-]
+{
+  "banana": [
+    "jane.doe@megacoorp.com"
+  ],
+  "apple": [
+    "jhon.smith@contractor.com"
+  ],
+  "orange": [
+    "jane.doe@megacoorp.com",
+    "jhon.smith@contractor.com"
+  ],
+  "tangerine": []
+}
 ```
 
 ```bash
@@ -338,9 +309,7 @@ curl -s -H "content-type: application/json"\
  localhost:3978/api/v1/topics | jq
 {
   "code": "BadRequest",
-  "required": [
-    "name"
-  ]
+  "message": "required: 'name'"
 }
 ```
 
@@ -360,7 +329,9 @@ PUT /api/v1/topics/{topic}
 
 ### Response Codes
 
-TODO
+- **200 Ok**: nice
+- **400 BadRequest**: request body doesn't fulfill the requirements.<br>
+  Returns the expected parameter list
 
 ### Examples
 
@@ -369,6 +340,20 @@ TODO
 curl -X PUT -H "content-type: application/json"\
  -d '{"user": "jane.doe@megacoorp.com"}'\
  localhost:3978/api/v1/topics/tangerine
+{
+  "subscribers": ["jane.doe@megacoorp.com"]
+}
+```
+
+```bash
+# 400
+curl -X PUT -H "content-type: application/json"\
+ -d '{}'\
+ localhost:3978/api/v1/topics/tangerine | jq
+{
+  "code": "BadRequest",
+  "message": "required: 'user'"
+}
 ```
 
 ---
