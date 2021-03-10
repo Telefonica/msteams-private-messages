@@ -7,7 +7,7 @@
     "start": "node index.js | ./node_modules/.bin/bunyan",
     "lint": "eslint . -f table .",
     "types": "tsc --build tsconfig.json",
-    "test": "NODE_ENV=test jest",
+    "test": "NODE_ENV=test jest --verbose",
     "blue-ball": "npm run lint && npm run types && npm test",
     "build-container": "docker build --rm -t docker.tuenti.io/sre/msteamsbot:$npm_package_version .",
     "push-container": "docker push docker.tuenti.io/sre/msteamsbot:$npm_package_version",
@@ -144,6 +144,7 @@
     "@types/jest": "^26.0.20",
     "@types/js-yaml": "^4.0.0",
     "@types/restify": "^8.4.2",
+    "@types/restify-errors": "^4.3.3",
     "@types/validator": "^13.1.3",
     "@typescript-eslint/eslint-plugin": "^4.14.1",
     "eslint": "^7.18.0",
@@ -168,6 +169,7 @@
     "js-yaml": "^4.0.0",
     "mysql2": "^2.2.5",
     "restify": "^8.5.1",
+    "restify-errors": "^8.0.2",
     "sequelize": "^6.5.0"
   }
 }

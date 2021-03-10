@@ -2,22 +2,22 @@
 
 ## Summary
 
-|                                                     | endpoint                     | method | body                                                      |
-| :-------------------------------------------------- | :--------------------------- | :----- | :-------------------------------------------------------- |
-| Server Info                                         | `/`                          | GET    | ---                                                       |
-|                                                     |                              |        |                                                           |
-| Main endpoints                                      |                              |        |                                                           |
-| [Private notification to user](#notify)             | **`/api/v1/notify`**         | POST   | <pre>{<br> user\*,<br> message\*,<br> mention<br>}</pre>  |
-| [Broadcast notification to subscribers](#broadcast) | **`/api/v1/broadcast`**      | POST   | <pre>{<br> topic\*,<br> message\*,<br> mention<br>}</pre> |
-| Bot-SDK entry-point                                 | **`/api/v1/messages`**       | POST   | _used by Bot-SDK_                                         |
-|                                                     |                              |        |                                                           |
-| Debugging                                           |                              |        |                                                           |
-| [List users](#users)                                | **`/api/v1/users`**          | GET    | ---                                                       |
-| [List topics & subscribers](#topics)                | **`/api/v1/topics`**         | GET    | ---                                                       |
-|                                                     |                              |        |                                                           |
-| Manual ops                                          |                              |        |                                                           |
-| [Register topic](#create-topic)                     | **`/api/v1/topics`**         | POST   | <pre>{<br> name\*<br>}</pre>                              |
-| [Force subscriptions](#subscribe)                   | **`/api/v1/topics/{topic}`** | PUT    | <pre>{<br>user\*<br>}</pre>                               |
+|                                                     | endpoint                     | method | body                                                                                  |
+| :-------------------------------------------------- | :--------------------------- | :----- | :------------------------------------------------------------------------------------ |
+| Server Info                                         | `/`                          | GET    | ---                                                                                   |
+|                                                     |                              |        |                                                                                       |
+| Main endpoints                                      |                              |        |                                                                                       |
+| [Private notification to user](#notify)             | **`/api/v1/notify`**         | POST   | <pre>{<br> user\*,<br> message\*,<br> mention<br>}</pre>                              |
+| [Broadcast notification to subscribers](#broadcast) | **`/api/v1/broadcast`**      | POST   | <pre>{<br> topic\*,<br> message\*,<br> mention,<br> createTopicIfNotExists<br>}</pre> |
+| Bot-SDK entry-point                                 | **`/api/v1/messages`**       | POST   | _used by Bot-SDK_                                                                     |
+|                                                     |                              |        |                                                                                       |
+| Debugging                                           |                              |        |                                                                                       |
+| [List users](#users)                                | **`/api/v1/users`**          | GET    | ---                                                                                   |
+| [List topics & subscribers](#topics)                | **`/api/v1/topics`**         | GET    | ---                                                                                   |
+|                                                     |                              |        |                                                                                       |
+| Manual ops                                          |                              |        |                                                                                       |
+| [Register topic](#create-topic)                     | **`/api/v1/topics`**         | POST   | <pre>{<br> name\*<br>}</pre>                                                          |
+| [Force subscriptions](#subscribe)                   | **`/api/v1/topics/{topic}`** | PUT    | <pre>{<br> user\*<br>}</pre>                                                          |
 
 <a id="notify" />
 
@@ -45,7 +45,7 @@ interface ICard {
 ### Response Codes
 
 - **202 Accepted**: notification has been submitted to Microsoft's endpoint.<br>
-  Returns the used `conversationId` for traceability.
+  Returns the used `conversationKey` for traceability.
 - **400 Bad Request**: request body doesn't fulfill the requirements.<br>
   Returns the expected parameter list.
 - **404 Not Found**: requested user isn't registered in db.<br>
@@ -90,10 +90,7 @@ curl -s -H "content-type: application/json"\
  localhost:3978/api/v1/notify | jq
 {
   "code": "BadRequest",
-  "required": [
-    "user",
-    "message"
-  ]
+  "message": "required: 'name', 'message'"
 }
 ```
 
@@ -104,9 +101,7 @@ curl -s -H "content-type: application/json"\
  localhost:3978/api/v1/notify | jq
 {
   "code": "NotFound",
-  "input": {
-    "user": "bill@unknown.com"
-  }
+  "message": "user not found: 'bill@unknown.com'"
 }
 ```
 
@@ -120,11 +115,12 @@ POST /api/v1/broadcast
 
 ### Parameters
 
-| Name        | Required | Type                | Description                                                                          |
-| :---------- | :------- | :------------------ | :----------------------------------------------------------------------------------- |
-| **topic**   | Required | `string`            | Name of the topic: every user subscribed to this topic will receive the notification |
-| **message** | Required | `string` or `ICard` | The notification                                                                     |
-| mention     | Optional | `boolean`           | Append a mention to the user (@user)                                                 |
+| Name                   | Required | Type                | Description                                                                          |
+| :--------------------- | :------- | :------------------ | :----------------------------------------------------------------------------------- |
+| **topic**              | Required | `string`            | Name of the topic: every user subscribed to this topic will receive the notification |
+| **message**            | Required | `string` or `ICard` | The notification                                                                     |
+| mention                | Optional | `boolean`           | Append a mention to the user (@user)                                                 |
+| createTopicIfNotExists | Optional | `boolean`           | Ensure topic is created if wasn't registered on db                                   |
 
 ```typescript
 interface ICard {
@@ -171,7 +167,7 @@ curl -s -H "content-type: application/json"\
 
 ```bash
 # 202
-curl -H "content-type: application/json"\
+curl -s -H "content-type: application/json"\
  -d '{"topic": "banana", "message": "hi there", "mention": true}'\
  localhost:3978/api/v1/broadcast | jq
 {
@@ -183,8 +179,18 @@ curl -H "content-type: application/json"\
 
 ```bash
 # 202
-curl -H "content-type: application/json"\
+curl -s -H "content-type: application/json"\
  -d '{"topic": "tangerine", "message": "anyone there?"}'\
+ localhost:3978/api/v1/broadcast | jq
+{
+  "conversationKeys": []
+}
+```
+
+```bash
+# 202
+curl -s -H "content-type: application/json"\
+ -d '{"topic": "tangerine", "message": "anyone there?", "createTopicIfNotExists": true}'\
  localhost:3978/api/v1/broadcast | jq
 {
   "conversationKeys": []
@@ -198,23 +204,7 @@ curl -s -H "content-type: application/json"\
  localhost:3978/api/v1/broadcast | jq
 {
   "code": "BadRequest",
-  "required": [
-    "topic",
-    "message"
-  ]
-}
-```
-
-```bash
-# 404
-curl -H "content-type: application/json"\
- -d '{"topic": "unknown", "message": "what is this"}'\
- localhost:3978/api/v1/broadcast | jq
-{
-  "code": "NotFound",
-  "input": {
-    "topic": "unknown"
-  }
+  "message": "required: 'topic', 'message'"
 }
 ```
 
@@ -296,9 +286,7 @@ POST /api/v1/topics
 
 ### Response Codes
 
-- **201 Created**: new topic registered.<br>
-  Returns the updated list of topics (equivalent to GET request)
-- **200 Ok**: topic already exists.<br>
+- **200 Ok**: topic registered (could already exist).<br>
   Returns the updated list of topics (equivalent to GET request)
 - **400 Bad Request**: request body doesn't fulfill the requirements.<br>
   Returns the expected parameter list
@@ -306,29 +294,23 @@ POST /api/v1/topics
 ### Examples
 
 ```bash
-# 201
-curl -s -H "content-type: application/json"\
- -d '{"name": "tangerine"}'\
- localhost:3978/api/v1/topics | jq
-[
-  "banana",
-  "apple",
-  "orange",
-  "tangerine"
-]
-```
-
-```bash
 # 200
 curl -s -H "content-type: application/json"\
  -d '{"name": "tangerine"}'\
  localhost:3978/api/v1/topics | jq
-[
-  "banana",
-  "apple",
-  "orange",
-  "tangerine"
-]
+{
+  "banana": [
+    "jane.doe@megacoorp.com"
+  ],
+  "apple": [
+    "jhon.smith@contractor.com"
+  ],
+  "orange": [
+    "jane.doe@megacoorp.com",
+    "jhon.smith@contractor.com"
+  ],
+  "tangerine": []
+}
 ```
 
 ```bash
@@ -338,9 +320,7 @@ curl -s -H "content-type: application/json"\
  localhost:3978/api/v1/topics | jq
 {
   "code": "BadRequest",
-  "required": [
-    "name"
-  ]
+  "message": "required: 'name'"
 }
 ```
 
@@ -360,15 +340,31 @@ PUT /api/v1/topics/{topic}
 
 ### Response Codes
 
-TODO
+- **200 Ok**: nice
+- **400 BadRequest**: request body doesn't fulfill the requirements.<br>
+  Returns the expected parameter list
 
 ### Examples
 
 ```bash
 # 200
-curl -X PUT -H "content-type: application/json"\
+curl -s -X PUT -H "content-type: application/json"\
  -d '{"user": "jane.doe@megacoorp.com"}'\
- localhost:3978/api/v1/topics/tangerine
+ localhost:3978/api/v1/topics/tangerine | jq
+{
+  "subscribers": ["jane.doe@megacoorp.com"]
+}
+```
+
+```bash
+# 400
+curl -s -X PUT -H "content-type: application/json"\
+ -d '{}'\
+ localhost:3978/api/v1/topics/tangerine | jq
+{
+  "code": "BadRequest",
+  "message": "required: 'user'"
+}
 ```
 
 ---

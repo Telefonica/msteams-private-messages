@@ -46,12 +46,7 @@ describe('createHandlers()', () => {
         conversationRef,
         expect.any(Function)
       )
-      expect(response).toEqual({
-        status: 202,
-        response: {
-          conversationKey: conversationRef.conversation.id
-        }
-      })
+      expect(response).toEqual(conversationRef.conversation.id)
     })
   })
 
@@ -63,24 +58,29 @@ describe('createHandlers()', () => {
       )
       expect(adapter.continueConversation).toHaveBeenCalledWith(
         conversationRef,
-        expect.anything()
+        expect.any(Function)
       )
-      expect(response).toEqual({
-        status: 202,
-        response: {
-          conversationKeys: [conversationRef.conversation.id]
-        }
+      expect(response).toEqual([conversationRef.conversation.id])
+    })
+    it("calls 'storage.registerTopic' depending on opts", async () => {
+      await handlers.broadcast('orange', 'an orange event did occur', {
+        ensureTopic: true
       })
+      expect(storage.registerTopic).toHaveBeenCalledWith('orange')
+      expect(adapter.continueConversation).toHaveBeenCalledWith(
+        conversationRef,
+        expect.any(Function)
+      )
     })
   })
 
   describe('handlers.getUsers()', () => {
     it("returns 'storage' items", async () => {
       const response = await handlers.getUsers()
-      expect(response).toEqual({
-        status: 200,
-        response: ['jane.doe@megacoorp.com', 'jhon.smith@contractor.com']
-      })
+      expect(response).toEqual([
+        'jane.doe@megacoorp.com',
+        'jhon.smith@contractor.com'
+      ])
     })
   })
 
@@ -88,12 +88,9 @@ describe('createHandlers()', () => {
     it("returns 'storage' items", async () => {
       const response = await handlers.getTopics()
       expect(response).toEqual({
-        status: 200,
-        response: {
-          banana: ['jane.doe@megacoorp.com'],
-          apple: ['jane.doe@megacoorp.com'],
-          orange: ['jane.doe@megacoorp.com']
-        }
+        banana: ['jane.doe@megacoorp.com'],
+        apple: ['jane.doe@megacoorp.com'],
+        orange: ['jane.doe@megacoorp.com']
       })
     })
   })
