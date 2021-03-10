@@ -1,24 +1,26 @@
 cards:
-  welcomeCard:
+  welcome:
     title: Welcome to the Private Notifications Center
     text: ""
 
-  unknownCard:
+  unknown:
     title: ""
     text: Unknown command...
 
-  menuCard:
+  menu:
     title: Available Options
     checkButton:
-      title: Check my subscribed notifications 🧾
+      title: Check my subscribed topics ✅
       value: check
+    listButton:
+      title: List every available topic 🔘
+      value: list
     resetButton:
-      title: Reset all my subscribed notifications ❌
+      title: Reset all my subscribed topics ❌
       value: reset
-    subscriptionButtons:
-      - title: Subscribe to banana notifications 🍌
-        value: banana
-      - title: Subscribe to apple notifications 🍎
-        value: apple
-      - title: Subscribe to orange notifications 🍊
-        value: orange
+
+  topics:
+    title: Available Topics
+    subscriptionButton:
+      title: Subscribe to ${topic} notifications
+      value: ${topic}

@@ -1,39 +1,37 @@
+/* eslint-disable no-template-curly-in-string */
 const { readConfig } = require('./config')
 
 const DEFAULT_EXAMPLE_CONFIG = {
   cards: {
-    welcomeCard: {
+    welcome: {
       title: 'Welcome to the Private Notifications Center',
       text: ''
     },
-    unknownCard: {
+    unknown: {
       title: '',
       text: 'Unknown command...'
     },
-    menuCard: {
+    menu: {
       title: 'Available Options',
       checkButton: {
-        title: 'Check my subscribed notifications 🧾',
+        title: 'Check my subscribed topics ✅',
         value: 'check'
       },
-      resetButton: {
-        title: 'Reset all my subscribed notifications ❌',
-        value: 'reset'
+      listButton: {
+        title: 'List every available topic 🔘',
+        value: 'list'
       },
-      subscriptionButtons: [
-        {
-          title: 'Subscribe to banana notifications 🍌',
-          value: 'banana'
-        },
-        {
-          title: 'Subscribe to apple notifications 🍎',
-          value: 'apple'
-        },
-        {
-          title: 'Subscribe to orange notifications 🍊',
-          value: 'orange'
-        }
-      ]
+      resetButton: {
+        title: 'Reset all my subscribed topics ❌',
+        value: 'reset'
+      }
+    },
+    topics: {
+      title: 'Available Topics',
+      subscriptionButton: {
+        title: 'Subscribe to ${topic} notifications',
+        value: '${topic}'
+      }
     }
   }
 }
