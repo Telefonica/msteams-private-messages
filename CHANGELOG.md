@@ -1,3 +1,10 @@
+### [0.7.1](https://github.com/Telefonica/msteams-private-messages/compare/v0.7.0...v0.7.1) (2021-03-10)
+
+
+### Internal
+
+* review topic creation (config.yaml) ([d003122](https://github.com/Telefonica/msteams-private-messages/commit/d003122b7400d850e904d836231ddb3ecbebbf4d))
+
 ## [0.7.0](https://github.com/Telefonica/msteams-private-messages/compare/v0.6.8...v0.7.0) (2021-03-10)
 
 
