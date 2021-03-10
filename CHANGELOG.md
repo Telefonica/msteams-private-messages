@@ -1,3 +1,16 @@
+## [0.7.0](https://github.com/Telefonica/msteams-private-messages/compare/v0.6.8...v0.7.0) (2021-03-10)
+
+
+### Features
+
+* new opt at /broadcast: createTopicIfNotExists ([57b1a88](https://github.com/Telefonica/msteams-private-messages/commit/57b1a88bc5efada9c5bf1d9c634b5d8455b20972))
+
+
+### Internal
+
+* handlers vs. server - single responsibility principle ([f57a4dd](https://github.com/Telefonica/msteams-private-messages/commit/f57a4dd3838f3a7aa7094b8c8576f931119ba18d))
+* simplify code style at handlers.js ([61efbdd](https://github.com/Telefonica/msteams-private-messages/commit/61efbdd891b9c5bc5a4e3a2e2b8cfb2813904b1b))
+
 ### [0.6.8](https://github.com/Telefonica/msteams-private-messages/compare/v0.6.7...v0.6.8) (2021-03-05)
 
 
