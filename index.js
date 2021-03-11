@@ -16,13 +16,20 @@ const { createServer } = require('./src/server')
 
 const run = async () => {
   log.info('[STARTUP]', log.fields.name)
-  log.info('[STARTUP]', '.env file read')
 
-  const adapter = createBotAdapter()
-  const storage = await createStorage()
+  const adapter = createBotAdapter({
+    runningLocally: process.env.LOCAL === 'true',
+    microsoftAppId: process.env.MICROSOFT_APP_ID || null,
+    microsoftAppPassword: process.env.MICROSOFT_APP_PASSWORD || null
+  })
+  const storage = await createStorage({
+    selectedStorage: process.env.STORAGE || 'memory'
+  })
   const bot = createBot(storage)
 
-  createServer(adapter, storage, bot).start()
+  createServer(adapter, storage, bot).start({
+    port: parseInt(process.env.PORT) || 3978
+  })
 }
 
 try {

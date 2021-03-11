@@ -1,12 +1,20 @@
 const { BotFrameworkAdapter } = require('botbuilder')
 const { log } = require('./log')
 
-const createBotAdapter = () => {
-  const runningLocally = process.env.LOCAL === 'true' || false
-
+/**
+ * @param {object} param0
+ * @param {boolean} param0.runningLocally
+ * @param {string=} param0.microsoftAppId
+ * @param {string=} param0.microsoftAppPassword
+ */
+const createBotAdapter = ({
+  runningLocally,
+  microsoftAppId,
+  microsoftAppPassword
+}) => {
   const adapter = new BotFrameworkAdapter({
-    appId: runningLocally ? null : process.env.MICROSOFT_APP_ID,
-    appPassword: runningLocally ? null : process.env.MICROSOFT_APP_PASSWORD
+    appId: runningLocally ? null : microsoftAppId,
+    appPassword: runningLocally ? null : microsoftAppPassword
   })
 
   adapter.onTurnError = async (context, error) => {
