@@ -8,9 +8,10 @@ const tryConnection = async () => {
   try {
     await db.authenticate()
     log.info('[STARTUP] db connection has been established successfully')
+    return true
   } catch (err) {
     log.error('[STARTUP] unable to connect to the database', err)
-    throw err
+    return false
   }
 }
 

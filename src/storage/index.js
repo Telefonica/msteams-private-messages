@@ -8,6 +8,8 @@ const mysqlStorage = require('./mysql')
  * @return {Promise<Types.Storage>}
  */
 const createStorage = async ({ selectedStorage }) => {
+  /** @type {'memory'|'mysql' } */
+  // @ts-ignore
   const curatedStorage =
     ['memory', 'mysql'].indexOf(selectedStorage) > -1
       ? selectedStorage

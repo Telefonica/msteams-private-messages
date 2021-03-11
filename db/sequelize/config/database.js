@@ -3,6 +3,13 @@ const mysql2 = require('mysql2')
 const { log } = require('../../../src/log')
 
 module.exports = {
+  test: {
+    username: 'root',
+    password: null,
+    database: 'database_test',
+    host: '127.0.0.1',
+    dialect: 'mysql'
+  },
   development: {
     username: process.env.MYSQL_USER || 'root',
     password: process.env.MYSQL_PASSWORD || null,
