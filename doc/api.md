@@ -29,18 +29,13 @@ POST /api/v1/notify
 
 ### Parameters
 
-| Name        | Required | Type                | Description                                |
-| :---------- | :------- | :------------------ | :----------------------------------------- |
-| **user**    | Required | `string`            | Name of the recipient for the notification |
-| **message** | Required | `string` or `ICard` | The notification                           |
-| mention     | Optional | `boolean`           | Append a mention to the user (@user)       |
+| Name        | Required | Type                       | Description                                |
+| :---------- | :------- | :------------------------- | :----------------------------------------- |
+| **user**    | Required | `string`                   | Name of the recipient for the notification |
+| **message** | Required | `string` or `Activity`(\*) | The notification                           |
+| mention     | Optional | `boolean`                  | Append a mention to the user (@user)       |
 
-```typescript
-interface ICard {
-  title: string;
-  text: string;
-}
-```
+> \*[Activity](https://www.npmjs.com/package/botframework-schema?activeTab=explore): JSON object defined in `botframework`.
 
 ### Response Codes
 
@@ -115,19 +110,14 @@ POST /api/v1/broadcast
 
 ### Parameters
 
-| Name                   | Required | Type                | Description                                                                          |
-| :--------------------- | :------- | :------------------ | :----------------------------------------------------------------------------------- |
-| **topic**              | Required | `string`            | Name of the topic: every user subscribed to this topic will receive the notification |
-| **message**            | Required | `string` or `ICard` | The notification                                                                     |
-| mention                | Optional | `boolean`           | Append a mention to the user (@user)                                                 |
-| createTopicIfNotExists | Optional | `boolean`           | Ensure topic is created if wasn't registered on db                                   |
+| Name                   | Required | Type                       | Description                                                                          |
+| :--------------------- | :------- | :------------------------- | :----------------------------------------------------------------------------------- |
+| **topic**              | Required | `string`                   | Name of the topic: every user subscribed to this topic will receive the notification |
+| **message**            | Required | `string` or `Activity`(\*) | The notification                                                                     |
+| mention                | Optional | `boolean`                  | Append a mention to the user (@user)                                                 |
+| createTopicIfNotExists | Optional | `boolean`                  | Ensure topic is created if wasn't registered on db                                   |
 
-```typescript
-interface ICard {
-  title: string;
-  text: string;
-}
-```
+> \*[Activity](https://www.npmjs.com/package/botframework-schema?activeTab=explore): JSON object defined in `botframework`.
 
 ### Response Codes
 
