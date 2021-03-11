@@ -59,14 +59,14 @@ declare namespace Types {
     /** @return conversationKey */
     notify: (
       user: string,
-      message: string,
+      message: string | Partial<Activity>,
       mention?: boolean
     ) => Promise<string>;
 
     /** @return conversationKeys */
     broadcast: (
       topic: string,
-      message: string,
+      message: string | Partial<Activity>,
       opts?: BroadcastOpts
     ) => Promise<string[]>;
 

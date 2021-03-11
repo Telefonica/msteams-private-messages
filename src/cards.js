@@ -63,7 +63,7 @@ const buttonListCardTemplate = (title, template, values) => {
 }
 
 /**
- * @param {Types.Config} config
+ * @param {Types.Config} param0
  */
 const prepareCards = ({ cards }) => {
   return {
@@ -92,6 +92,5 @@ const prepareCards = ({ cards }) => {
 }
 
 module.exports = {
-  prepareCards,
-  simpleCard
+  prepareCards
 }

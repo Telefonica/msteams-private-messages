@@ -1,7 +1,6 @@
 const { MessageFactory } = require('botbuilder')
 const { TextEncoder } = require('util')
 const { log } = require('../log')
-const { simpleCard } = require('../cards')
 
 const encoder = new TextEncoder()
 
@@ -31,7 +30,7 @@ const createConversationHelper = adapter => {
    * @doc https://docs.microsoft.com/en-us/azure/bot-service/bot-builder-howto-proactive-message?view=azure-bot-service-4.0&tabs=javascript
    *
    * @param {Partial<Types.ConversationReference>} conversationRef
-   * @param {string | Types.ICard} message
+   * @param {string | Partial<Types.Activity>} message
    * @param {boolean} includeMention
    */
   const sendMessage = async (
@@ -48,8 +47,8 @@ const createConversationHelper = adapter => {
           ? appendMentionToMsg(context, message)
           : message
       } else {
-        // TODO: include the option of include mention to card messages (use 'text' property)
-        messageAsActivity = simpleCard(message)
+        // TODO validation?
+        messageAsActivity = message
       }
       try {
         await context.sendActivity(messageAsActivity)
