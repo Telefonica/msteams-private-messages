@@ -1,3 +1,12 @@
+### [0.7.2](https://github.com/Telefonica/msteams-private-messages/compare/v0.7.1...v0.7.2) (2021-03-15)
+
+
+### Internal
+
+* bot-adapter.test.js ([8229faf](https://github.com/Telefonica/msteams-private-messages/commit/8229fafefe25e1cd98b5087c694144a5e57c7548))
+* reading env vars only at index.js ([a8ab5ca](https://github.com/Telefonica/msteams-private-messages/commit/a8ab5caef354a4a222df1a04828785f5bf5bf3a6))
+* storage/index.test.js ([2be1194](https://github.com/Telefonica/msteams-private-messages/commit/2be1194e75ffbbb462a36a84245da81f9da729ae))
+
 ### [0.7.1](https://github.com/Telefonica/msteams-private-messages/compare/v0.7.0...v0.7.1) (2021-03-10)
 
 
