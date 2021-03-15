@@ -132,9 +132,13 @@ const createRestifyServer = ({
   })
 
   return {
-    start: () =>
+    /**
+     * @param {object=} param0
+     * @param {number=} param0.port
+     */
+    start: (opts = { port: 3978 }) =>
       new Promise((resolve, reject) => {
-        server.listen(process.env.PORT || 3978, () => {
+        server.listen(opts.port, () => {
           log.info(`[STARTUP] ${server.name} listening to ${server.url}`)
           resolve()
         })
