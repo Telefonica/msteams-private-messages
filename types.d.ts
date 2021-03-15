@@ -42,8 +42,11 @@ declare namespace Types {
     removeSubscribers: (topic: string) => Promise<boolean>;
   }
 
-  interface BroadcastOpts {
+  interface NotifyOpts {
     includeMention?: boolean;
+  }
+
+  interface BroadcastOpts {
     ensureTopic?: boolean;
   }
 
@@ -60,7 +63,7 @@ declare namespace Types {
     notify: (
       user: string,
       message: string | Partial<Activity>,
-      mention?: boolean
+      opts?: NotifyOpts
     ) => Promise<string>;
 
     /** @return conversationKeys */

@@ -34,20 +34,19 @@ const createHandlers = (adapter, storage, bot) => {
         await bot.run(turnContext)
       }),
 
-    notify: async (user, message, mention) => {
+    notify: async (user, message, opts) => {
       const conversationRef = await storage.getConversation(user)
       if (!conversationRef) {
         throw new NotFoundError(`user not found: '${user}'`)
       }
-      await conversationHelper.sendMessage(conversationRef, message, mention)
+      await conversationHelper.sendMessage(conversationRef, message, opts)
       return conversationRef.conversation.id
     },
 
     broadcast: async (
       topic,
       message,
-      { includeMention, ensureTopic } = {
-        includeMention: false,
+      { ensureTopic } = {
         ensureTopic: false
       }
     ) => {
@@ -64,11 +63,7 @@ const createHandlers = (adapter, storage, bot) => {
           )
         } else {
           conversationKeys.push(conversationRef.conversation.id)
-          conversationHelper.sendMessage(
-            conversationRef,
-            message,
-            includeMention
-          )
+          conversationHelper.sendMessage(conversationRef, message)
         }
       }
       return conversationKeys

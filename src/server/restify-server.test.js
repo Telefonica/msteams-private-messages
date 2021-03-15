@@ -183,7 +183,7 @@ describe('createRestifyServer()', () => {
           expect(mockedHandlers.notify).toHaveBeenCalledWith(
             'jane@megacoorp.com',
             'hi there',
-            false
+            { includeMention: false }
           )
           done()
         }
@@ -207,7 +207,7 @@ describe('createRestifyServer()', () => {
           expect(mockedHandlers.notify).toHaveBeenCalledWith(
             'jane@megacoorp.com',
             'hi there',
-            true
+            { includeMention: true }
           )
           done()
         }
@@ -245,30 +245,14 @@ describe('createRestifyServer()', () => {
           expect(mockedHandlers.broadcast).toHaveBeenCalledWith(
             'orange',
             'orange event',
-            { includeMention: false, ensureTopic: false }
+            { ensureTopic: false }
           )
           done()
         }
       )
     })
 
-    it('[202] routes to broadcast() (considering mention)', done => {
-      client.post(
-        '/api/v1/broadcast',
-        { topic: 'orange', message: 'orange event', mention: true },
-        // @ts-ignore
-        (_, __, res, data) => {
-          expect(mockedHandlers.broadcast).toHaveBeenCalledWith(
-            'orange',
-            'orange event',
-            { includeMention: true, ensureTopic: false }
-          )
-          done()
-        }
-      )
-    })
-
-    it('[202] routes to broadcast() (considering registering topic)', done => {
+    it('[202] routes to broadcast() (considering topic creation)', done => {
       client.post(
         '/api/v1/broadcast',
         { topic: 'orange', message: 'orange event', createTopicIfNotExists: true },
@@ -277,7 +261,7 @@ describe('createRestifyServer()', () => {
           expect(mockedHandlers.broadcast).toHaveBeenCalledWith(
             'orange',
             'orange event',
-            { includeMention: false, ensureTopic: true }
+            { ensureTopic: true }
           )
           done()
         }
