@@ -108,7 +108,9 @@ const createRestifyServer = ({
       return next(err)
     }
     try {
-      const conversationKey = await notify(user, message, includeMention(req))
+      const conversationKey = await notify(user, message, {
+        includeMention: includeMention(req)
+      })
       res.send(202, { conversationKey })
       next()
     } catch (err) {
@@ -123,12 +125,15 @@ const createRestifyServer = ({
       const err = new BadRequestError("required: 'topic', 'message'")
       return next(err)
     }
-    const conversationKeys = await broadcast(topic, message, {
-      includeMention: includeMention(req),
-      ensureTopic: ensureTopic(req)
-    })
-    res.send(202, { conversationKeys })
-    next()
+    try {
+      const conversationKeys = await broadcast(topic, message, {
+        ensureTopic: ensureTopic(req)
+      })
+      res.send(202, { conversationKeys })
+      next()
+    } catch (err) {
+      next(err)
+    }
   })
 
   return {
