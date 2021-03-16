@@ -1,3 +1,16 @@
+## [0.8.0](https://github.com/Telefonica/msteams-private-messages/compare/v0.7.2...v0.8.0) (2021-03-16)
+
+
+### Features
+
+* **api:** /notify & /broadcast accepting RichCards ([ca1b928](https://github.com/Telefonica/msteams-private-messages/commit/ca1b92822b82a152cd3db58b919ccd5f6224ce9e))
+* **bot:** sending incoming 'Activity' (JSON) to SDK ([0ebd074](https://github.com/Telefonica/msteams-private-messages/commit/0ebd0741c4b1b87e085e324f4cf26ade29dc3d4b))
+
+
+### Internal
+
+* new unit test 'cards.test.js' ([d05e10a](https://github.com/Telefonica/msteams-private-messages/commit/d05e10a9e507b9f7dea653ce214f6ec0b90964b1))
+
 ### [0.7.2](https://github.com/Telefonica/msteams-private-messages/compare/v0.7.1...v0.7.2) (2021-03-15)
 
 

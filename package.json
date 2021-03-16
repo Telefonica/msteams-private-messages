@@ -1,6 +1,6 @@
 {
   "name": "msteams-private-messages",
-  "version": "0.7.2",
+  "version": "0.8.0",
   "description": "send private messages to users in MSTeams",
   "main": "index.js",
   "scripts": {
