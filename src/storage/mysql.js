@@ -100,8 +100,29 @@ const registerTopic = async topic =>
   ensureTopic(topic).then(instance => !!instance)
 
 /**
+ * @param {string} topic
+ * @return {Promise<boolean>}
+ */
+const removeTopic = async topic => {
+  log.debug(`[db] removing topic: "${topic}"`)
+  return Topics.destroy({ where: { name: topic } })
+    .then(affectedRows => {
+      if (affectedRows === 1) {
+        log.debug(`[db] removed topic "${topic}"`)
+        return true
+      }
+      log.warn(`[db] unexpected affected rows removing topic "${topic}"`)
+      return false
+    })
+    .catch(err => {
+      log.error(`[db] unable to remove topic "${topic}"`, err)
+      return false
+    })
+}
+
+/**
  * @param {string} user
- * @return {Promise<{userInstance: any, topics: string[]|null}>}
+ * @return {Promise<{userInstance: any, topics: string[]}|null>}
  */
 const getAllUserInfo = async user => {
   log.debug(`[db] reading subscriptions for user "${user}"`)
@@ -155,6 +176,15 @@ const subscribe = async (user, topic) => {
       )
       return false
     })
+}
+
+/**
+ * @param {string} user
+ * @param {string} topic
+ * @return {Promise<boolean>}
+ */
+const cancelSubscription = async (user, topic) => {
+
 }
 
 /**
@@ -268,7 +298,9 @@ const storage = {
   saveConversation,
   getConversation,
   registerTopic,
+  removeTopic,
   subscribe,
+  cancelSubscription,
   getSubscribedTopics,
   getSubscribers,
   listUsers,

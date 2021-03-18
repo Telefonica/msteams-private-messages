@@ -20,9 +20,14 @@ const mockedHandlers = {
     orange: ['jane.doe@megacoorp.com', 'jhon.smith@contractor.com'],
     tangerine: []
   }),
+  removeTopic: jest.fn().mockResolvedValue({
+    banana: ['jane.doe@megacoorp.com'],
+    tangerine: []
+  }),
   forceSubscription: jest
     .fn()
-    .mockResolvedValue(['jane.doe@megacoorp.com', 'jhon.smith@contractor.com'])
+    .mockResolvedValue(['jane.doe@megacoorp.com', 'jhon.smith@contractor.com']),
+  cancelSubscription: jest.fn().mockResolvedValue(['jhon.smith@contractor.com'])
 }
 
 describe('createRestifyServer()', () => {
@@ -104,6 +109,21 @@ describe('createRestifyServer()', () => {
           done()
         }
       )
+    })
+  })
+
+  describe('[DELETE] /api/v1/topics', () => {
+    it('[200] routes to removeTopic()', done => {
+      // @ts-ignore
+      client.del('/api/v1/topics', (_, __, res, data) => {
+        expect(res.statusCode).toEqual(200)
+        expect(data).toEqual({
+          banana: ['jane.doe@megacoorp.com'],
+          tangerine: []
+        })
+        expect(mockedHandlers.removeTopic).toHaveBeenCalledWith('')
+        done()
+      })
     })
   })
 
@@ -255,7 +275,11 @@ describe('createRestifyServer()', () => {
     it('[202] routes to broadcast() (considering topic creation)', done => {
       client.post(
         '/api/v1/broadcast',
-        { topic: 'orange', message: 'orange event', createTopicIfNotExists: true },
+        {
+          topic: 'orange',
+          message: 'orange event',
+          createTopicIfNotExists: true
+        },
         // @ts-ignore
         (_, __, res, data) => {
           expect(mockedHandlers.broadcast).toHaveBeenCalledWith(

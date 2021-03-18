@@ -81,10 +81,26 @@ const createHandlers = (adapter, storage, bot) => {
       return getTopics()
     },
 
+    removeTopic: async topic => {
+      const formerSubscribers = await storage.getSubscribers(topic)
+      const cancelSubscriptionTasks = formerSubscribers.map(user => {
+        return () => storage.cancelSubscription(user, topic)
+      })
+      await Promise.all(cancelSubscriptionTasks)
+      await storage.removeTopic(topic)
+      return getTopics()
+    },
+
     forceSubscription: async (user, topic) => {
       await storage.subscribe(user, topic)
       const subscribers = await storage.getSubscribers(topic)
       return subscribers
+    },
+
+    cancelSubscription: async (user, topic) => {
+      await storage.cancelSubscription(user, topic)
+      const currentSubscribers = await storage.getSubscribers(topic)
+      return currentSubscribers
     }
   }
 }

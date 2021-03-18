@@ -17,7 +17,7 @@ const ensureTopic = req =>
 
 /**
  * restify server in charge of:
- *  - routing to handler functions
+ *  - routing to handler functions (delegating all business-logic)
  *  - logging requests and responses
  *  - extracting input from request (parsing)
  *  - handle HTTP status codes
@@ -31,7 +31,9 @@ const createRestifyServer = ({
   getUsers,
   getTopics,
   createTopic,
-  forceSubscription
+  removeTopic,
+  forceSubscription,
+  cancelSubscription
 }) => {
   const server = restify.createServer({ log })
   server.use(restify.plugins.queryParser())
@@ -51,41 +53,6 @@ const createRestifyServer = ({
 
   server.get('/', (_, res, next) => {
     res.send(log.fields.name)
-    next()
-  })
-
-  server.get('/api/v1/users', async (_, res, next) => {
-    const users = await getUsers()
-    res.send(200, users)
-    next()
-  })
-
-  server.get('/api/v1/topics', async (_, res, next) => {
-    const topics = await getTopics()
-    res.send(200, topics)
-    next()
-  })
-
-  server.post('/api/v1/topics', async (req, res, next) => {
-    const topic = req.body ? req.body.name : undefined
-    if (!topic) {
-      const err = new BadRequestError("required: 'name'")
-      return next(err)
-    }
-    const topics = await createTopic(topic)
-    res.send(200, topics)
-    next()
-  })
-
-  server.put('/api/v1/topics/:topic', async (req, res, next) => {
-    const user = req.body ? req.body.user : undefined
-    if (!user) {
-      const err = new BadRequestError("required: 'user'")
-      return next(err)
-    }
-    const topic = req.params.topic
-    const subscribers = await forceSubscription(user, topic)
-    res.send(200, { subscribers })
     next()
   })
 
@@ -135,6 +102,69 @@ const createRestifyServer = ({
       next(err)
     }
   })
+
+  server.get('/api/v1/admin', (_, res, next) => {
+    const { routes } = server.getDebugInfo()
+    res.send(200, routes)
+  })
+
+  server.get('/api/v1/admin/users', async (_, res, next) => {
+    const users = await getUsers()
+    res.send(200, users)
+    next()
+  })
+
+  server.get('/api/v1/admin/topics', async (_, res, next) => {
+    const topics = await getTopics()
+    res.send(200, topics)
+    next()
+  })
+
+  server.post('/api/v1/admin/topics', async (req, res, next) => {
+    const topic = req.body ? req.body.name : undefined
+    if (!topic) {
+      const err = new BadRequestError("required: 'name'")
+      return next(err)
+    }
+    const topics = await createTopic(topic)
+    res.send(200, topics)
+    next()
+  })
+
+  server.del('/api/v1/topics/:topic', async (req, res, next) => {
+    const topic = req.body ? req.body.name : undefined
+    try {
+      const topics = await removeTopic(topic)
+      res.send(200, topics)
+      next()
+    } catch (err) {
+      next(err)
+    }
+  })
+
+  server.put('/api/v1/topics/:topic/subscribers', async (req, res, next) => {
+    const user = req.body ? req.body.user : undefined
+    if (!user) {
+      const err = new BadRequestError("required: 'user'")
+      return next(err)
+    }
+    const topic = req.params.topic
+    const subscribers = await forceSubscription(user, topic)
+    res.send(200, { subscribers })
+    next()
+  })
+
+  // server.del('/api/v1/topics/:topic', async (req, res, next) => {
+  //   const user = req.body ? req.body.user : undefined
+  //   if (!user) {
+  //     const err = new BadRequestError("required: 'user'")
+  //     return next(err)
+  //   }
+  //   const topic = req.params.topic
+  //   const subscribers = await cancelSubscription(user, topic)
+  //   res.send(200, { subscribers })
+  //   next()
+  // })
 
   return {
     /**

@@ -22,8 +22,12 @@ declare namespace Types {
     /** @return success flag (independently of actual operation - e.g. already existing entry) */
     registerTopic: (topic: string) => Promise<boolean>;
 
+    removeTopic: (topic: string) => Promise<boolean>;
+
     /** @return success flag (independently of actual operation - e.g. already existing entry) */
     subscribe: (user: string, topic: string) => Promise<boolean>;
+
+    cancelSubscription: (user: string, topic: string) => Promise<boolean>;
 
     /** @return null if err */
     getSubscribedTopics: (user: string) => Promise<string[] | null>;
@@ -49,6 +53,8 @@ declare namespace Types {
   interface BroadcastOpts {
     ensureTopic?: boolean;
   }
+
+  type TopicsDictionary = { [topic: string]: string[] };
 
   interface Handlers {
     /* bot-SDK entry point */
@@ -76,14 +82,18 @@ declare namespace Types {
     /* debugging */
 
     getUsers: () => Promise<string[]>;
-    getTopics: () => Promise<{ [topic: string]: string[] }>;
+    getTopics: () => Promise<TopicsDictionary>;
 
     /* ops */
 
     /** @return topics */
-    createTopic: (topic: string) => Promise<{ [topic: string]: string[] }>;
+    createTopic: (topic: string) => Promise<TopicsDictionary>;
+    /** @return topics */
+    removeTopic: (topic: string) => Promise<TopicsDictionary>;
     /** @return subscribers */
     forceSubscription: (user: string, topic: string) => Promise<string[]>;
+    /** @return subscribers */
+    cancelSubscription: (user: string, topic: string) => Promise<string[]>;
   }
 
   interface ICard {
