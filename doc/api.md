@@ -29,13 +29,13 @@ POST /api/v1/notify
 
 ### Parameters
 
-| Name        | Required | Type                       | Description                                |
-| :---------- | :------- | :------------------------- | :----------------------------------------- |
-| **user**    | Required | `string`                   | Name of the recipient for the notification |
-| **message** | Required | `string` or `Activity`(\*) | The notification                           |
-| mention     | Optional | `boolean`                  | Append a mention to the user (@user)       |
+| Name        | Required | Type                                      | Description                                                     |
+| :---------- | :------- | :---------------------------------------- | :-------------------------------------------------------------- |
+| **user**    | Required | `string`                                  | Name of the recipient for the notification                      |
+| **message** | Required | `string` or `Activity` or `RichCard` (\*) | The notification                                                |
+| mention     | Optional | `boolean`                                 | Append a mention to the user (@user) (only for string messages) |
 
-> \*[Activity](https://www.npmjs.com/package/botframework-schema?activeTab=explore): JSON object defined in `botframework`.
+> \* `message` allows 3 formats, [read more](./message-format.md)
 
 ### Response Codes
 
@@ -52,16 +52,6 @@ POST /api/v1/notify
 # 202
 curl -s -H "content-type: application/json"\
  -d '{"user": "jane.doe@megacoorp.com", "message": "hi there"}'\
- localhost:3978/api/v1/notify | jq
-{
-  "conversationKey": "6afb0bc0-6ba7-11eb-98a1-211142846850|livechat"
-}
-```
-
-```bash
-# 202
-curl -s -H "content-type: application/json"\
- -d '{"user": "jane.doe@megacoorp.com", "message": {"text": "this is the text", "title": "this is the title"}}'\
  localhost:3978/api/v1/notify | jq
 {
   "conversationKey": "6afb0bc0-6ba7-11eb-98a1-211142846850|livechat"
@@ -110,18 +100,18 @@ POST /api/v1/broadcast
 
 ### Parameters
 
-| Name                   | Required | Type                       | Description                                                                          |
-| :--------------------- | :------- | :------------------------- | :----------------------------------------------------------------------------------- |
-| **topic**              | Required | `string`                   | Name of the topic: every user subscribed to this topic will receive the notification |
-| **message**            | Required | `string` or `Activity`(\*) | The notification                                                                     |
-| mention                | Optional | `boolean`                  | Append a mention to the user (@user)                                                 |
-| createTopicIfNotExists | Optional | `boolean`                  | Ensure topic is created if wasn't registered on db                                   |
+| Name                   | Required | Type                                      | Description                                                                          |
+| :--------------------- | :------- | :---------------------------------------- | :----------------------------------------------------------------------------------- |
+| **topic**              | Required | `string`                                  | Name of the topic: every user subscribed to this topic will receive the notification |
+| **message**            | Required | `string` or `Activity` or `RichCard` (\*) | The notification                                                                     |
+| mention                | Optional | `boolean`                                 | Append a mention to the user (@user) (only for string messages)                      |
+| createTopicIfNotExists | Optional | `boolean`                                 | Ensure topic is created if wasn't registered on db                                   |
 
-> \*[Activity](https://www.npmjs.com/package/botframework-schema?activeTab=explore): JSON object defined in `botframework`.
+> \* `message` allows 3 formats, [read more](./message-format.md)
 
 ### Response Codes
 
-- **202 Accepted**: multiple notifications have been submitted to Microsoft's endpoint.<br>
+- **202 Accepted**: 1+ notifications have been submitted to Microsoft's endpoint.<br>
   Returns every used `conversationId` for traceability.<br>
   Note: empty list would mean that there are currently no subscribers to the given topic.
 - **400 Bad Request**: request body doesn't fulfill the requirements.<br>
@@ -146,19 +136,7 @@ curl -s -H "content-type: application/json"\
 ```bash
 # 202
 curl -s -H "content-type: application/json"\
- -d '{"topic": "banana", "message": {"text": "this is the text", "title": "this is the title"}}'\
- localhost:3978/api/v1/broadcast | jq
-{
-  "conversationKeys": [
-    "6afb0bc0-6ba7-11eb-98a1-211142846850|livechat"
-  ]
-}
-```
-
-```bash
-# 202
-curl -s -H "content-type: application/json"\
- -d '{"topic": "banana", "message": "hi there", "mention": true}'\
+ -d '{"topic": "banana", "message": "broadcasting to banana subscribers", "mention": true}'\
  localhost:3978/api/v1/broadcast | jq
 {
   "conversationKeys": [
@@ -360,3 +338,4 @@ curl -s -X PUT -H "content-type: application/json"\
 ---
 
 > - [Back to main README](../README.md)
+> - [More about `message` format](./message-format.md)

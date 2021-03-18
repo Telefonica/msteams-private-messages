@@ -38,7 +38,7 @@ We used to have Slack as communication platform. When an event occur in our infr
 
 ### Our solution
 
-![main-diagram](doc/main-diagram.png)
+![main-diagram](doc/img/main-diagram.png)
 
 We've implemented a MSTeams Bot that allows us to interact with users through text and cards while exposing a regular HTTP API.
 
@@ -138,7 +138,7 @@ cards:
 
 This `.yaml` file would render as:
 
-![default-options](doc/default-options.png)
+![default-options](doc/img/default-options.png)
 
 ---
 
@@ -162,14 +162,14 @@ We'll need a few resources from the [Azure portal](https://portal.azure.com/#hom
      ```
      https://{domain}/api/v1/messages
      ```
-     <img src="doc/azure-create-bot-channel.png" height=600 />
+     <img src="doc/img/azure-create-bot-channel.png" height=600 />
 3. Go to the settings of your **Bot Channel Registration**
-   - Select "Settings": <img src="doc/azure-bot-management.png" />
+   - Select "Settings": <img src="doc/img/azure-bot-management.png" />
    - Copy the **Microsoft App ID** value (the one that can't be changed)
-   - Click "Manage", then "Certificate & secrets": <img src="doc/azure-manage-appid.png" height=300 />
+   - Click "Manage", then "Certificate & secrets": <img src="doc/img/azure-manage-appid.png" height=300 />
    - Create a "New client secret" and copy its value (you won't see it again). This will be our **Microsoft App Secret**
 4. Go back to the settings of your **Bot Channel Registration**
-   - Select "Channels": <img src="doc/azure-bot-management2.png" width=250 />
+   - Select "Channels": <img src="doc/img/azure-bot-management2.png" width=250 />
    - Connect to Microsoft Teams channel. It should say "Running" <img src="doc/azure-connect-to-channels.png" />
 
 ### Remote Connection

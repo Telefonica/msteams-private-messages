@@ -45,7 +45,6 @@ docker-compose up -d
    - add "172.17.0.1" to the setting "localhost override" in the Emulator
    - Bot URL would be `http://localhost:3978/api/v1/messages`
    - Leave app id and password empty for local development
-   <p align="center"><img src="doc/open-bot-emulator.png" alt="open-bot-emulator" width="300" /></p>
 
 ![local-bot-emulator](doc/local-bot-emulator.png)
 _Bot Emulator connected to local service_
