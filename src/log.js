@@ -1,8 +1,8 @@
 const Logger = require('bunyan')
-const { name, version } = require('../package.json')
+const { serverInfo } = require('./server-info')
 
 const log = new Logger({
-  name: `${name}@${version}`,
+  name: serverInfo(),
   // @ts-ignore
   level: process.env.LOG_LEVEL || 'info'
 })
