@@ -1,23 +1,26 @@
 # API 🎨
 
+<a id="summary" />
+
 ## Summary
 
-|                                                     | endpoint                     | method | body                                                                                  |
-| :-------------------------------------------------- | :--------------------------- | :----- | :------------------------------------------------------------------------------------ |
-| Server Info                                         | `/`                          | GET    | ---                                                                                   |
-|                                                     |                              |        |                                                                                       |
-| Main endpoints                                      |                              |        |                                                                                       |
-| [Private notification to user](#notify)             | **`/api/v1/notify`**         | POST   | <pre>{<br> user\*,<br> message\*,<br> mention<br>}</pre>                              |
-| [Broadcast notification to subscribers](#broadcast) | **`/api/v1/broadcast`**      | POST   | <pre>{<br> topic\*,<br> message\*,<br> mention,<br> createTopicIfNotExists<br>}</pre> |
-| Bot-SDK entry-point                                 | **`/api/v1/messages`**       | POST   | _used by Bot-SDK_                                                                     |
-|                                                     |                              |        |                                                                                       |
-| Debugging                                           |                              |        |                                                                                       |
-| [List users](#users)                                | **`/api/v1/users`**          | GET    | ---                                                                                   |
-| [List topics & subscribers](#topics)                | **`/api/v1/topics`**         | GET    | ---                                                                                   |
-|                                                     |                              |        |                                                                                       |
-| Manual ops                                          |                              |        |                                                                                       |
-| [Register topic](#create-topic)                     | **`/api/v1/topics`**         | POST   | <pre>{<br> name\*<br>}</pre>                                                          |
-| [Force subscriptions](#subscribe)                   | **`/api/v1/topics/{topic}`** | PUT    | <pre>{<br> user\*<br>}</pre>                                                          |
+|             Group |                                                | method | endpoint                                  |
+| ----------------: | :--------------------------------------------- | :----- | :---------------------------------------- |
+|                   | Server Info                                    | GET    | `/`                                       |
+|  _Main endpoints_ |                                                |        |                                           |
+|                 ├ | [Private message to user](#notify)             | POST   | **`/api/v1/notify`**                      |
+|                 ├ | [Broadcast message to subscribers](#broadcast) | POST   | **`/api/v1/broadcast`**                   |
+|                 └ | [Botframework-SDK entry-point](#botframework)  | POST   | **`/api/v1/messages`**                    |
+| _Admin endpoints_ |                                                |        |                                           |
+|                 ├ | Server Routes                                  | GET    | **`/api/v1/admin`**                       |
+|                 ├ | [User index](#user-index)                      | GET    | **`/api/v1/admin/users`**                 |
+|                 ├ | [User detail](#user-detail)                    | GET    | **`/api/v1/admin/users/{user}`**          |
+|                 ├ | [Topic index](#topic-index)                    | GET    | **`/api/v1/admin/topics`**                |
+|                 ├ | [Topic creation](#create-topic)                | POST   | **`/api/v1/admin/topics`**                |
+|                 ├ | [Topic detail](#topic-detail)                  | GET    | **`/api/v1/admin/topics/{topic}`**        |
+|                 ├ | [Topic subscription](#subscribe)               | PUT    | **`/api/v1/admin/topics/{topic}`**        |
+|                 ├ | [Topic removal](#delete-topic)                 | DELETE | **`/api/v1/admin/topics/{topic}`**        |
+|                 └ | [Topic subscription cancelation](#unsubscribe) | DELETE | **`/api/v1/admin/topics/{topic}/{user}`** |
 
 <a id="notify" />
 
@@ -89,6 +92,8 @@ curl -s -H "content-type: application/json"\
   "message": "user not found: 'bill@unknown.com'"
 }
 ```
+
+> [up](#summary)
 
 <a id="broadcast" />
 
@@ -176,12 +181,29 @@ curl -s -H "content-type: application/json"\
 }
 ```
 
-<a id="users" />
+> [up](#summary)
 
-## List users
+<a id="botframework" />
+
+## Botframework-SDK entry-point
 
 ```
-GET /api/v1/users
+POST /api/v1/messages
+```
+
+> This endpoint will be used by Azure (or the BotEmulator if you're working locally).<br>
+> Does only accept POST method and already includes Microsoft's authentication.
+
+> [up](#summary)
+
+---
+
+<a id="user-index" />
+
+## User index
+
+```
+GET /api/v1/admin/users
 ```
 
 ### Query params
@@ -190,25 +212,27 @@ None
 
 ### Response Codes
 
-- **200 Ok**: nice
+- **200 Ok**: list of user keys
 
 ### Examples
 
 ```bash
 # 200
-curl -s localhost:3978/api/v1/users | jq
+curl -s localhost:3978/api/v1/admin/users | jq
 [
   "jane.doe@megacoorp.com",
   "jhon.smith@contractor.com"
 ]
 ```
 
-<a id="topics" />
+> [up](#summary)
 
-## List topics & subscribers
+<a id="user-detail" />
+
+## User detail
 
 ```
-GET /api/v1/topics
+GET /api/v1/admin/users/{user}
 ```
 
 ### Query params
@@ -217,33 +241,69 @@ None
 
 ### Response Codes
 
-- **200 Ok**: nice
+- **200 Ok**: user instance
+- **404 Not Found**: requested user isn't registered in db.<br>
+  Returns the given key for traceability.
 
 ### Examples
 
 ```bash
 # 200
-curl -s localhost:3978/api/v1/topics | jq
+curl -s localhost:3978/api/v1/admin/users/jane.doe%40megacoorp.com | jq
 {
-  "banana": [
-    "jane.doe@megacoorp.com"
-  ],
-  "apple": [
-    "jhon.smith@contractor.com"
-  ],
-  "orange": [
-    "jane.doe@megacoorp.com",
-    "jhon.smith@contractor.com"
+  "user": "jane.doe@megacoorp.com",
+  "subscriptions": [
+    "orange",
+    "banana"
   ]
 }
 ```
 
-<a id="create-topic" />
+```bash
+# 404
+curl -s localhost:3978/api/v1/admin/users/fake.person%40nowhere.com | jq
+{
+  "code": "NotFound",
+  "message": "user not found: 'fake.person@nowhere.com'"
+}
+```
 
-## Register topic
+<a id="topic-index" />
+
+## Topic index
 
 ```
-POST /api/v1/topics
+GET /api/v1/admin/topics
+```
+
+### Query params
+
+None
+
+### Response Codes
+
+- **200 Ok**: list of topic names
+
+### Examples
+
+```bash
+# 200
+curl -s localhost:3978/api/v1/admin/topics | jq
+[
+  "banana",
+  "apple",
+  "orange"
+]
+```
+
+> [up](#summary)
+
+<a id="create-topic" />
+
+## Topic creation
+
+```
+POST /api/v1/admin/topics
 ```
 
 ### Parameters
@@ -254,8 +314,8 @@ POST /api/v1/topics
 
 ### Response Codes
 
-- **200 Ok**: topic registered (could already exist).<br>
-  Returns the updated list of topics (equivalent to GET request)
+- **200 Ok**: registered topic (could already exist).<br>
+  Returns the topic (equivalent to a GET request)
 - **400 Bad Request**: request body doesn't fulfill the requirements.<br>
   Returns the expected parameter list
 
@@ -267,17 +327,8 @@ curl -s -H "content-type: application/json"\
  -d '{"name": "tangerine"}'\
  localhost:3978/api/v1/topics | jq
 {
-  "banana": [
-    "jane.doe@megacoorp.com"
-  ],
-  "apple": [
-    "jhon.smith@contractor.com"
-  ],
-  "orange": [
-    "jane.doe@megacoorp.com",
-    "jhon.smith@contractor.com"
-  ],
-  "tangerine": []
+  "name": "tangerine",
+  "subscribers": []
 }
 ```
 
@@ -292,12 +343,59 @@ curl -s -H "content-type: application/json"\
 }
 ```
 
-<a id="subscribe" />
+> [up](#summary)
 
-## Force subscription
+<a id="topic-detail" />
+
+## Topic Detail
 
 ```
-PUT /api/v1/topics/{topic}
+GET /api/v1/admin/topic/:topic
+```
+
+### Query params
+
+None
+
+### Response Codes
+
+- **200 Ok**: topic instance.
+- **404 Not Found**: requested topic isn't registered in db.<br>
+  Returns the given name for traceability.
+
+### Examples
+
+```bash
+# 200
+curl -s -H "content-type: application/json"\
+ localhost:3978/api/v1/admin/topics/orange | jq
+{
+  "name": "orange",
+  "subscribers": [
+    "jane.doe@megacoorp.com",
+    "jhon.smith@contractor.com"
+  ]
+}
+```
+
+```bash
+# 404
+curl -s -H "content-type: application/json"\
+ localhost:3978/api/v1/admin/topics/xxx | jq
+{
+  "code": "NotFound",
+  "message": "xxx"
+}
+```
+
+> [up](#summary)
+
+<a id="subscribe" />
+
+## Topic subscription
+
+```
+PUT /api/v1/admin/topics/{topic}
 ```
 
 ### Parameters
@@ -308,9 +406,12 @@ PUT /api/v1/topics/{topic}
 
 ### Response Codes
 
-- **200 Ok**: nice
+- **200 Ok**: nice<br>
+  Returns the `topic` (equivalent to a GET request)
 - **400 BadRequest**: request body doesn't fulfill the requirements.<br>
   Returns the expected parameter list
+- - **404 Not Found**: requested user isn't registered in db.<br>
+    Returns the given user for traceability.
 
 ### Examples
 
@@ -318,8 +419,9 @@ PUT /api/v1/topics/{topic}
 # 200
 curl -s -X PUT -H "content-type: application/json"\
  -d '{"user": "jane.doe@megacoorp.com"}'\
- localhost:3978/api/v1/topics/tangerine | jq
+ localhost:3978/api/v1/admin/topics/tangerine | jq
 {
+  "name": "tangerine",
   "subscribers": ["jane.doe@megacoorp.com"]
 }
 ```
@@ -328,14 +430,87 @@ curl -s -X PUT -H "content-type: application/json"\
 # 400
 curl -s -X PUT -H "content-type: application/json"\
  -d '{}'\
- localhost:3978/api/v1/topics/tangerine | jq
+ localhost:3978/api/v1/admin/topics/tangerine | jq
 {
   "code": "BadRequest",
   "message": "required: 'user'"
 }
 ```
 
+```bash
+# 404
+curl -s -X PUT -H "content-type: application/json"\
+ -d '{"user": "fake.person@nowhere.com"}'\
+ localhost:3978/api/v1/admin/topics/tangerine | jq
+{
+  "code": "NotFound",
+  "message": "user not found: 'fake.person@nowhere.com'"
+}
+```
+
+> [up](#summary)
+
+<a id="delete-topic" />
+
+## Topic removal
+
+```
+
+> [up](#summary)
+
+<a id="unsubscribe" />
+
+## Topic subscription cancelation
+
+```
+
+DELETE /api/v1/admin/topics/{topic}/{user}
+
+````
+
+### Response Codes
+
+- **200 Ok**: nice; independently of actual operation - e.g. the user wasn't subscribed to the given topic in first place.<br>
+  Returns the `topic` (equivalent to a GET request).
+- **400 BadRequest**: request body doesn't fulfill the requirements.<br>
+  Returns the expected parameter list
+- **404 Not Found**: requested user or topic aren't registered in db.<br>
+  Returns the given resource for traceability.
+
+### Examples
+
+```bash
+# 200
+curl -s -X DELETE -H "content-type: application/json"\
+ localhost:3978/api/v1/admin/topics/tangerine/jane.doe%40megacoorp.com | jq
+{
+  "name": "tangerine",
+  "subscribers": []
+}
+````
+
+```bash
+# 404
+curl -s -X DELETE -H "content-type: application/json"\
+ localhost:3978/api/v1/admin/topics/tangerine/fake.person%40nowhere.com | jq
+{
+  "code": "NotFound",
+  "message": "user not found: 'fake.person@nowhere.com'"
+}
+```
+
+```bash
+# 404
+curl -s -X DELETE -H "content-type: application/json"\
+ localhost:3978/api/v1/admin/topics/fake/jane.doe%40megacoorp.com | jq
+{
+  "code": "NotFound",
+  "message": "topic not found: 'fake'"
+}
+```
+
 ---
 
+> - [up](#summary)
 > - [Back to main README](../README.md)
 > - [More about `message` format](./message-format.md)

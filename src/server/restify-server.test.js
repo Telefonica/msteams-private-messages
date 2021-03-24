@@ -11,23 +11,28 @@ const mockedHandlers = {
   getUsers: jest
     .fn()
     .mockResolvedValue(['jane.doe@megacoorp.com', 'jhon.smith@contractor.com']),
-  getTopics: jest.fn().mockResolvedValue({
-    banana: ['jane.doe@megacoorp.com'],
-    orange: ['jane.doe@megacoorp.com', 'jhon.smith@contractor.com']
+  getUser: jest.fn().mockResolvedValue({
+    user: 'jane.doe@megacoorp.com',
+    subscriptions: ['banana', 'orange']
+  }),
+  getTopics: jest.fn().mockResolvedValue(['banana', 'orange']),
+  getTopic: jest.fn().mockResolvedValue({
+    name: 'orange',
+    subscribers: ['jane.doe@megacoorp.com', 'jhon.smith@contractor.com']
   }),
   createTopic: jest.fn().mockResolvedValue({
-    banana: ['jane.doe@megacoorp.com'],
-    orange: ['jane.doe@megacoorp.com', 'jhon.smith@contractor.com'],
-    tangerine: []
+    name: 'tangerine',
+    subscribers: []
   }),
-  removeTopic: jest.fn().mockResolvedValue({
-    banana: ['jane.doe@megacoorp.com'],
-    tangerine: []
+  removeTopic: jest.fn().mockResolvedValue(['banana', 'tangerine']),
+  forceSubscription: jest.fn().mockResolvedValue({
+    name: 'tangerine',
+    subscribers: ['jane.doe@megacoorp.com']
   }),
-  forceSubscription: jest
-    .fn()
-    .mockResolvedValue(['jane.doe@megacoorp.com', 'jhon.smith@contractor.com']),
-  cancelSubscription: jest.fn().mockResolvedValue(['jhon.smith@contractor.com'])
+  cancelSubscription: jest.fn().mockResolvedValue({
+    name: 'orange',
+    subscribers: ['jhon.smith@contractor.com']
+  })
 }
 
 describe('createRestifyServer()', () => {
@@ -46,10 +51,10 @@ describe('createRestifyServer()', () => {
     jest.clearAllMocks()
   })
 
-  describe('[GET] /api/v1/users', () => {
+  describe('[GET] /api/v1/admin/users', () => {
     it('[200] routes to getUsers()', done => {
       // @ts-ignore
-      client.get('/api/v1/users', (_, __, res, data) => {
+      client.get('/api/v1/admin/users', (_, __, res, data) => {
         expect(res.statusCode).toEqual(200)
         expect(data).toEqual([
           'jane.doe@megacoorp.com',
@@ -61,25 +66,45 @@ describe('createRestifyServer()', () => {
     })
   })
 
-  describe('[GET] /api/v1/topics', () => {
-    it('[200] routes to getTopics()', done => {
-      // @ts-ignore
-      client.get('/api/v1/topics', (_, __, res, data) => {
-        expect(res.statusCode).toEqual(200)
-        expect(data).toEqual({
-          banana: ['jane.doe@megacoorp.com'],
-          orange: ['jane.doe@megacoorp.com', 'jhon.smith@contractor.com']
-        })
-        expect(mockedHandlers.getTopics).toHaveBeenCalledWith()
-        done()
-      })
+  describe('[GET] /api/v1/admin/users/{user}', () => {
+    it('[200] routes to getUser()', done => {
+      client.get(
+        '/api/v1/admin/users/jane.doe%40megacoorp.com',
+        // @ts-ignore
+        (_, __, res, data) => {
+          expect(res.statusCode).toEqual(200)
+          expect(data).toEqual({
+            user: 'jane.doe@megacoorp.com',
+            subscriptions: ['banana', 'orange']
+          })
+          expect(mockedHandlers.getUser).toHaveBeenCalledWith(
+            'jane.doe@megacoorp.com'
+          )
+          done()
+        }
+      )
     })
   })
 
-  describe('[POST] /api/v1/topics', () => {
+  describe('[GET] /api/v1/admin/topics', () => {
+    it('[200] routes to getTopics()', done => {
+      client.get(
+        '/api/v1/admin/topics',
+        // @ts-ignore
+        (_, __, res, data) => {
+          expect(res.statusCode).toEqual(200)
+          expect(data).toEqual(['banana', 'orange'])
+          expect(mockedHandlers.getTopics).toHaveBeenCalledWith()
+          done()
+        }
+      )
+    })
+  })
+
+  describe('[POST] /api/v1/admin/topics', () => {
     it("[400] requires 'name'", done => {
       client.post(
-        '/api/v1/topics',
+        '/api/v1/admin/topics',
         {},
         // @ts-ignore
         (_, __, res, data) => {
@@ -95,15 +120,14 @@ describe('createRestifyServer()', () => {
 
     it('[200] routes to createTopic()', done => {
       client.post(
-        '/api/v1/topics',
+        '/api/v1/admin/topics',
         { name: 'tangerine' },
         // @ts-ignore
         (_, __, res, data) => {
           expect(res.statusCode).toEqual(200)
           expect(data).toEqual({
-            banana: ['jane.doe@megacoorp.com'],
-            orange: ['jane.doe@megacoorp.com', 'jhon.smith@contractor.com'],
-            tangerine: []
+            name: 'tangerine',
+            subscribers: []
           })
           expect(mockedHandlers.createTopic).toHaveBeenCalledWith('tangerine')
           done()
@@ -112,25 +136,40 @@ describe('createRestifyServer()', () => {
     })
   })
 
-  describe('[DELETE] /api/v1/topics', () => {
+  describe('[GET] /api/v1/admin/topics/{topic}', () => {
+    it('[200] routes to getTopic()', done => {
+      client.get(
+        '/api/v1/admin/topics/orange',
+        // @ts-ignore
+        (_, __, res, data) => {
+          expect(res.statusCode).toEqual(200)
+          expect(data).toEqual({
+            name: 'orange',
+            subscribers: ['jane.doe@megacoorp.com', 'jhon.smith@contractor.com']
+          })
+          expect(mockedHandlers.getTopic).toHaveBeenCalledWith('orange')
+          done()
+        }
+      )
+    })
+  })
+
+  describe('[DELETE] /api/v1/admin/topics/{topic}', () => {
     it('[200] routes to removeTopic()', done => {
       // @ts-ignore
-      client.del('/api/v1/topics', (_, __, res, data) => {
+      client.del('/api/v1/admin/topics/orange', (_, __, res, data) => {
         expect(res.statusCode).toEqual(200)
-        expect(data).toEqual({
-          banana: ['jane.doe@megacoorp.com'],
-          tangerine: []
-        })
-        expect(mockedHandlers.removeTopic).toHaveBeenCalledWith('')
+        expect(data).toEqual(['banana', 'tangerine'])
+        expect(mockedHandlers.removeTopic).toHaveBeenCalledWith('orange')
         done()
       })
     })
   })
 
-  describe('[PUT] /api/v1/topics/{topic}', () => {
+  describe('[PUT] /api/v1/admin/topics/{topic}', () => {
     it("[400] requires 'user'", done => {
       client.put(
-        '/api/v1/topics/orange',
+        '/api/v1/admin/topics/tangerine',
         {},
         // @ts-ignore
         (_, __, res, data) => {
@@ -146,17 +185,39 @@ describe('createRestifyServer()', () => {
 
     it('[200] routes to forceSubscription()', done => {
       client.put(
-        '/api/v1/topics/banana',
-        { user: 'jhon.smith@contractor.com' },
+        '/api/v1/admin/topics/tangerine',
+        { user: 'jane.doe@megacoorp.com' },
         // @ts-ignore
         (_, __, res, data) => {
           expect(res.statusCode).toEqual(200)
           expect(data).toEqual({
-            subscribers: ['jane.doe@megacoorp.com', 'jhon.smith@contractor.com']
+            name: 'tangerine',
+            subscribers: ['jane.doe@megacoorp.com']
           })
           expect(mockedHandlers.forceSubscription).toHaveBeenCalledWith(
-            'jhon.smith@contractor.com',
-            'banana'
+            'jane.doe@megacoorp.com',
+            'tangerine'
+          )
+          done()
+        }
+      )
+    })
+  })
+
+  describe('[DELETE] /api/v1/admin/topics/{topic}/{user}', () => {
+    it('[200] routes to cancelSubscription()', done => {
+      client.del(
+        '/api/v1/admin/topics/orange/jane.doe%40megacoorp.com',
+        // @ts-ignore
+        (_, __, res, data) => {
+          expect(res.statusCode).toEqual(200)
+          expect(data).toEqual({
+            name: 'orange',
+            subscribers: ['jhon.smith@contractor.com']
+          })
+          expect(mockedHandlers.cancelSubscription).toHaveBeenCalledWith(
+            'jane.doe@megacoorp.com',
+            'orange'
           )
           done()
         }

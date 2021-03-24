@@ -30,7 +30,9 @@ const createRestifyServer = ({
   notify,
   broadcast,
   getUsers,
+  getUser,
   getTopics,
+  getTopic,
   createTopic,
   removeTopic,
   forceSubscription,
@@ -64,13 +66,17 @@ const createRestifyServer = ({
       path: '/api/v1/messages'
     },
     async (req, res, next) => {
-      await processMessage(req, res)
-      /* do not
-       * `res.send(202)`
-       *  -> headers already sent to the client
-       *  -> [ERR_HTTP_HEADERS_SENT] err
-       */
-      next()
+      try {
+        await processMessage(req, res)
+        /* do not
+         * `res.send(202)`
+         *  -> headers already sent to the client
+         *  -> [ERR_HTTP_HEADERS_SENT] err
+         */
+        next()
+      } catch (err) {
+        next(err)
+      }
     }
   )
 
@@ -124,7 +130,7 @@ const createRestifyServer = ({
 
   server.get(
     {
-      name: 'admin root',
+      name: 'server routes',
       path: '/api/v1/admin'
     },
     (_, res, next) => {
@@ -136,36 +142,61 @@ const createRestifyServer = ({
         path
       }))
       res.send(200, response)
+      next()
     }
   )
 
   server.get(
     {
-      name: 'admin: user index',
+      name: 'admin: get user index',
       path: '/api/v1/admin/users'
     },
     async (_, res, next) => {
-      const users = await getUsers()
-      res.send(200, users)
-      next()
+      try {
+        const users = await getUsers()
+        res.send(200, users)
+        next()
+      } catch (err) {
+        next(err)
+      }
     }
   )
 
   server.get(
     {
-      name: 'admin: topic index',
+      name: 'admin: get user detail',
+      path: '/api/v1/admin/users/:user'
+    },
+    async (req, res, next) => {
+      try {
+        const user = await getUser(req.params.user)
+        res.send(200, user)
+        next()
+      } catch (err) {
+        next(err)
+      }
+    }
+  )
+
+  server.get(
+    {
+      name: 'admin: get topic index',
       path: '/api/v1/admin/topics'
     },
     async (_, res, next) => {
-      const topics = await getTopics()
-      res.send(200, topics)
-      next()
+      try {
+        const topics = await getTopics()
+        res.send(200, topics)
+        next()
+      } catch (err) {
+        next(err)
+      }
     }
   )
 
   server.post(
     {
-      name: 'admin: topic creation',
+      name: 'admin: create topic',
       path: '/api/v1/admin/topics'
     },
     async (req, res, next) => {
@@ -174,21 +205,40 @@ const createRestifyServer = ({
         const err = new BadRequestError("required: 'name'")
         return next(err)
       }
-      const topics = await createTopic(topic)
-      res.send(200, topics)
-      next()
+      try {
+        const topics = await createTopic(topic)
+        res.send(200, topics)
+        next()
+      } catch (err) {
+        next(err)
+      }
+    }
+  )
+
+  server.get(
+    {
+      name: 'admin: get topic detail',
+      path: '/api/v1/admin/topics/:topic'
+    },
+    async (req, res, next) => {
+      try {
+        const topic = await getTopic(req.params.topic)
+        res.send(200, topic)
+        next()
+      } catch (err) {
+        next(err)
+      }
     }
   )
 
   server.del(
     {
-      name: 'admin: topic delete',
+      name: 'admin: remove topic',
       path: '/api/v1/admin/topics/:topic'
     },
     async (req, res, next) => {
-      const topic = req.body ? req.body.name : undefined
       try {
-        const topics = await removeTopic(topic)
+        const topics = await removeTopic(req.params.topic)
         res.send(200, topics)
         next()
       } catch (err) {
@@ -200,7 +250,7 @@ const createRestifyServer = ({
   server.put(
     {
       name: 'admin: subscribe to topic',
-      path: '/api/v1/admin/topics/:topic/subscribers'
+      path: '/api/v1/admin/topics/:topic'
     },
     async (req, res, next) => {
       const user = req.body ? req.body.user : undefined
@@ -208,28 +258,29 @@ const createRestifyServer = ({
         const err = new BadRequestError("required: 'user'")
         return next(err)
       }
-      const topic = req.params.topic
-      const subscribers = await forceSubscription(user, topic)
-      res.send(200, { subscribers })
-      next()
+      try {
+        const topic = await forceSubscription(user, req.params.topic)
+        res.send(200, topic)
+        next()
+      } catch (err) {
+        next(err)
+      }
     }
   )
 
   server.del(
     {
-      name: 'admin: unsubscribe from topic',
-      path: '/api/v1/admin/topics/:topic/subscribers'
+      name: 'admin: cancel subscription from topic',
+      path: '/api/v1/admin/topics/:topic/:user'
     },
     async (req, res, next) => {
-      const user = req.body ? req.body.user : undefined
-      if (!user) {
-        const err = new BadRequestError("required: 'user'")
-        return next(err)
+      try {
+        const topic = await cancelSubscription(req.params.user, req.params.topic)
+        res.send(200, topic)
+        next()
+      } catch (err) {
+        next(err)
       }
-      const topic = req.params.topic
-      const subscribers = await cancelSubscription(user, topic)
-      res.send(200, { subscribers })
-      next()
     }
   )
 

@@ -54,16 +54,26 @@ declare namespace Types {
     ensureTopic?: boolean;
   }
 
-  type TopicsDictionary = { [topic: string]: string[] };
+  interface TopicObj {
+    name: string;
+    subscribers: string[];
+  }
+
+  interface UserObj {
+    user: string;
+    subscriptions: string[];
+  }
 
   interface Handlers {
-    /* bot-SDK entry point */
+    // --------------
+    // main methods
+    // --------------
+
+    /** bot-SDK entry point */
     processMessage: (
       req: import("restify").Request,
       res: import("restify").Response
     ) => Promise<void>;
-
-    /* main methods */
 
     /** @return conversationKey */
     notify: (
@@ -79,21 +89,17 @@ declare namespace Types {
       opts?: BroadcastOpts
     ) => Promise<string[]>;
 
-    /* debugging */
-
+    // --------------
+    // admin methods
+    // --------------
     getUsers: () => Promise<string[]>;
-    getTopics: () => Promise<TopicsDictionary>;
-
-    /* ops */
-
-    /** @return topics */
-    createTopic: (topic: string) => Promise<TopicsDictionary>;
-    /** @return topics */
-    removeTopic: (topic: string) => Promise<TopicsDictionary>;
-    /** @return subscribers */
-    forceSubscription: (user: string, topic: string) => Promise<string[]>;
-    /** @return subscribers */
-    cancelSubscription: (user: string, topic: string) => Promise<string[]>;
+    getUser: (user: string) => Promise<UserObj>;
+    getTopics: () => Promise<string[]>;
+    getTopic: (topic: string) => Promise<TopicObj>;
+    createTopic: (topic: string) => Promise<TopicObj>;
+    removeTopic: (topic: string) => Promise<string[]>;
+    forceSubscription: (user: string, topic: string) => Promise<TopicObj>;
+    cancelSubscription: (user: string, topic: string) => Promise<TopicObj>;
   }
 
   interface ICard {

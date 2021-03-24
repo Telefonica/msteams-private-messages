@@ -159,7 +159,11 @@ const getSubscribedTopics = async user =>
 const subscribe = async (user, topic) => {
   log.debug(`[db] subscribing <user-topic>: <${user}, ${topic}>`)
   return getAllUserInfo(user)
-    .then(({ userInstance, topics }) => {
+    .then(userInfo => {
+      if (!userInfo) {
+        return false
+      }
+      const { userInstance, topics } = userInfo
       if (topics.includes(topic)) {
         log.debug(`[db] already subscribed <user-topic> <${user}-${topic}>`)
         return true
@@ -184,7 +188,25 @@ const subscribe = async (user, topic) => {
  * @return {Promise<boolean>}
  */
 const cancelSubscription = async (user, topic) => {
-
+  log.debug(`[db] cancelling subscription <user-topic>: <${user}-${topic}>`)
+  return Users.findOne({
+    where: { user },
+    include: ['subscriptions']
+  })
+    .then(userInstance => {
+      if (!userInstance) {
+        log.debug(`[db] user "${user}" not found`)
+        return false
+      }
+      return ensureTopic(topic).then(topicInstance =>
+        // @ts-ignore
+        userInstance.removeSubscription(topicInstance.id)
+      )
+    })
+    .catch(err => {
+      log.error(`[db] unable to remove subscriptions for user "${user}"`, err)
+      return false
+    })
 }
 
 /**
