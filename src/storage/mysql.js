@@ -213,7 +213,7 @@ const storage = {
 
   listUsers: async () => {
     try {
-      const users = await Users.findAll({})
+      const users = await Users.findAll({ order: [['user', 'ASC']] })
       log.debug(`[db] recovered ${users.length} users`)
       // @ts-ignore
       return users.map(userInstance => userInstance.user)
@@ -225,7 +225,7 @@ const storage = {
 
   listTopics: async () => {
     try {
-      const topics = await Topics.findAll({})
+      const topics = await Topics.findAll({ order: [['name', 'ASC']] })
       log.debug(`[db] recovered ${topics.length} topics`)
       // @ts-ignore
       return topics.map(topic => topic.name)
