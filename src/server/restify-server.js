@@ -247,8 +247,8 @@ const createRestifyServer = ({
     async (req, res, next) => {
       try {
         const topicName = sanitizeStr(req.params.topic)
-        const topicObj = await removeTopic(topicName)
-        res.send(200, topicObj)
+        const topics = await removeTopic(topicName)
+        res.send(200, topics)
         next()
       } catch (err) {
         next(err)

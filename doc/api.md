@@ -455,6 +455,38 @@ curl -s -X PUT -H "content-type: application/json"\
 ## Topic removal
 
 ```
+DELETE /api/v1/admin/topics/{topic}
+```
+
+### Response Codes
+
+- **200 Ok**: nice;<br>
+  Returns the `topic` list (equivalent to a GET index request).
+- **404 Not Found**: requested topic doesn't exist in db.<br>
+  Returns the given topic for traceability.
+
+### Examples
+
+```bash
+# 200
+curl -s -X DELETE -H "content-type: application/json"\
+ localhost:3978/api/v1/admin/topics/tangerine | jq
+[
+  "banana",
+  "apple",
+  "orange"
+]
+```
+
+```bash
+# 404
+curl -s -X DELETE -H "content-type: application/json"\
+ localhost:3978/api/v1/admin/topics/UNKNOWN | jq
+{
+  "code": "NotFound",
+  "message": "topic not found: 'unknown'"
+}
+```
 
 > [up](#summary)
 
@@ -463,17 +495,13 @@ curl -s -X PUT -H "content-type: application/json"\
 ## Topic subscription cancelation
 
 ```
-
 DELETE /api/v1/admin/topics/{topic}/{user}
-
 ````
 
 ### Response Codes
 
 - **200 Ok**: nice; independently of actual operation - e.g. the user wasn't subscribed to the given topic in first place.<br>
   Returns the `topic` (equivalent to a GET request).
-- **400 BadRequest**: request body doesn't fulfill the requirements.<br>
-  Returns the expected parameter list
 - **404 Not Found**: requested user or topic aren't registered in db.<br>
   Returns the given resource for traceability.
 
