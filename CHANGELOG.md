@@ -1,3 +1,25 @@
+## [0.9.0](https://github.com/Telefonica/msteams-private-messages/compare/v0.8.0...v0.9.0) (2021-03-25)
+
+
+### Features
+
+* **api:** list available paths at /api/v1/admin ([8b95e14](https://github.com/Telefonica/msteams-private-messages/commit/8b95e14a3bf0ab060aaefa9dd8e961e71495994d))
+* **api:** overhaul of API endpoints ([7e1d829](https://github.com/Telefonica/msteams-private-messages/commit/7e1d8293bdfbb1f93cef6d01d4703547bc485183))
+* **server:** unsubscribe from topic ([fe5e61b](https://github.com/Telefonica/msteams-private-messages/commit/fe5e61b1074a74a6f9fbabaedb2abd270e927f54))
+
+
+### Bug Fixes
+
+* **api:** sorting user & topic indexes ([cb901cb](https://github.com/Telefonica/msteams-private-messages/commit/cb901cb75f0ffaead02d07ddfc16f490ccb89b1d))
+* **sanitisation:** first approach for input sanitisation ([872a7ac](https://github.com/Telefonica/msteams-private-messages/commit/872a7ac0b4914d8438598f51d374b71aacadcebe))
+
+
+### Internal
+
+* fix Typescript not parsing node_modules (tsconfig) ([9fa8675](https://github.com/Telefonica/msteams-private-messages/commit/9fa8675ed187c47503ac8bd77577c838018317ca))
+* **unit:** new unit test 'mysql.test.js' ([77b7d08](https://github.com/Telefonica/msteams-private-messages/commit/77b7d08b451ae0edbc050d0441d141d0c01fad4a))
+* simplified storage/mysql.js (await vs. then()) ([ac4527b](https://github.com/Telefonica/msteams-private-messages/commit/ac4527b6b9c3601d5ee2742330a49c83f086ae48))
+
 ## [0.8.0](https://github.com/Telefonica/msteams-private-messages/compare/v0.7.2...v0.8.0) (2021-03-16)
 
 
