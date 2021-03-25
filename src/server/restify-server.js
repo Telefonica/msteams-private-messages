@@ -1,7 +1,8 @@
 const restify = require('restify')
 const { BadRequestError } = require('restify-errors')
-const { log } = require('../log')
+const { sanitizeStr } = require('../sanitizers')
 const { serverInfo } = require('../server-info')
+const { log } = require('../log')
 
 /**
  * @param {import('restify').Request} req
@@ -18,9 +19,11 @@ const ensureTopic = req =>
 
 /**
  * restify server in charge of:
+ *
  *  - routing to handler functions (delegating all business-logic)
  *  - logging requests and responses
  *  - extracting input from request (parsing)
+ *  - sanitize user input
  *  - handle HTTP status codes
  *
  * @param {Types.Handlers} param0
@@ -93,7 +96,8 @@ const createRestifyServer = ({
         return next(err)
       }
       try {
-        const conversationKey = await notify(user, message, {
+        const userKey = sanitizeStr(user)
+        const conversationKey = await notify(userKey, message, {
           includeMention: includeMention(req)
         })
         res.send(202, { conversationKey })
@@ -117,7 +121,8 @@ const createRestifyServer = ({
         return next(err)
       }
       try {
-        const conversationKeys = await broadcast(topic, message, {
+        const topicName = sanitizeStr(topic)
+        const conversationKeys = await broadcast(topicName, message, {
           ensureTopic: ensureTopic(req)
         })
         res.send(202, { conversationKeys })
@@ -169,8 +174,9 @@ const createRestifyServer = ({
     },
     async (req, res, next) => {
       try {
-        const user = await getUser(req.params.user)
-        res.send(200, user)
+        const userKey = sanitizeStr(req.params.user)
+        const userObj = await getUser(userKey)
+        res.send(200, userObj)
         next()
       } catch (err) {
         next(err)
@@ -206,8 +212,9 @@ const createRestifyServer = ({
         return next(err)
       }
       try {
-        const topics = await createTopic(topic)
-        res.send(200, topics)
+        const topicName = sanitizeStr(topic)
+        const topicObj = await createTopic(topicName)
+        res.send(200, topicObj)
         next()
       } catch (err) {
         next(err)
@@ -222,8 +229,9 @@ const createRestifyServer = ({
     },
     async (req, res, next) => {
       try {
-        const topic = await getTopic(req.params.topic)
-        res.send(200, topic)
+        const topicName = sanitizeStr(req.params.topic)
+        const topicObj = await getTopic(topicName)
+        res.send(200, topicObj)
         next()
       } catch (err) {
         next(err)
@@ -238,8 +246,9 @@ const createRestifyServer = ({
     },
     async (req, res, next) => {
       try {
-        const topics = await removeTopic(req.params.topic)
-        res.send(200, topics)
+        const topicName = sanitizeStr(req.params.topic)
+        const topicObj = await removeTopic(topicName)
+        res.send(200, topicObj)
         next()
       } catch (err) {
         next(err)
@@ -259,8 +268,10 @@ const createRestifyServer = ({
         return next(err)
       }
       try {
-        const topic = await forceSubscription(user, req.params.topic)
-        res.send(200, topic)
+        const userKey = sanitizeStr(user)
+        const topicName = sanitizeStr(req.params.topic)
+        const topicObj = await forceSubscription(userKey, topicName)
+        res.send(200, topicObj)
         next()
       } catch (err) {
         next(err)
@@ -275,8 +286,10 @@ const createRestifyServer = ({
     },
     async (req, res, next) => {
       try {
-        const topic = await cancelSubscription(req.params.user, req.params.topic)
-        res.send(200, topic)
+        const userKey = sanitizeStr(req.params.user)
+        const topicName = sanitizeStr(req.params.topic)
+        const topicObj = await cancelSubscription(userKey, topicName)
+        res.send(200, topicObj)
         next()
       } catch (err) {
         next(err)
