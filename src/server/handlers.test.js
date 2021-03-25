@@ -6,6 +6,7 @@ const adapter = {
   processActivity: jest.fn()
 }
 const storage = {
+  cancelSubscription: jest.fn().mockResolvedValue(true),
   getConversation: jest.fn().mockResolvedValue(conversationRef),
   getSubscribedTopics: jest.fn().mockResolvedValue(['banana', 'orange']),
   getSubscribers: jest.fn().mockResolvedValue(['jane.doe@megacoorp.com']),
@@ -14,6 +15,9 @@ const storage = {
     .fn()
     .mockResolvedValue(['jane.doe@megacoorp.com', 'jhon.smith@contractor.com']),
   registerTopic: jest.fn().mockResolvedValue(true),
+  removeSubscribers: jest.fn().mockResolvedValue(true),
+  removeTopic: jest.fn().mockResolvedValue(true),
+  resetSubscriptions: jest.fn().mockResolvedValue(true),
   subscribe: jest.fn().mockResolvedValue(true)
 }
 const bot = {
@@ -67,10 +71,6 @@ describe('createHandlers()', () => {
         ensureTopic: true
       })
       expect(storage.registerTopic).toHaveBeenCalledWith('orange')
-      expect(adapter.continueConversation).toHaveBeenCalledWith(
-        conversationRef,
-        expect.any(Function)
-      )
     })
   })
 
@@ -87,10 +87,63 @@ describe('createHandlers()', () => {
   describe('handlers.getTopics()', () => {
     it("returns 'storage' items", async () => {
       const response = await handlers.getTopics()
-      expect(response).toEqual({
-        banana: ['jane.doe@megacoorp.com'],
-        apple: ['jane.doe@megacoorp.com'],
-        orange: ['jane.doe@megacoorp.com']
+      expect(response).toEqual(['banana', 'apple', 'orange'])
+    })
+  })
+
+  describe('handlers.createTopic()', () => {
+    it("calls 'storage.registerTopic()'", async () => {
+      const topic = await handlers.createTopic('tangerine')
+      expect(storage.registerTopic).toHaveBeenCalledWith('tangerine')
+      expect(topic).toEqual({
+        name: 'tangerine',
+        subscribers: ['jane.doe@megacoorp.com']
+      })
+    })
+  })
+
+  describe('handlers.removeTopic()', () => {
+    it("calls 'storage.cancelSubscription()' & 'storage.removeTopic()'", async () => {
+      const response = await handlers.removeTopic('orange')
+      expect(storage.cancelSubscription).toHaveBeenCalledWith(
+        'jane.doe@megacoorp.com', // getSubscribers()
+        'orange'
+      )
+      expect(storage.removeTopic).toHaveBeenCalledWith('orange')
+      expect(response).toEqual(['banana', 'apple', 'orange']) // listTopics()
+    })
+  })
+
+  describe('handlers.forceSubscription()', () => {
+    it("calls 'storage.subscribe()'", async () => {
+      const updatedTopic = await handlers.forceSubscription(
+        'jane.doe@megacoorp.com',
+        'tangerine'
+      )
+      expect(storage.subscribe).toHaveBeenCalledWith(
+        'jane.doe@megacoorp.com',
+        'tangerine'
+      )
+      expect(updatedTopic).toEqual({
+        name: 'tangerine',
+        subscribers: ['jane.doe@megacoorp.com']
+      })
+    })
+  })
+
+  describe('handlers.cancelSubscription()', () => {
+    it("calls 'storage.cancelSubscription()", async () => {
+      const updatedTopic = await handlers.cancelSubscription(
+        'jhon.smith@contractor.com',
+        'banana'
+      )
+      expect(storage.cancelSubscription).toHaveBeenCalledWith(
+        'jhon.smith@contractor.com',
+        'banana'
+      )
+      expect(updatedTopic).toEqual({
+        name: 'banana',
+        subscribers: ['jane.doe@megacoorp.com']
       })
     })
   })

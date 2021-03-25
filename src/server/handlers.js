@@ -3,6 +3,8 @@ const { log } = require('../log')
 const { createConversationHelper } = require('./conversation-helper')
 
 /**
+ * Main Logic;
+ * Connects: botframework - storage - API rest
  *
  * @param {import('botbuilder').BotFrameworkAdapter} adapter
  * @param {Types.Storage} storage
@@ -12,19 +14,13 @@ const { createConversationHelper } = require('./conversation-helper')
 const createHandlers = (adapter, storage, bot) => {
   const conversationHelper = createConversationHelper(adapter)
 
-  const getTopics = async () => {
-    const topicNames = await storage.listTopics()
-    /** @type {{[name: string]: string[]}} */
-    const topics = topicNames.reduce((acc, cur) => {
-      // @ts-ignore
-      acc[cur] = []
-      return acc
-    }, {})
-    for (const topic of topicNames) {
-      const subscribers = await storage.getSubscribers(topic)
-      topics[topic] = topics[topic].concat(subscribers)
+  /** @param {string} topic */
+  const getTopic = async topic => {
+    const subscribers = await storage.getSubscribers(topic)
+    if (subscribers == null) {
+      throw new NotFoundError(`topic not found: '${topic}'`)
     }
-    return topics
+    return { name: topic, subscribers }
   }
 
   return {
@@ -69,22 +65,63 @@ const createHandlers = (adapter, storage, bot) => {
       return conversationKeys
     },
 
-    getTopics,
-
     getUsers: async () => {
       const users = await storage.listUsers()
       return users
     },
 
+    getUser: async user => {
+      const subscriptions = await storage.getSubscribedTopics(user)
+      if (subscriptions == null) {
+        throw new NotFoundError(`user not found: '${user}'`)
+      }
+      return { user, subscriptions }
+    },
+
+    getTopics: async () => {
+      return await storage.listTopics()
+    },
+
+    getTopic,
+
     createTopic: async topic => {
       await storage.registerTopic(topic) // may already exist
-      return getTopics()
+      return getTopic(topic)
+    },
+
+    removeTopic: async topic => {
+      const formerSubscribers = await storage.getSubscribers(topic)
+      if (formerSubscribers == null) {
+        throw new NotFoundError(`topic not found: '${topic}'`)
+      }
+      const cancelSubscriptionTasks = formerSubscribers.map(user => {
+        return () => storage.cancelSubscription(user, topic)
+      })
+      await Promise.all(cancelSubscriptionTasks.map(t => t()))
+      await storage.removeTopic(topic)
+      return await storage.listTopics()
     },
 
     forceSubscription: async (user, topic) => {
+      const subscriptions = await storage.getSubscribedTopics(user)
+      if (subscriptions == null) {
+        throw new NotFoundError(`user not found: '${user}'`)
+      }
       await storage.subscribe(user, topic)
-      const subscribers = await storage.getSubscribers(topic)
-      return subscribers
+      return getTopic(topic)
+    },
+
+    cancelSubscription: async (user, topic) => {
+      const subscriptions = await storage.getSubscribedTopics(user)
+      if (subscriptions == null) {
+        throw new NotFoundError(`user not found: '${user}'`)
+      }
+      const formerSubscribers = await storage.getSubscribers(topic)
+      if (formerSubscribers == null) {
+        throw new NotFoundError(`topic not found: '${topic}'`)
+      }
+      await storage.cancelSubscription(user, topic)
+      return getTopic(topic)
     }
   }
 }

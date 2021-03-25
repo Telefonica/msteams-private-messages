@@ -7,6 +7,7 @@ const {
 } = require('botbuilder')
 const { prepareCards } = require('./cards')
 const { readConfig } = require('./config')
+const { sanitizeStr } = require('./sanitizers')
 const { log } = require('./log')
 
 const USE_EMAIL_AS_KEY = true // FIXME read from .env
@@ -17,7 +18,7 @@ const USE_EMAIL_AS_KEY = true // FIXME read from .env
 const extractInfoFromContext = async context => {
   const conversation = TurnContext.getConversationReference(context.activity)
   log.debug('[bot] conversation: ', conversation)
-  let user = context.activity.from.name
+  let userKey = context.activity.from.name
   if (USE_EMAIL_AS_KEY) {
     try {
       const memeberInfo = await TeamsInfo.getMember(
@@ -25,13 +26,13 @@ const extractInfoFromContext = async context => {
         context.activity.from.id
       )
       /* check if we need .email or .userPrincipalName (seems to be the same) */
-      user = memeberInfo.email
+      userKey = memeberInfo.email
     } catch (err) {
       // we've tried our best, lets keep the username
-      log.warn(err, 'considering username (%s) instead of user.email', user)
+      log.warn(err, 'considering username (%s) instead of user.email', userKey)
     }
   }
-  return { conversation, user }
+  return { conversation, user: sanitizeStr(userKey) }
 }
 
 /**

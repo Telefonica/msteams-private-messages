@@ -1,5 +1,7 @@
 const restify = require('restify')
 const { BadRequestError } = require('restify-errors')
+const { sanitizeStr } = require('../sanitizers')
+const { serverInfo } = require('../server-info')
 const { log } = require('../log')
 
 /**
@@ -17,9 +19,11 @@ const ensureTopic = req =>
 
 /**
  * restify server in charge of:
- *  - routing to handler functions
+ *
+ *  - routing to handler functions (delegating all business-logic)
  *  - logging requests and responses
  *  - extracting input from request (parsing)
+ *  - sanitize user input
  *  - handle HTTP status codes
  *
  * @param {Types.Handlers} param0
@@ -29,9 +33,13 @@ const createRestifyServer = ({
   notify,
   broadcast,
   getUsers,
+  getUser,
   getTopics,
+  getTopic,
   createTopic,
-  forceSubscription
+  removeTopic,
+  forceSubscription,
+  cancelSubscription
 }) => {
   const server = restify.createServer({ log })
   server.use(restify.plugins.queryParser())
@@ -49,92 +57,245 @@ const createRestifyServer = ({
     req.log.info('[<< RESPONSE]', res.toString())
   })
 
-  server.get('/', (_, res, next) => {
-    res.send(log.fields.name)
-    next()
-  })
-
-  server.get('/api/v1/users', async (_, res, next) => {
-    const users = await getUsers()
-    res.send(200, users)
-    next()
-  })
-
-  server.get('/api/v1/topics', async (_, res, next) => {
-    const topics = await getTopics()
-    res.send(200, topics)
-    next()
-  })
-
-  server.post('/api/v1/topics', async (req, res, next) => {
-    const topic = req.body ? req.body.name : undefined
-    if (!topic) {
-      const err = new BadRequestError("required: 'name'")
-      return next(err)
-    }
-    const topics = await createTopic(topic)
-    res.send(200, topics)
-    next()
-  })
-
-  server.put('/api/v1/topics/:topic', async (req, res, next) => {
-    const user = req.body ? req.body.user : undefined
-    if (!user) {
-      const err = new BadRequestError("required: 'user'")
-      return next(err)
-    }
-    const topic = req.params.topic
-    const subscribers = await forceSubscription(user, topic)
-    res.send(200, { subscribers })
+  server.get({ name: 'server info', path: '/' }, (_, res, next) => {
+    res.send(serverInfo())
     next()
   })
 
   /** Resolves 202: Accepted */
-  server.post('/api/v1/messages', async (req, res, next) => {
-    await processMessage(req, res)
-    /* do not
-     * `res.send(202)`
-     *  -> headers already sent to the client
-     *  -> [ERR_HTTP_HEADERS_SENT] err
-     */
-    next()
-  })
+  server.post(
+    {
+      name: 'botframework entrypoint',
+      path: '/api/v1/messages'
+    },
+    async (req, res, next) => {
+      try {
+        await processMessage(req, res)
+        /* do not
+         * `res.send(202)`
+         *  -> headers already sent to the client
+         *  -> [ERR_HTTP_HEADERS_SENT] err
+         */
+        next()
+      } catch (err) {
+        next(err)
+      }
+    }
+  )
 
-  server.post('/api/v1/notify', async (req, res, next) => {
-    const user = req.body ? req.body.user : undefined
-    const message = req.body ? req.body.message : undefined
-    if (!user || !message) {
-      const err = new BadRequestError("required: 'user', 'message'")
-      return next(err)
+  server.post(
+    {
+      name: 'notify',
+      path: '/api/v1/notify'
+    },
+    async (req, res, next) => {
+      const user = req.body ? req.body.user : undefined
+      const message = req.body ? req.body.message : undefined
+      if (!user || !message) {
+        const err = new BadRequestError("required: 'user', 'message'")
+        return next(err)
+      }
+      try {
+        const userKey = sanitizeStr(user)
+        const conversationKey = await notify(userKey, message, {
+          includeMention: includeMention(req)
+        })
+        res.send(202, { conversationKey })
+        next()
+      } catch (err) {
+        next(err)
+      }
     }
-    try {
-      const conversationKey = await notify(user, message, {
-        includeMention: includeMention(req)
-      })
-      res.send(202, { conversationKey })
-      next()
-    } catch (err) {
-      next(err)
-    }
-  })
+  )
 
-  server.post('/api/v1/broadcast', async (req, res, next) => {
-    const topic = req.body ? req.body.topic : undefined
-    const message = req.body ? req.body.message : undefined
-    if (!topic || !message) {
-      const err = new BadRequestError("required: 'topic', 'message'")
-      return next(err)
+  server.post(
+    {
+      name: 'broadcast',
+      path: '/api/v1/broadcast'
+    },
+    async (req, res, next) => {
+      const topic = req.body ? req.body.topic : undefined
+      const message = req.body ? req.body.message : undefined
+      if (!topic || !message) {
+        const err = new BadRequestError("required: 'topic', 'message'")
+        return next(err)
+      }
+      try {
+        const topicName = sanitizeStr(topic)
+        const conversationKeys = await broadcast(topicName, message, {
+          ensureTopic: ensureTopic(req)
+        })
+        res.send(202, { conversationKeys })
+        next()
+      } catch (err) {
+        next(err)
+      }
     }
-    try {
-      const conversationKeys = await broadcast(topic, message, {
-        ensureTopic: ensureTopic(req)
-      })
-      res.send(202, { conversationKeys })
+  )
+
+  server.get(
+    {
+      name: 'server routes',
+      path: '/api/v1/admin'
+    },
+    (_, res, next) => {
+      const { routes } = server.getDebugInfo()
+      // @ts-ignore
+      const response = routes.map(({ name, method, path }) => ({
+        name,
+        method,
+        path
+      }))
+      res.send(200, response)
       next()
-    } catch (err) {
-      next(err)
     }
-  })
+  )
+
+  server.get(
+    {
+      name: 'admin: get user index',
+      path: '/api/v1/admin/users'
+    },
+    async (_, res, next) => {
+      try {
+        const users = await getUsers()
+        res.send(200, users)
+        next()
+      } catch (err) {
+        next(err)
+      }
+    }
+  )
+
+  server.get(
+    {
+      name: 'admin: get user detail',
+      path: '/api/v1/admin/users/:user'
+    },
+    async (req, res, next) => {
+      try {
+        const userKey = sanitizeStr(req.params.user)
+        const userObj = await getUser(userKey)
+        res.send(200, userObj)
+        next()
+      } catch (err) {
+        next(err)
+      }
+    }
+  )
+
+  server.get(
+    {
+      name: 'admin: get topic index',
+      path: '/api/v1/admin/topics'
+    },
+    async (_, res, next) => {
+      try {
+        const topics = await getTopics()
+        res.send(200, topics)
+        next()
+      } catch (err) {
+        next(err)
+      }
+    }
+  )
+
+  server.post(
+    {
+      name: 'admin: create topic',
+      path: '/api/v1/admin/topics'
+    },
+    async (req, res, next) => {
+      const topic = req.body ? req.body.name : undefined
+      if (!topic) {
+        const err = new BadRequestError("required: 'name'")
+        return next(err)
+      }
+      try {
+        const topicName = sanitizeStr(topic)
+        const topicObj = await createTopic(topicName)
+        res.send(200, topicObj)
+        next()
+      } catch (err) {
+        next(err)
+      }
+    }
+  )
+
+  server.get(
+    {
+      name: 'admin: get topic detail',
+      path: '/api/v1/admin/topics/:topic'
+    },
+    async (req, res, next) => {
+      try {
+        const topicName = sanitizeStr(req.params.topic)
+        const topicObj = await getTopic(topicName)
+        res.send(200, topicObj)
+        next()
+      } catch (err) {
+        next(err)
+      }
+    }
+  )
+
+  server.del(
+    {
+      name: 'admin: remove topic',
+      path: '/api/v1/admin/topics/:topic'
+    },
+    async (req, res, next) => {
+      try {
+        const topicName = sanitizeStr(req.params.topic)
+        const topics = await removeTopic(topicName)
+        res.send(200, topics)
+        next()
+      } catch (err) {
+        next(err)
+      }
+    }
+  )
+
+  server.put(
+    {
+      name: 'admin: subscribe to topic',
+      path: '/api/v1/admin/topics/:topic'
+    },
+    async (req, res, next) => {
+      const user = req.body ? req.body.user : undefined
+      if (!user) {
+        const err = new BadRequestError("required: 'user'")
+        return next(err)
+      }
+      try {
+        const userKey = sanitizeStr(user)
+        const topicName = sanitizeStr(req.params.topic)
+        const topicObj = await forceSubscription(userKey, topicName)
+        res.send(200, topicObj)
+        next()
+      } catch (err) {
+        next(err)
+      }
+    }
+  )
+
+  server.del(
+    {
+      name: 'admin: cancel subscription from topic',
+      path: '/api/v1/admin/topics/:topic/:user'
+    },
+    async (req, res, next) => {
+      try {
+        const userKey = sanitizeStr(req.params.user)
+        const topicName = sanitizeStr(req.params.topic)
+        const topicObj = await cancelSubscription(userKey, topicName)
+        res.send(200, topicObj)
+        next()
+      } catch (err) {
+        next(err)
+      }
+    }
+  )
 
   return {
     /**
