@@ -6,8 +6,6 @@ const USE_EMAIL_AS_KEY = true // FIXME read from .env
 
 /** @param {Types.Activity} activity */
 const hasSubmitData = activity =>
-  activity.channelData &&
-  activity.channelData.postBack &&
   activity.value &&
   activity.value.action
 
