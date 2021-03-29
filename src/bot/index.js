@@ -19,13 +19,16 @@ const createBot = storage => {
   /**
    * @param {string} user
    * @param {string} topic
+   * @param {Types.Context} context
    */
-  const toggleSubscription = async (user, topic) => {
+  const toggleSubscription = async (user, topic, context) => {
     const subscribedTopics = await storage.getSubscribedTopics(user)
     if (subscribedTopics.includes(topic)) {
-      await storage.cancelSubscription(user, topic)
+      await context.sendActivity(`Cancelling subscription from ${topic}...`)
+      return storage.cancelSubscription(user, topic)
     } else {
-      await storage.subscribe(user, topic)
+      await context.sendActivity(`Subscribing to ${topic}...`)
+      return storage.subscribe(user, topic)
     }
   }
 
@@ -102,7 +105,7 @@ const createBot = storage => {
     if (text === check) {
       const subscriptionStatus = await getSubscriptionStatus(topics, user)
       const card = cards.topicsCard(
-        'Currently subscribed to...',
+        'Currently subscribed to:',
         subscriptionStatus.filter(item => item.subscribed)
       )
       await context.sendActivity(card)
@@ -115,11 +118,11 @@ const createBot = storage => {
       const card = cards.topicsCard(null, [])
       await context.sendActivity(card)
     } else if (topics.includes(text)) {
-      await toggleSubscription(user, text)
+      await toggleSubscription(user, text, context)
       /* perf: double db call (toggleSubscription already reads db...) */
       const subscriptionStatus = await getSubscriptionStatus(topics, user)
       const card = cards.topicsCard(
-        'Currently subscribed to...',
+        'Currently subscribed to:',
         subscriptionStatus.filter(item => item.subscribed)
       )
       await context.sendActivity(card)
