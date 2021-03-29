@@ -122,10 +122,21 @@ declare namespace Types {
         resetButton: IButton;
         listButton: IButton;
       };
-      topics: {
-        title: string;
-        subscriptionButton: IButton;
-      };
     };
+  }
+
+  interface InfoFromContext {
+    user: string;
+    text: string;
+    selectedTopics?: {
+      subscribeTo: string[];
+      unsubscribeFrom: string[];
+    };
+    conversation: Partial<ConversationReference>;
+  }
+
+  interface SubcriptionStatus {
+    topic: string;
+    subscribed: boolean;
   }
 }

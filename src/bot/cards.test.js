@@ -25,13 +25,6 @@ const config = {
         title: 'list button title',
         value: 'list button value'
       }
-    },
-    topics: {
-      title: 'topics title',
-      subscriptionButton: {
-        title: 'subscription button title: ${topic}',
-        value: 'subscription button value: ${topic}'
-      }
     }
   }
 }
@@ -102,35 +95,6 @@ describe('prepareCards()', () => {
                 }
               ],
               title: 'menu title'
-            }
-          }
-        ]
-      })
-    })
-  })
-
-  describe('topicsCard()', () => {
-    it('returns expected JSON object', () => {
-      const topicsCard = cards.topicsCard(['topic no. 1', 'topic no. 2'])
-      expect(topicsCard).toMatchObject({
-        type: 'message',
-        attachmentLayout: 'list',
-        attachments: [
-          {
-            content: {
-              buttons: [
-                {
-                  title: 'subscription button title: topic no. 1',
-                  value: 'subscription button value: topic no. 1',
-                  type: 'imBack'
-                },
-                {
-                  title: 'subscription button title: topic no. 2',
-                  value: 'subscription button value: topic no. 2',
-                  type: 'imBack'
-                }
-              ],
-              title: 'topics title'
             }
           }
         ]

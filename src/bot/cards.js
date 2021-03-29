@@ -2,21 +2,8 @@
  * @doc https://docs.microsoft.com/en-us/microsoftteams/platform/task-modules-and-cards/cards/cards-actions
  */
 const { CardFactory, MessageFactory, ActionTypes } = require('botbuilder')
-
-/**
- * ```js
- * str = 'My name is ${name}, I am ${age}'
- * obj = {name: 'Jane', age: 23}
- * inject(str, obj)
- * =>
- * 'My name is Jane, I am 23
- * ```
- *
- * @see https://stackoverflow.com/a/55594573/1614677
- * @param {string} str
- * @param {any} obj
- */
-const inject = (str, obj) => str.replace(/\${(.*?)}/g, (x, g) => obj[g])
+const { log } = require('../log')
+const topicListTemplate = require('../../config/topic-list-template.json')
 
 /**
  * @param {import('botbuilder').Attachment} card
@@ -47,18 +34,24 @@ const buttonListCard = (title, buttons) => {
 
 /**
  * @param {string} title
- * @param {Types.IButton} template
- * @param {string[]} values
+ * @param {Types.SubcriptionStatus[]} status
+ * @param {Types.IButton} emptyButton
  */
-const buttonListCardTemplate = (title, template, values) => {
-  const cardActions = values.map(topic => {
-    return {
-      title: inject(template.title, { topic }),
-      value: inject(template.value, { topic }),
-      type: ActionTypes.ImBack
-    }
-  })
-  const card = CardFactory.heroCard(title, null, cardActions)
+const topicsCardBuilder = (title, status, emptyButton) => {
+  if (status.length === 0) {
+    return buttonListCard('Currently subscribed to none', [emptyButton])
+  }
+  const adaptiveCard = JSON.parse(JSON.stringify(topicListTemplate)) // deep copy
+  const toogleItems = status.map(t => ({
+    type: 'Input.Toggle',
+    id: t.topic,
+    title: t.topic,
+    value: t.subscribed.toString()
+  }))
+  adaptiveCard.body[0].items[0].text = title
+  adaptiveCard.body[0].items.push(...toogleItems)
+  log.trace(JSON.stringify(adaptiveCard))
+  const card = CardFactory.adaptiveCard(adaptiveCard)
   return asMessage(card)
 }
 
@@ -75,12 +68,12 @@ const prepareCards = ({ cards }) => {
         cards.menu.listButton,
         cards.menu.resetButton
       ]),
-    topicsCard: (/** @type {string[]} */ topics) =>
-      buttonListCardTemplate(
-        cards.topics.title,
-        cards.topics.subscriptionButton,
-        topics
-      ),
+    /**
+     * @param {string} title
+     * @param {Types.SubcriptionStatus[]} subscriptionStatus
+     */
+    topicsCard: (title, subscriptionStatus) =>
+      topicsCardBuilder(title, subscriptionStatus, cards.menu.listButton),
     registeredKeywords: () => {
       return {
         check: cards.menu.checkButton.value,
