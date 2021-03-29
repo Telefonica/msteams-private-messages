@@ -1,6 +1,6 @@
 const { TeamsInfo, TurnContext } = require('botbuilder')
-const { log } = require('./log')
-const { sanitizeStr } = require('./sanitizers')
+const { log } = require('../log')
+const { sanitizeStr } = require('../sanitizers')
 
 const USE_EMAIL_AS_KEY = true // FIXME read from .env
 

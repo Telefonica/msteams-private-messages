@@ -4,9 +4,9 @@ const {
   teamsGetChannelId
 } = require('botbuilder')
 const { prepareCards } = require('./cards')
-const { readConfig } = require('./config')
 const { extractInfoFromContext } = require('./context-helper')
-const { log } = require('./log')
+const { readConfig } = require('../config')
+const { log } = require('../log')
 
 /**
  * @param {Types.Storage} storage

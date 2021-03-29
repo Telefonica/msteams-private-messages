@@ -2,8 +2,8 @@
  * @doc https://docs.microsoft.com/en-us/microsoftteams/platform/task-modules-and-cards/cards/cards-actions
  */
 const { CardFactory, MessageFactory, ActionTypes } = require('botbuilder')
-const { log } = require('./log')
-const topicListTemplate = require('../config/topic-list-template.json')
+const { log } = require('../log')
+const topicListTemplate = require('../../config/topic-list-template.json')
 
 /**
  * @param {import('botbuilder').Attachment} card
