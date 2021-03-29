@@ -1,3 +1,10 @@
+### [0.10.2](https://github.com/Telefonica/msteams-private-messages/compare/v0.10.1...v0.10.2) (2021-03-29)
+
+
+### Bug Fixes
+
+* **bot:** checking if user has submit data: ignore 'channelData' ([23328ff](https://github.com/Telefonica/msteams-private-messages/commit/23328ffc29fcaab71c716c4a7245736134acaf42))
+
 ### [0.10.1](https://github.com/Telefonica/msteams-private-messages/compare/v0.10.0...v0.10.1) (2021-03-29)
 
 
