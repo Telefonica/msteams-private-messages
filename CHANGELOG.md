@@ -1,3 +1,17 @@
+## [0.10.0](https://github.com/Telefonica/msteams-private-messages/compare/v0.9.0...v0.10.0) (2021-03-29)
+
+
+### Features
+
+* **bot:** (un)subscription via chat sending extra msg ([f0c2613](https://github.com/Telefonica/msteams-private-messages/commit/f0c261372e1e957bb21913d73e5b51b43ae65c83))
+* **bot:** overhaul of (un)subscription cards ([e79f06b](https://github.com/Telefonica/msteams-private-messages/commit/e79f06bf367869e2a47ce2c8afea8c8bbdd4b2e8))
+
+
+### Internal
+
+* create 'src/bot' package ([686798a](https://github.com/Telefonica/msteams-private-messages/commit/686798a199fd24ed98c54f9642cd24a95ea1f54a))
+* reduce log calls ([15d5656](https://github.com/Telefonica/msteams-private-messages/commit/15d5656b74c14bd04bac0bd4dc0cb2407e6d98d2))
+
 ## [0.9.0](https://github.com/Telefonica/msteams-private-messages/compare/v0.8.0...v0.9.0) (2021-03-25)
 
 
