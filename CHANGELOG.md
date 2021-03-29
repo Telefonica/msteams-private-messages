@@ -1,3 +1,10 @@
+### [0.10.1](https://github.com/Telefonica/msteams-private-messages/compare/v0.10.0...v0.10.1) (2021-03-29)
+
+
+### Internal
+
+* extra log.trace() on bot.js ([4397f0a](https://github.com/Telefonica/msteams-private-messages/commit/4397f0a66eb3a9a6afdd0446af8fe5edb35c2166))
+
 ## [0.10.0](https://github.com/Telefonica/msteams-private-messages/compare/v0.9.0...v0.10.0) (2021-03-29)
 
 
