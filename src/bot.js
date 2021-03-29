@@ -1,39 +1,12 @@
 const {
   ActivityHandler,
-  TeamsInfo,
   teamsGetTeamId,
-  teamsGetChannelId,
-  TurnContext
+  teamsGetChannelId
 } = require('botbuilder')
 const { prepareCards } = require('./cards')
 const { readConfig } = require('./config')
-const { sanitizeStr } = require('./sanitizers')
+const { extractInfoFromContext } = require('./context-helper')
 const { log } = require('./log')
-
-const USE_EMAIL_AS_KEY = true // FIXME read from .env
-
-/**
- * @param {Types.Context} context
- */
-const extractInfoFromContext = async context => {
-  const conversation = TurnContext.getConversationReference(context.activity)
-  log.debug('[bot] conversation: ', conversation)
-  let userKey = context.activity.from.name
-  if (USE_EMAIL_AS_KEY) {
-    try {
-      const memeberInfo = await TeamsInfo.getMember(
-        context,
-        context.activity.from.id
-      )
-      /* check if we need .email or .userPrincipalName (seems to be the same) */
-      userKey = memeberInfo.email
-    } catch (err) {
-      // we've tried our best, lets keep the username
-      log.warn(err, 'considering username (%s) instead of user.email', userKey)
-    }
-  }
-  return { conversation, user: sanitizeStr(userKey) }
-}
 
 /**
  * @param {Types.Storage} storage
@@ -42,6 +15,31 @@ const createBot = storage => {
   const bot = new ActivityHandler()
   const config = readConfig()
   const cards = prepareCards(config)
+
+  /**
+   * @param {string} user
+   * @param {string} topic
+   */
+  const toggleSubscription = async (user, topic) => {
+    const subscribedTopics = await storage.getSubscribedTopics(user)
+    if (subscribedTopics.includes(topic)) {
+      await storage.cancelSubscription(user, topic)
+    } else {
+      await storage.subscribe(user, topic)
+    }
+  }
+
+  /**
+   * @param {string[]} topics
+   * @param {string} user
+   */
+  const getSubscriptionStatus = async (topics, user) => {
+    const subscribedTopics = await storage.getSubscribedTopics(user)
+    return topics.map(topic => {
+      const subscribed = subscribedTopics.includes(topic)
+      return { topic, subscribed }
+    })
+  }
 
   /**
    * A party (including the bot) joins or leaves a conversation
@@ -75,37 +73,56 @@ const createBot = storage => {
    */
   bot.onMessage(async (context, next) => {
     log.debug('[bot] onMessage')
+    let {
+      user,
+      conversation,
+      selectedTopics,
+      text
+    } = await extractInfoFromContext(context)
     /* perf: call only db if needed */
-    const { user, conversation } = await extractInfoFromContext(context)
     await storage.saveConversation(user, conversation)
 
-    const { check, reset, list } = cards.registeredKeywords()
+    const { check, list, reset } = cards.registeredKeywords()
     const topics = await storage.listTopics()
-    const text = context.activity.text
+
+    if (selectedTopics) {
+      /* perf: call only db if needed */
+      const subscriptionTasks = selectedTopics.subscribeTo.map(topic => () =>
+        storage.subscribe(user, topic)
+      )
+      /* perf: call only db if needed */
+      const unsubscribeTasks = selectedTopics.unsubscribeFrom.map(topic => () =>
+        storage.cancelSubscription(user, topic)
+      )
+      const tasks = subscriptionTasks.concat(unsubscribeTasks)
+      await Promise.all(tasks.map(t => t()))
+      text = check /* emulate the user did type 'check' */
+    }
 
     if (text === check) {
-      const info = await storage.getSubscribedTopics(user)
-      // TODO: cool card instead
-      await context.sendActivity(
-        `subscribed to ${info.length} topics (${info.toString()})`
+      const subscriptionStatus = await getSubscriptionStatus(topics, user)
+      const card = cards.topicsCard(
+        'Currently subscribed to...',
+        subscriptionStatus.filter(item => item.subscribed)
       )
+      await context.sendActivity(card)
     } else if (text === list) {
-      // TODO: cool card instead
-      await context.sendActivity(cards.topicsCard(topics))
+      const subscriptionStatus = await getSubscriptionStatus(topics, user)
+      const card = cards.topicsCard('Available Topics', subscriptionStatus)
+      await context.sendActivity(card)
     } else if (text === reset) {
       await storage.resetSubscriptions(user)
-      const info = await storage.getSubscribedTopics(user)
-      // TODO: cool card instead
-      await context.sendActivity(
-        `subscribed to ${info.length} topics (${info.toString()})`
+      const card = cards.topicsCard(null, [])
+      await context.sendActivity(card)
+    } else if (topics.includes(text)) {
+      await toggleSubscription(user, text)
+      /* perf: double db call (toggleSubscription already reads db...) */
+      const subscriptionStatus = await getSubscriptionStatus(topics, user)
+      const card = cards.topicsCard(
+        'Currently subscribed to...',
+        subscriptionStatus.filter(item => item.subscribed)
       )
-    } else if (topics.indexOf(text) > -1) {
-      await storage.subscribe(user, text)
-      const info = await storage.getSubscribedTopics(user)
-      // TODO: cool card instead
-      await context.sendActivity(
-        `subscribed to ${info.length} topics (${info.toString()})`
-      )
+      await context.sendActivity(card)
     } else if (text === 'DEBUG') {
       const teamId = await teamsGetTeamId(context.activity)
       log.info('teamId: %s', teamId)

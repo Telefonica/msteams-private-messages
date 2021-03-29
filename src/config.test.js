@@ -25,13 +25,6 @@ const DEFAULT_EXAMPLE_CONFIG = {
         title: 'Reset all my subscribed topics ❌',
         value: 'reset'
       }
-    },
-    topics: {
-      title: 'Available Topics',
-      subscriptionButton: {
-        title: 'Subscribe to ${topic} notifications',
-        value: '${topic}'
-      }
     }
   }
 }
