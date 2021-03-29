@@ -58,6 +58,7 @@ const extractInfoFromContext = async context => {
       log.warn(err, 'considering username (%s) instead of user.email', userKey)
     }
   }
+  log.trace('[bot] activity: ', context.activity)
   let selectedTopics = null
   if (hasSubmitData(context.activity)) {
     if (hasSubmitTopicSelection(context.activity)) {
@@ -70,7 +71,7 @@ const extractInfoFromContext = async context => {
     selectedTopics,
     text: context.activity.text
   }
-  log.trace('[bot] info from context: ', infoFromContext)
+  log.debug('[bot] info from context: ', infoFromContext)
   return infoFromContext
 }
 
