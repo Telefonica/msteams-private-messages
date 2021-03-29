@@ -50,7 +50,7 @@ const topicsCardBuilder = (title, status, emptyButton) => {
   }))
   adaptiveCard.body[0].items[0].text = title
   adaptiveCard.body[0].items.push(...toogleItems)
-  log.debug(JSON.stringify(adaptiveCard))
+  log.trace(JSON.stringify(adaptiveCard))
   const card = CardFactory.adaptiveCard(adaptiveCard)
   return asMessage(card)
 }
