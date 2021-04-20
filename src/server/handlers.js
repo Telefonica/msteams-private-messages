@@ -40,26 +40,36 @@ const createHandlers = (adapter, storage, bot) => {
     },
 
     broadcast: async (
-      topic,
+      topics,
       message,
       { ensureTopic } = {
         ensureTopic: false
       }
     ) => {
-      if (ensureTopic) {
-        await storage.registerTopic(topic) // may already exist
-      }
-      const subscribers = await storage.getSubscribers(topic)
       const conversationKeys = []
-      for (const user of subscribers) {
-        const conversationRef = await storage.getConversation(user)
-        if (!conversationRef) {
-          log.warn(
-            `weird status: user "${user}" seems to be subscribed to "${topic}" but conversationRef not found. SKIPPING.`
-          )
-        } else {
-          conversationKeys.push(conversationRef.conversation.id)
-          conversationHelper.sendMessage(conversationRef, message)
+      /** @type {string[]} */
+      const usersNotified = []
+      for (const topic of topics) {
+        if (ensureTopic) {
+          await storage.registerTopic(topic) // may already exist
+        }
+        const subscribers = await storage.getSubscribers(topic)
+        for (const user of subscribers) {
+          if (usersNotified.includes(user)) {
+            log.debug(`User "${user}" already notified`)
+          } else {
+            const conversationRef = await storage.getConversation(user)
+            if (!conversationRef) {
+              log.warn(
+                `weird status: user "${user}" seems to be subscribed to "${topic}" but conversationRef not found. SKIPPING.`
+              )
+            } else {
+              conversationKeys.push(conversationRef.conversation.id)
+              log.debug(`Broadcast message sent to user: "${user}"`)
+              conversationHelper.sendMessage(conversationRef, message)
+              usersNotified.push(user)
+            }
+          }
         }
       }
       return conversationKeys

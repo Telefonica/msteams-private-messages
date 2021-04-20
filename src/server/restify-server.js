@@ -115,14 +115,19 @@ const createRestifyServer = ({
     },
     async (req, res, next) => {
       const topic = req.body ? req.body.topic : undefined
+      /** @type {string[]} */
+      const topics = req.body ? req.body.topics : undefined
       const message = req.body ? req.body.message : undefined
-      if (!topic || !message) {
-        const err = new BadRequestError("required: 'topic', 'message'")
+      // Just one of the two fields (topic or topics) must be defined
+      if ((!topic && !topics) || (topic && topics) || !message) {
+        const err = new BadRequestError("required: 'topics or topic', 'message'")
         return next(err)
       }
       try {
-        const topicName = sanitizeStr(topic)
-        const conversationKeys = await broadcast(topicName, message, {
+        const topicNames = topic
+          ? [sanitizeStr(topic)]
+          : topics.map(topic => sanitizeStr(topic))
+        const conversationKeys = await broadcast(topicNames, message, {
           ensureTopic: ensureTopic(req)
         })
         res.send(202, { conversationKeys })

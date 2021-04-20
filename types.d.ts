@@ -84,7 +84,7 @@ declare namespace Types {
 
     /** @return conversationKeys */
     broadcast: (
-      topic: string,
+      topics: string[],
       message: string | Partial<Activity>,
       opts?: BroadcastOpts
     ) => Promise<string[]>;

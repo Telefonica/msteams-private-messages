@@ -105,13 +105,15 @@ POST /api/v1/broadcast
 
 ### Parameters
 
-| Name                   | Required | Type                                      | Description                                                                          |
-| :--------------------- | :------- | :---------------------------------------- | :----------------------------------------------------------------------------------- |
-| **topic**              | Required | `string`                                  | Name of the topic: every user subscribed to this topic will receive the notification |
-| **message**            | Required | `string` or `Activity` or `RichCard` (\*) | The notification                                                                     |
-| mention                | Optional | `boolean`                                 | Append a mention to the user (@user) (only for string messages)                      |
-| createTopicIfNotExists | Optional | `boolean`                                 | Ensure topic is created if wasn't registered on db                                   |
+| Name                   | Required   | Type                                      | Description                                                                               |
+| :--------------------- | :--------- | :---------------------------------------- | :---------------------------------------------------------------------------------------- |
+| **topic**              | Optional\* | `string`                                  | Name of the topic: every user subscribed to this topic will receive the notification      |
+| **topics**             | Optional\* | `string[]`                                | List of topics names: every user subscribed to these topics will receive the notification |
+| **message**            | Required   | `string` or `Activity` or `RichCard` (\*) | The notification                                                                          |
+| mention                | Optional   | `boolean`                                 | Append a mention to the user (@user) (only for string messages)                           |
+| createTopicIfNotExists | Optional   | `boolean`                                 | Ensure topic is created if wasn't registered on db                                        |
 
+>
 > \* `message` allows 3 formats, [read more](./message-format.md)
 
 ### Response Codes
