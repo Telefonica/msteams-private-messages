@@ -1,4 +1,4 @@
-const conversationRef = require('../fixtures/conversation-reference.json')
+const conversationRefs = require('../fixtures/conversation-reference.json')
 
 jest.mock('../../db/sequelize/models')
 const { sequelize: db } = require('../../db/sequelize/models')
@@ -36,7 +36,7 @@ const apple = {
 const jane = {
   user: 'jane.doe@megacoorp.com',
   conversationKey: '16123xxxxxxxx',
-  conversationRef,
+  conversationRef: conversationRefs['jane.doe@megacoorp.com'],
   subscriptions: [banana, orange],
   setSubscriptions: jest.fn(),
   removeSubscription: jest.fn(),
@@ -45,7 +45,7 @@ const jane = {
 const jhon = {
   user: 'jhon.smith@contractor.com',
   conversationKey: '16123yyyyyyyy',
-  conversationRef,
+  conversationRef: conversationRefs['john.smith@contractor.com'],
   subscriptions: [orange, apple]
 }
 orange.subscribers = [jane, jhon]
@@ -65,7 +65,7 @@ describe('mysql.storage', () => {
       const conversation = await storage.getConversation(
         'jane.doe@megacoorp.com'
       )
-      expect(conversation).toBe(conversationRef)
+      expect(conversation).toBe(conversationRefs['jane.doe@megacoorp.com'])
       expect(db.models.Users.findOne).toHaveBeenCalledWith({
         where: { user: 'jane.doe@megacoorp.com' }
       })
@@ -74,7 +74,7 @@ describe('mysql.storage', () => {
 
   describe('saveConversation()', () => {
     it('overrides existing conversation reference', async () => {
-      const newConversationRef = { ...conversationRef }
+      const newConversationRef = { ...conversationRefs['jane.doe@megacoorp.com'] }
       newConversationRef.conversation.id = 'NEW CONVERSATION ID'
       db.models.Users.findOrCreate.mockResolvedValue([jane, false])
       jane.save.mockResolvedValue(true)

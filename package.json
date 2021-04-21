@@ -36,6 +36,9 @@
       "email": "manutero.developer@gmail.com"
     }
   ],
+  "jest": {
+    "clearMocks": true
+  },
   "license": "ISC",
   "private": true,
   "engines": {
