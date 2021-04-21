@@ -16,21 +16,25 @@ npm install
 2. write `.env` file; you may start using `.env.template` for local development
 
 ```bash
-cp .env.template .env
+cp .env.template local-development/.env
 ```
 
 3. (OPTIONAL) write `config.yaml` file; you may use `config.example.yaml` as reference.
 
 ```bash
-cp config.example.yaml config.yaml
+cp config.example.yaml local-development/config.yaml
 ```
 
 4. Configure the mysql database
 ```
 cd local-development
 docker-compose up -d
-mysql -h 127.0.0.1 -u root -e "create database msteamsbot;"
-npx sequelize-cli db:migrate
+docker-compose exec mpm-db bash
+# inside container
+--> mysql -h 127.0.0.1 -u root -e "create database msteamsbot;"
+docker-compose exec mpm-server bash
+# inside container
+--> npx sequelize-cli db:migrate
 ```
 
 5. Start the database and server
@@ -48,6 +52,11 @@ docker-compose up -d
 
 ![local-bot-emulator](doc/local-bot-emulator.png)
 _Bot Emulator connected to local service_
+
+6. Once everything is running, you can add into the database some entries for topics by just running:
+   ```bash
+   bash scripts/populate-topics.sh
+   ```
 
 ### Run on Teams app
 
