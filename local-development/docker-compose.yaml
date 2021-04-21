@@ -10,7 +10,9 @@ services:
     volumes:
       - ..:/usr/src/app/
     environment:
+      - STORAGE=mysql
       - MYSQL_HOST=mpm-db
+      - LOG_LEVEL=debug
     depends_on:
       - mpm-db
     ports:
