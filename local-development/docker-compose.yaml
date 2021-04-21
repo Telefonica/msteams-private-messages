@@ -2,11 +2,13 @@ version: "3.3"
 
 services:
   mpm-server:
-    build: .
+    build:
+      context: ../
+      dockerfile: local-development/Dockerfile
     image: lifecycle/msteams-private-messages
     container_name: mpm-server
     volumes:
-      - ${PWD}/..:/usr/src/app/
+      - ..:/usr/src/app/
     environment:
       - MYSQL_HOST=mpm-db
     depends_on:
