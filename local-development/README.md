@@ -55,10 +55,15 @@ docker-compose up -d
 ![local-bot-emulator](doc/local-bot-emulator.png)
 _Bot Emulator connected to local service_
 
-6. Once everything is running, you can add into the database some entries for topics by just running:
-   ```bash
-   bash scripts/populate-topics.sh
-   ```
+6. Once everything is running, you can insert into the database some data:
+    - to add some topics:
+      ```bash
+      bash scripts/populate-topics.sh
+      ```
+    - to add some users and subscriptions (it requires the topics created above):
+      ```bash
+      bash scripts/populate-users-and-subscriptions.sh
+      ```
 
 ### Run on Teams app
 
