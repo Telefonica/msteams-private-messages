@@ -46,9 +46,11 @@ docker-compose up -d
 ### Run on the Emulator
 
 5. Connect to the bot endpoint using Bot Framework Emulator
-   - add "172.17.0.1" to the setting "localhost override" in the Emulator
+   - Add "172.17.0.1" to the setting "localhost override" in the Emulator
    - Bot URL would be `http://localhost:3978/api/v1/messages`
    - Leave app id and password empty for local development
+   - Uncheck "Bypass ngrod for local addresses"
+       - Probably, it requires to press "Restart Conversation - New User ID" in the Live Chat tab.
 
 ![local-bot-emulator](doc/local-bot-emulator.png)
 _Bot Emulator connected to local service_
