@@ -11,6 +11,13 @@ docker-compose exec -T mpm-db mysql -D msteamsbot -e "INSERT INTO \`Users\` (\`i
 echo "Done."
 
 echo ""
+num_topics=$(curl -s -X GET -H "content-type: application/json" localhost:3978/api/v1/admin/topics | jq -r '.|length')
+
+if [ $num_topics -eq 0 ]; then
+    echo "There are no topics in the databse."
+    echo "Run the script scripts/populate-topics.sh to add some topics into the database"
+    exit 1
+fi
 
 echo "Adding some subscriptions for user1 and user2..."
 curl -s -X PUT -H "content-type: application/json" \
