@@ -1,5 +1,5 @@
 const { storage } = require('./memory')
-const conversationRef = require('../fixtures/conversation-reference.json')
+const conversationRefs = require('../fixtures/conversation-reference.json')
 
 describe('memory.storage', () => {
   beforeAll(async () => {
@@ -13,8 +13,8 @@ describe('memory.storage', () => {
      * Just have in mind that test order IS relevant.
      * ------------------------------------------------------------
      */
-    await storage.saveConversation('jane.doe@megacoorp.com', conversationRef)
-    await storage.saveConversation('jhon.smith@contractor.com', conversationRef)
+    await storage.saveConversation('jane.doe@megacoorp.com', conversationRefs['jane.doe@megacoorp.com'])
+    await storage.saveConversation('jhon.smith@contractor.com', conversationRefs['john.smith@contractor.com'])
     await storage.subscribe('jane.doe@megacoorp.com', 'banana')
     await storage.subscribe('jane.doe@megacoorp.com', 'orange')
     await storage.subscribe('jhon.smith@contractor.com', 'orange')
@@ -24,13 +24,13 @@ describe('memory.storage', () => {
   describe('getConversation()', () => {
     it('recovers the conversation reference', async () => {
       const got = await storage.getConversation('jane.doe@megacoorp.com')
-      expect(got).toEqual(conversationRef)
+      expect(got).toEqual(conversationRefs['jane.doe@megacoorp.com'])
     })
   })
 
   describe('saveConversation()', () => {
     it('overrides existing conversation reference', async () => {
-      const newConversationRef = { ...conversationRef, activityId: 'NEW VALUE' }
+      const newConversationRef = { ...conversationRefs['jane.doe@megacoorp.com'], activityId: 'NEW VALUE' }
       await storage.saveConversation(
         'jane.doe@megacoorp.com',
         newConversationRef
@@ -51,10 +51,10 @@ describe('memory.storage', () => {
 
     it('mangages duplicated entries', async () => {
       await Promise.all([
-        storage.saveConversation('jane.doe@megacoorp.com', conversationRef),
-        storage.saveConversation('jane.doe@megacoorp.com', conversationRef),
-        storage.saveConversation('jhon.smith@contractor.com', conversationRef),
-        storage.saveConversation('jane.doe@megacoorp.com', conversationRef)
+        storage.saveConversation('jane.doe@megacoorp.com', conversationRefs['jane.doe@megacoorp.com']),
+        storage.saveConversation('jane.doe@megacoorp.com', conversationRefs['jane.doe@megacoorp.com']),
+        storage.saveConversation('jhon.smith@contractor.com', conversationRefs['john.smith@contractor.com']),
+        storage.saveConversation('jane.doe@megacoorp.com', conversationRefs['jane.doe@megacoorp.com'])
       ])
       const users = await storage.listUsers()
       expect(users).toEqual([

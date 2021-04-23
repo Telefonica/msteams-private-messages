@@ -11,8 +11,8 @@
     "blue-ball": "npm run lint && npm run types && npm test",
     "build-container": "docker build --rm -t docker.tuenti.io/sre/msteamsbot:$npm_package_version .",
     "push-container": "docker push docker.tuenti.io/sre/msteamsbot:$npm_package_version",
-    "prepare-artifact": "docker-compose run builder set-version . $npm_package_version && sed -i '' s/_SERVICE_VERSION_/${npm_package_version}/g publish/docker-compose.yaml",
-    "publish-artifact": "docker-compose run --rm builder publish . && git checkout publish docker-compose.yaml"
+    "prepare-artifact": "docker-compose run --rm builder set-version . $npm_package_version && sed -i.bak -e s/_SERVICE_VERSION_/${npm_package_version}/g publish/docker-compose.yaml && rm publish/docker-compose.yaml.bak; docker-compose down",
+    "publish-artifact": "docker-compose run --rm builder publish . && git checkout . ; docker-compose down"
   },
   "keywords": [
     "Microsoft Teams",
@@ -27,7 +27,7 @@
     "url": "https://github.com/Telefonica/msteams-private-messages/issues"
   },
   "author": {
-    "email": "Lifecycle@telefonica.com",
+    "email": "novum-lifecycle@telefonica.com",
     "name": "Software Lifecycle Team"
   },
   "maintainers": [
@@ -36,6 +36,9 @@
       "email": "manutero.developer@gmail.com"
     }
   ],
+  "jest": {
+    "clearMocks": true
+  },
   "license": "ISC",
   "private": true,
   "engines": {

@@ -1,22 +1,68 @@
 {
-    "activityId": "16123xxxxxxxx",
-    "user": {
-        "id": "29:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-        "name": "Jane Doe",
-        "aadObjectId": "1xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+    "jane.doe@megacoorp.com": {
+        "activityId": "16123xxxxxxxx",
+        "user": {
+            "id": "29:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+            "name": "Jane Doe",
+            "aadObjectId": "1xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+        },
+        "bot": {
+            "id": "28:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+            "name": "Private Notifications Center"
+        },
+        "conversation": {
+            "name": "",
+            "isGroup": false,
+            "conversationType": "personal",
+            "tenantId": "9xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx",
+            "id": "a:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        },
+        "channelId": "msteams",
+        "locale": "en-US",
+        "serviceUrl": "https://smba.trafficmanager.net/emea/"
     },
-    "bot": {
-        "id": "28:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-        "name": "Private Notifications Center"
+    "john.doe@megacoorp.com": {
+        "activityId": "32123xxxxxxxx",
+        "user": {
+            "id": "30:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+            "name": "John Doe",
+            "aadObjectId": "1xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+        },
+        "bot": {
+            "id": "28:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+            "name": "Private Notifications Center"
+        },
+        "conversation": {
+            "name": "",
+            "isGroup": false,
+            "conversationType": "personal",
+            "tenantId": "7xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx",
+            "id": "b:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        },
+        "channelId": "msteams",
+        "locale": "en-US",
+        "serviceUrl": "https://smba.trafficmanager.net/emea/"
     },
-    "conversation": {
-        "name": "",
-        "isGroup": false,
-        "conversationType": "personal",
-        "tenantId": "9xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx",
-        "id": "a:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-    },
-    "channelId": "msteams",
-    "locale": "en-US",
-    "serviceUrl": "https://smba.trafficmanager.net/emea/"
+    "john.smith@contractor.com": {
+        "activityId": "44444xxxxxxxx",
+        "user": {
+            "id": "32:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+            "name": "John Smith",
+            "aadObjectId": "1xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+        },
+        "bot": {
+            "id": "28:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+            "name": "Private Notifications Center"
+        },
+        "conversation": {
+            "name": "",
+            "isGroup": false,
+            "conversationType": "personal",
+            "tenantId": "5xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxx",
+            "id": "c:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        },
+        "channelId": "msteams",
+        "locale": "en-US",
+        "serviceUrl": "https://smba.trafficmanager.net/emea/"
+    }
 }

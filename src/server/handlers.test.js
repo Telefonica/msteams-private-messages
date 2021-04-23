@@ -1,5 +1,5 @@
 const { createHandlers } = require('./handlers')
-const conversationRef = require('../fixtures/conversation-reference.json')
+const conversationRefs = require('../fixtures/conversation-reference.json')
 
 const adapter = {
   continueConversation: jest.fn().mockResolvedValue(),
@@ -7,9 +7,17 @@ const adapter = {
 }
 const storage = {
   cancelSubscription: jest.fn().mockResolvedValue(true),
-  getConversation: jest.fn().mockResolvedValue(conversationRef),
+  getConversation: jest.fn().mockImplementation(/** @param {'jane.doe@megacoorp.com'|'john.doe@megacoorp.com'} user */ user => conversationRefs[user]),
   getSubscribedTopics: jest.fn().mockResolvedValue(['banana', 'orange']),
-  getSubscribers: jest.fn().mockResolvedValue(['jane.doe@megacoorp.com']),
+  getSubscribers: jest.fn().mockImplementation(/** @param {string} topic */ topic => {
+    /** @type {Map<String, string[]>} */
+    const subscribersPerTopic = new Map()
+    subscribersPerTopic.set('orange', ['jane.doe@megacoorp.com'])
+    subscribersPerTopic.set('banana', ['jane.doe@megacoorp.com'])
+    subscribersPerTopic.set('tangerine', ['john.smith@contractor.com'])
+    subscribersPerTopic.set('apple', ['john.doe@megacoorp.com'])
+    return subscribersPerTopic.get(topic)
+  }),
   listTopics: jest.fn().mockResolvedValue(['banana', 'apple', 'orange']),
   listUsers: jest
     .fn()
@@ -42,35 +50,79 @@ describe('createHandlers()', () => {
 
   describe('handlers.notify()', () => {
     it("calls 'adapter.continueConversation()", async () => {
+      const user = 'jane.doe@megacoorp.com'
       const response = await handlers.notify(
-        'jane.doe@megacoorp.com',
+        user,
         'Hi Jane'
       )
       expect(adapter.continueConversation).toHaveBeenCalledWith(
-        conversationRef,
+        conversationRefs[user],
         expect.any(Function)
       )
-      expect(response).toEqual(conversationRef.conversation.id)
+      expect(response).toEqual(conversationRefs[user].conversation.id)
     })
   })
 
   describe('handlers.broadcast()', () => {
     it("calls 'adapter.continueConversation()'", async () => {
+      const user = 'jane.doe@megacoorp.com'
       const response = await handlers.broadcast(
-        'orange',
+        ['orange'],
         'an orange event did occur'
       )
       expect(adapter.continueConversation).toHaveBeenCalledWith(
-        conversationRef,
+        conversationRefs[user],
         expect.any(Function)
       )
-      expect(response).toEqual([conversationRef.conversation.id])
+      expect(response).toEqual([conversationRefs[user].conversation.id])
     })
     it("calls 'storage.registerTopic' depending on opts", async () => {
-      await handlers.broadcast('orange', 'an orange event did occur', {
+      await handlers.broadcast(['orange'], 'an orange event did occur', {
         ensureTopic: true
       })
       expect(storage.registerTopic).toHaveBeenCalledWith('orange')
+    })
+    it("calls 'adapter.continueConversation()' several topics to several users", async () => {
+      const response = await handlers.broadcast(
+        ['orange', 'apple', 'tangerine'],
+        'an orange event did occur'
+      )
+      expect(adapter.continueConversation).toHaveBeenCalledTimes(3)
+      expect(adapter.continueConversation).toHaveBeenNthCalledWith(
+        1,
+        conversationRefs['jane.doe@megacoorp.com'],
+        expect.any(Function)
+      )
+      expect(adapter.continueConversation).toHaveBeenNthCalledWith(
+        2,
+        conversationRefs['john.doe@megacoorp.com'],
+        expect.any(Function)
+      )
+      expect(adapter.continueConversation).toHaveBeenNthCalledWith(
+        3,
+        conversationRefs['john.smith@contractor.com'],
+        expect.any(Function)
+      )
+      expect(response).toEqual([
+        conversationRefs['jane.doe@megacoorp.com'].conversation.id,
+        conversationRefs['john.doe@megacoorp.com'].conversation.id,
+        conversationRefs['john.smith@contractor.com'].conversation.id
+      ])
+    })
+    it("calls 'adapter.continueConversation()' several topics just one user", async () => {
+      const response = await handlers.broadcast(
+        ['orange', 'banana'],
+        'an orange event did occur'
+      )
+      expect(adapter.continueConversation).toHaveBeenCalledTimes(1)
+      expect(adapter.continueConversation).toHaveBeenNthCalledWith(
+        1,
+        conversationRefs['jane.doe@megacoorp.com'],
+        expect.any(Function)
+      )
+      expect(response).toEqual([
+        conversationRefs['jane.doe@megacoorp.com'].conversation.id
+      ])
     })
   })
 
@@ -97,7 +149,7 @@ describe('createHandlers()', () => {
       expect(storage.registerTopic).toHaveBeenCalledWith('tangerine')
       expect(topic).toEqual({
         name: 'tangerine',
-        subscribers: ['jane.doe@megacoorp.com']
+        subscribers: ['john.smith@contractor.com']
       })
     })
   })
@@ -117,16 +169,18 @@ describe('createHandlers()', () => {
   describe('handlers.forceSubscription()', () => {
     it("calls 'storage.subscribe()'", async () => {
       const updatedTopic = await handlers.forceSubscription(
-        'jane.doe@megacoorp.com',
+        'john.smith@contractor.com',
         'tangerine'
       )
       expect(storage.subscribe).toHaveBeenCalledWith(
-        'jane.doe@megacoorp.com',
+        'john.smith@contractor.com',
         'tangerine'
       )
+
+      // updateTopic response is the value returned by the mock
       expect(updatedTopic).toEqual({
         name: 'tangerine',
-        subscribers: ['jane.doe@megacoorp.com']
+        subscribers: ['john.smith@contractor.com']
       })
     })
   })

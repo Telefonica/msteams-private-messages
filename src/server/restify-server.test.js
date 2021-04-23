@@ -306,14 +306,30 @@ describe('createRestifyServer()', () => {
           expect(res.statusCode).toEqual(400)
           expect(data).toEqual({
             code: 'BadRequest',
-            message: "required: 'topic', 'message'"
+            message: "required: 'topics or topic', 'message'"
           })
           done()
         }
       )
     })
 
-    it('[202] routes to broadcast()', done => {
+    it('[400] just topics or topic', done => {
+      client.post(
+        '/api/v1/broadcast',
+        { topic: 'orange', topics: ['banana'], message: 'orange event' },
+        // @ts-ignore
+        (_, __, res, data) => {
+          expect(res.statusCode).toEqual(400)
+          expect(data).toEqual({
+            code: 'BadRequest',
+            message: "required: 'topics or topic', 'message'"
+          })
+          done()
+        }
+      )
+    })
+
+    it('[202] routes to broadcast() using one topic', done => {
       client.post(
         '/api/v1/broadcast',
         { topic: 'orange', message: 'orange event' },
@@ -324,7 +340,27 @@ describe('createRestifyServer()', () => {
             conversationKeys: ['conversation_key_jane', 'conversation_key_jhon']
           })
           expect(mockedHandlers.broadcast).toHaveBeenCalledWith(
-            'orange',
+            ['orange'],
+            'orange event',
+            { ensureTopic: false }
+          )
+          done()
+        }
+      )
+    })
+
+    it('[202] routes to broadcast() using topic list', done => {
+      client.post(
+        '/api/v1/broadcast',
+        { topics: ['orange', 'banana'], message: 'orange event' },
+        // @ts-ignore
+        (_, __, res, data) => {
+          expect(res.statusCode).toEqual(202)
+          expect(data).toEqual({
+            conversationKeys: ['conversation_key_jane', 'conversation_key_jhon']
+          })
+          expect(mockedHandlers.broadcast).toHaveBeenCalledWith(
+            ['orange', 'banana'],
             'orange event',
             { ensureTopic: false }
           )
@@ -344,7 +380,7 @@ describe('createRestifyServer()', () => {
         // @ts-ignore
         (_, __, res, data) => {
           expect(mockedHandlers.broadcast).toHaveBeenCalledWith(
-            'orange',
+            ['orange'],
             'orange event',
             { ensureTopic: true }
           )
