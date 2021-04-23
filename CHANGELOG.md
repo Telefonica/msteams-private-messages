@@ -1,3 +1,22 @@
+## [0.11.0](https://github.com/Telefonica/msteams-private-messages/compare/v0.10.2...v0.11.0) (2021-04-23)
+
+
+### Features
+
+* add support for topics ([af6cb5a](https://github.com/Telefonica/msteams-private-messages/commit/af6cb5a5259393bb8958f52528ff5e1b1aa11c96))
+
+
+### Internal
+
+* add check about topics in populate-users-and-subscriptions.sh script ([04c2e2f](https://github.com/Telefonica/msteams-private-messages/commit/04c2e2ff45e33b8829e057540a42e8d0e777525f))
+* revert set version for rc ([d66a6f1](https://github.com/Telefonica/msteams-private-messages/commit/d66a6f1852df8ec11eab6df3b360001a52a2ee8a))
+* set artifact commands compatible with Linux and Mac ([2bd43a6](https://github.com/Telefonica/msteams-private-messages/commit/2bd43a673a7f0ae54b147f5f9fbb41f5613d926e))
+* set version for rc ([feb876d](https://github.com/Telefonica/msteams-private-messages/commit/feb876d18d1679f782fcff0cb2ef819221766a86))
+* update docker and docker-compose files ([84e71f1](https://github.com/Telefonica/msteams-private-messages/commit/84e71f143f3e3c7beb0807e88952408af8a024ae))
+* update modules in package-lock.json ([b607b69](https://github.com/Telefonica/msteams-private-messages/commit/b607b692f4f4c3f27378c3c62a3396c4a19eff5d))
+* update scripts to set an initial database for some basic testing ([3c9f9ee](https://github.com/Telefonica/msteams-private-messages/commit/3c9f9eec36a6cae7333766ea4984c4c81d5afe69))
+* update tests ([d86251b](https://github.com/Telefonica/msteams-private-messages/commit/d86251bc05ee9badd4e2287545e549a7582a449e))
+
 ### [0.10.2](https://github.com/Telefonica/msteams-private-messages/compare/v0.10.1...v0.10.2) (2021-03-29)
 
 
