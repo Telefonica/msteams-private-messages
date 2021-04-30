@@ -1,6 +1,6 @@
 {
   "name": "msteams-private-messages",
-  "version": "0.11.0",
+  "version": "1.0.0",
   "description": "send private messages to users in MSTeams",
   "main": "index.js",
   "scripts": {
@@ -39,7 +39,7 @@
   "jest": {
     "clearMocks": true
   },
-  "license": "ISC",
+  "license": "Apache-2.0",
   "private": true,
   "engines": {
     "node": ">=14"

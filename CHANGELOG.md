@@ -196,14 +196,14 @@
 * minor tuning at API handlers (index.js)
 * db log down to trace() level
 
-# [0.6.0](https://github.com/Telefonica/msteams-private-messages/compare/v0.5.0...v0.6.0) (2021-02-15)
+## [0.6.0](https://github.com/Telefonica/msteams-private-messages/compare/v0.5.0...v0.6.0) (2021-02-15)
 
 
 ### Features
 
 * MySQL storage ([#1](https://github.com/Telefonica/msteams-private-messages/issues/1)) ([9e13945](https://github.com/Telefonica/msteams-private-messages/commit/9e13945db7c66bac8696531ce77e9e46fbb9632b))
 
-# [0.5.0](https://github.com/Telefonica/msteams-private-messages/compare/v0.4.0...v0.5.0) (2021-02-09)
+## [0.5.0](https://github.com/Telefonica/msteams-private-messages/compare/v0.4.0...v0.5.0) (2021-02-09)
 
 
 ### Bug Fixes
@@ -215,21 +215,21 @@
 
 * dockerfile ([453f282](https://github.com/Telefonica/msteams-private-messages/commit/453f282140e98cc0d9174207015be100b1c34a62))
 
-# [0.4.0](https://github.com/Telefonica/msteams-private-messages/compare/v0.3.0...v0.4.0) (2021-02-08)
+## [0.4.0](https://github.com/Telefonica/msteams-private-messages/compare/v0.3.0...v0.4.0) (2021-02-08)
 
 
 ### Features
 
 * considering "user" instead of user name ([e65941f](https://github.com/Telefonica/msteams-private-messages/commit/e65941fe9538fab1966a2b2748e3ec5b25c0e631))
 
-# [0.3.0](https://github.com/Telefonica/msteams-private-messages/compare/v0.2.0...v0.3.0) (2021-02-03)
+## [0.3.0](https://github.com/Telefonica/msteams-private-messages/compare/v0.2.0...v0.3.0) (2021-02-03)
 
 
 ### Features
 
 * 2x debugging API endpoints (/usernames & /topics) ([4a991b5](https://github.com/Telefonica/msteams-private-messages/commit/4a991b5a371bbaeebbdfe139825ad4e68e745bb4))
 
-# [0.2.0](https://github.com/Telefonica/msteams-private-messages/compare/v0.1.1...v0.2.0) (2021-02-02)
+## [0.2.0](https://github.com/Telefonica/msteams-private-messages/compare/v0.1.1...v0.2.0) (2021-02-02)
 
 
 ### Features
